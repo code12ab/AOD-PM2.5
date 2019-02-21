@@ -1,0 +1,13 @@
+cd Desktop
+cd MODIS
+cd 相关程序
+python MODIS_download.py -s https://ladsweb.modaps.eosdis.nasa.gov/archive/orders/501301319/  -d F:\MODIS\modis08_m3_T  -t 0199091A-1D26-11E9-A7F5-C3B17C49A85D
+
+.143.014.55.409/archive/orders/501301319/
+
+
+备注：
+1.更换orders
+2.更换储存位置
+3.京津冀鲁坐标：114.0-123.0; 34.0-42.0
+
