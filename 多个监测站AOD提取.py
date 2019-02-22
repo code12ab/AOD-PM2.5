@@ -29,9 +29,9 @@ def geo_distance(lng1, lat1, lng2, lat2):
 
 # 参数设置
 r = 7500   # 参照文献;经纬度转换为的距离范围,监测站3KM半径范围内为观测区域
-file_path = "F:\\MODIS\\modis04_3km_T\\"  # HDF文件位置 TTT
-output_file_path = "C:\\Users\\Administrator\\Desktop\\气溶胶光学厚度\\"  # 结果的输出位置
-JCZ_file = pd.read_excel("C:\\Users\\Administrator\\Desktop\\MODIS\\坐标\\监测站坐标.xlsx")
+file_path = "F:\\MODIS DATA\\modis04_3km_T_2018\\"  # HDF文件位置 TTT
+output_file_path = "F:\\毕业论文程序\\MODIS\\气溶胶光学厚度\\"  # 结果的输出位置
+JCZ_file = pd.read_excel("F:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx")
 
 JCZ = []
 # 批量导入监测站

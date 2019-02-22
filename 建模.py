@@ -49,9 +49,9 @@ from sklearn.linear_model import Ridge, RidgeCV
 
 
 # 读取数据
-input_AOD = "G:\\硕士\\论文\\正在写的论文\\毕业论文之MODIS04_3KM_AOD\\AOD结果_python方式\\2018Terra_北京\\北京-顺义新城.xlsx"
-input_sky = "C:\\Users\\Administrator\\Desktop\\气象数据\\整理\\北京-顺义新城_Terra.xlsx"
-input_PM = "C:\\Users\\Administrator\\Desktop\\污染物浓度\\整理\\Terra\\北京-顺义新城.xlsx"
+input_AOD = "F:\\毕业论文程序\\气溶胶光学厚度\\Aqua\\北京-顺义新城.xlsx"
+input_sky = "F:\\毕业论文程序\\气象数据\\整理\\Aqua\\北京-顺义新城.xlsx"
+input_PM = "F:\\毕业论文程序\\污染物浓度\\整理\\Aqua\\北京-顺义新城.xlsx"
 data_PM = pd.read_excel(input_PM, index_col="日期")
 data_aod = pd.read_excel(input_AOD, index_col="日期")
 data_sky = pd.read_excel(input_sky, index_col='日期')
@@ -66,7 +66,7 @@ indexs = list(data[np.isnan(data['AOD值'])].index)  # 获取AOD值为空的数�
 data = data.drop(indexs)  # 删除
 # 删除PM2.5为空的数据
 data = data[data["PM2.5浓度"] > 0]
-data.to_excel("C:\\Users\\Administrator\\Desktop\\data_bj_02.xlsx")
+data.to_excel("C:\\Users\\Administrator\\Desktop\\data_bj.xlsx")
 # 删除部分自变量
 data = data.drop(["windGust", "apparentTemperature", ], axis=1)
 # print(data[["windBearing", "windSpeed"]])
@@ -163,10 +163,6 @@ print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))  # 获�
 # clf = svm.SVC(kernel='linear', C=1).fit(x_train, y_train)
 # print('准确率：', clf.score(x_test, y_test))  # 计算测试集的度量值（准确率）
 '''
-
-
-
-
 
 
 

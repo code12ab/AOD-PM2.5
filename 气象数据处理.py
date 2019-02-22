@@ -3,13 +3,14 @@
 # 作者：xcl
 # 工具：PyCharm
 # 版本：1.0
+
 import pandas as pd
 import datetime
 from datetime import datetime as dt
-import time
-input_path = "C:\\Users\\Administrator\\Desktop\\北京-顺义新城.xlsx"
-output_path = "C:\\Users\\Administrator\\Desktop\\气象数据\\整理\\"
-file_name = input_path.replace("C:\\Users\\Administrator\\Desktop\\", "").replace(".xlsx", "")
+# import time
+input_path = "F:\\毕业论文程序\\气象数据\\数据\\北京-顺义新城.xlsx"
+output_path = "F:\\毕业论文程序\\气象数据\\整理\\"
+file_name = input_path.replace("F:\\毕业论文程序\\气象数据\\数据\\", "").replace(".xlsx", "")
 
 data = pd.read_excel(input_path)
 data["Index"] = data["time"]

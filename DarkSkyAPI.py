@@ -17,10 +17,10 @@ pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显
 # 参数设置
 year_days = 365  # 365
 date_start = 2018000
-API_KEY = "1875a6cd9baea3db91c31aa29bfa5638"
-coordinate_file_path = "C:\\Users\\Administrator\\Desktop\\MODIS\\坐标\\"
-output_file_path = "C:\\Users\\Administrator\\Desktop\\气象数据\\数据\\"  # 气象数据输出路径
-error_information_path = "C:\\Users\\Administrator\\Desktop\\气象数据\\报错\\"  # 报错信息输出路径
+API_KEY = "ed7de1f3687f4c53316538a0ce968752"
+coordinate_file_path = "F:\\毕业论文程序\\MODIS\\坐标\\"
+output_file_path = "F:\\毕业论文程序\\气象数据\\数据\\"  # 气象数据输出路径
+error_information_path = "F:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
 time_out = 30  # 超时设置,10秒太短
 
 # 批量导入监测站坐标
