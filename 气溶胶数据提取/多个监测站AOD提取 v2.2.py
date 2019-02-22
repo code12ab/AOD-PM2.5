@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # 时间    : 2019/1/17 15:06
 # 作者    : xcl
-# 版本    ：v2.1
+# 版本    ：v2.2
 import warnings
 from math import radians, cos, sin, asin, sqrt  # 经纬度计算距离
 import pandas as pd  # BDS

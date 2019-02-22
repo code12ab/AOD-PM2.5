@@ -52,6 +52,8 @@ from sklearn.linear_model import Ridge, RidgeCV
 input_AOD = "F:\\毕业论文程序\\气溶胶光学厚度\\Aqua\\北京-顺义新城.xlsx"
 input_sky = "F:\\毕业论文程序\\气象数据\\整理\\Aqua\\北京-顺义新城.xlsx"
 input_PM = "F:\\毕业论文程序\\污染物浓度\\整理\\Aqua\\北京-顺义新城.xlsx"
+output_name = input_AOD.replace("F:\\毕业论文程序\\气溶胶光学厚度\\Aqua\\", "")
+output_name = output_name.replace(".xlsx", "")
 data_PM = pd.read_excel(input_PM, index_col="日期")
 data_aod = pd.read_excel(input_AOD, index_col="日期")
 data_sky = pd.read_excel(input_sky, index_col='日期')
@@ -66,7 +68,7 @@ indexs = list(data[np.isnan(data['AOD值'])].index)  # 获取AOD值为空的数�
 data = data.drop(indexs)  # 删除
 # 删除PM2.5为空的数据
 data = data[data["PM2.5浓度"] > 0]
-data.to_excel("C:\\Users\\Administrator\\Desktop\\data_bj.xlsx")
+data.to_excel("F:\\毕业论文程序\\整合数据\\%s .xlsx" % output_name)
 # 删除部分自变量
 data = data.drop(["windGust", "apparentTemperature", ], axis=1)
 # print(data[["windBearing", "windSpeed"]])
