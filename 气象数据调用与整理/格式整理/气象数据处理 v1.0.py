@@ -8,9 +8,10 @@ import pandas as pd
 import datetime
 from datetime import datetime as dt
 
-input_path = "C:\\Users\\寻常鹿\\Desktop\\北京-顺义新城.xlsx"
-output_path = "C:\\Users\\寻常鹿\\Desktop\\气象数据\\整理\\"
-file_name = input_path.replace("C:\\Users\\寻常鹿\\Desktop\\", "").replace(".xlsx", "")
+DarkSky_file_name = "北京-奥体中心.xlsx"
+input_path = "F:\\毕业论文程序\\气象数据\\数据\\"+DarkSky_file_name
+output_path = "F:\\毕业论文程序\\气象数据\\整理\\"
+file_name = input_path.replace("F:\\毕业论文程序\\气象数据\\数据\\", "").replace(".xlsx", "")
 
 data = pd.read_excel(input_path)
 data["Index"] = data["time"]
@@ -24,7 +25,7 @@ for key in data.columns:
 for key in data.columns:
     data["%s" % key] = data["%s" % key].fillna(method='ffill')
 '''
-data["date_only"] = data["time"].dt.date  # 新建日期列
+data["日期"] = data["time"].dt.date  # 新建日期列
 data["time_only"] = data["time"].dt.time  # 时间列只保留时间
 # print(data.head())
 
@@ -58,17 +59,17 @@ print(len(loc_list))
 # 筛选10:00到14:00之间的数据,用于Aqua-Terra,12时数据
 data_combine = data[(data["time_only"] <= index_time[4]) & (data["time_only"] >= index_time[0])]
 # print(data_combine.head(5))
-data_combine = data_combine.groupby("date_only").mean()
-data_combine.to_excel(output_path+"%s_combine.xlsx" % file_name)
+data_combine = data_combine.groupby("日期").mean()
+data_combine.to_excel(output_path+"combine\\%s.xlsx" % file_name)
 
 # 筛选10:00到11:00之间的数据,用于Terra,10:30时数据,上午过境
 data_Terra = data[(data["time_only"] <= index_time[1]) & (data["time_only"] >= index_time[0])]
 # print(data_Terra.head(5))
-data_Terra = data_Terra.groupby("date_only").mean()
-data_Terra.to_excel(output_path+"%s_Terra.xlsx" % file_name)
+data_Terra = data_Terra.groupby("日期").mean()
+data_Terra.to_excel(output_path+"Terra\\%s.xlsx" % file_name)
 
 # 筛选13:00到14:00之间的数据,用于Aqua,13:30时数据,下午过境
 data_Aqua = data[(data["time_only"] <= index_time[4]) & (data["time_only"] >= index_time[3])]
 # print(data_Aqua.head(5))
-data_Aqua = data_Aqua.groupby("date_only").mean()
-data_Aqua.to_excel(output_path+"%s_Aqua.xlsx" % file_name)
+data_Aqua = data_Aqua.groupby("日期").mean()
+data_Aqua.to_excel(output_path+"Aqua\\%s.xlsx" % file_name)

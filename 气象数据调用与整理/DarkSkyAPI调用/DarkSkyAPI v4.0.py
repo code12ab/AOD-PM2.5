@@ -17,7 +17,7 @@ pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显
 # 参数设置
 year_days = 365  # 365
 date_start = 2018000
-API_KEY = "ed7de1f3687f4c53316538a0ce968752"
+API_KEY = "a5fc93a6781f6d55e7899ae443acd876"
 coordinate_file_path = "F:\\毕业论文程序\\MODIS\\坐标\\"
 output_file_path = "F:\\毕业论文程序\\气象数据\\数据\\"  # 气象数据输出路径
 error_information_path = "F:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径

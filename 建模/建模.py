@@ -41,17 +41,11 @@ from sklearn.linear_model import Ridge, RidgeCV
 
 
 
-
-
-
-
-
-
-
+file_name = "北京-昌平镇.xlsx"
 # 读取数据
-input_AOD = "F:\\毕业论文程序\\气溶胶光学厚度\\Aqua\\北京-顺义新城.xlsx"
-input_sky = "F:\\毕业论文程序\\气象数据\\整理\\Aqua\\北京-顺义新城.xlsx"
-input_PM = "F:\\毕业论文程序\\污染物浓度\\整理\\Aqua\\北京-顺义新城.xlsx"
+input_AOD = "F:\\毕业论文程序\\气溶胶光学厚度\\Aqua\\"+file_name
+input_sky = "F:\\毕业论文程序\\气象数据\\整理\\Aqua\\"+file_name
+input_PM = "F:\\毕业论文程序\\污染物浓度\\整理\\Aqua\\"+file_name
 output_name = input_AOD.replace("F:\\毕业论文程序\\气溶胶光学厚度\\Aqua\\", "")
 output_name = output_name.replace(".xlsx", "")
 data_PM = pd.read_excel(input_PM, index_col="日期")
@@ -61,14 +55,14 @@ data_sky = pd.read_excel(input_sky, index_col='日期')
 data = pd.concat([data_PM, data_aod, data_sky], axis=1)
 # print(data.isnull().sum())  # 空值检查
 
-
 # 处理残缺值
 # 删除AOD值为空的数据
 indexs = list(data[np.isnan(data['AOD值'])].index)  # 获取AOD值为空的数据的索引
 data = data.drop(indexs)  # 删除
 # 删除PM2.5为空的数据
 data = data[data["PM2.5浓度"] > 0]
-data.to_excel("F:\\毕业论文程序\\整合数据\\%s .xlsx" % output_name)
+# 输出文件,格式xls
+# data.to_excel("F:\\毕业论文程序\\整合数据\\各监测站\\%s.xlsx" % output_name)  # 用于ArcGIS 10.2 Map
 # 删除部分自变量
 data = data.drop(["windGust", "apparentTemperature", ], axis=1)
 # print(data[["windBearing", "windSpeed"]])
@@ -166,13 +160,13 @@ print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))  # 获�
 # print('准确率：', clf.score(x_test, y_test))  # 计算测试集的度量值（准确率）
 '''
 
-
-
-
 # 线性回归模型
 # 进行湿度-垂直订正
-
+# 尚未进行
 
 # 地理加权回归模型
+# R语言
+
+
 # 多阶段模型
-# 2.25号之前,完成一篇
+# 尚未进行
