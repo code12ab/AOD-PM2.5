@@ -8,7 +8,7 @@ import pandas as pd
 import datetime
 from datetime import datetime as dt
 
-DarkSky_file_name = "北京-奥体中心.xlsx"
+DarkSky_file_name = "天津-勤俭路.xlsx"
 input_path = "F:\\毕业论文程序\\气象数据\\数据\\"+DarkSky_file_name
 output_path = "F:\\毕业论文程序\\气象数据\\整理\\"
 file_name = input_path.replace("F:\\毕业论文程序\\气象数据\\数据\\", "").replace(".xlsx", "")

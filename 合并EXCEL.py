@@ -6,15 +6,21 @@
 import pandas as pd
 import os
 # 参数设置
-r = 7500   # 参照文献;经纬度转换为的距离范围,监测站3KM半径范围内为观测区域
-input_file_path = "F:\\毕业论文程序\\整合数据\\各监测站\\"  # HDF文件位置 TTT
-output_file_path = "F:\\毕业论文程序\\整合数据\\各地区\\"  # 结果的输出位置
+location = "天津"
+input_file_path = "F:\\毕业论文程序\\整合数据\\各监测站\\Terra\\"  # HDF文件位置 TTT
+output_file_path = "F:\\毕业论文程序\\整合数据\\各地区\\Terra\\"  # 结果的输出位置
 
 # 批量读取
 file_name = os.listdir(input_file_path)  # 文件名
 
+file_location_name = []
+for name in file_name:
+    if location in name:
+        file_location_name.append(name)
+print(file_location_name)
+
 list_file = []
-for file in file_name:
+for file in file_location_name:
     data = pd.read_excel(input_file_path+file)
     list_file.append(data)
 
@@ -27,14 +33,14 @@ df = df.dropna()
 # print(df.isnull().sum())
 
 # 删除全0列
-print(df.std())
+# print(df.std())
 df_std = pd.DataFrame(df.std())
 list_0 = []
 # print(df_sum.index)
 # print(df_sum[0]["AOD值"])
 for key in df_std.index:
     if df_std[0]["%s" % key] == 0:
-        print(key)
+        print("删除", key)
         list_0.append(key)
 df = df.drop(list_0, axis=1)
 
@@ -42,4 +48,4 @@ df = df.drop(list_0, axis=1)
 df["日期"] = df["日期"].dt.date
 df = df.set_index('日期')
 # 导出
-df.to_excel(output_file_path+"Beijing.xls")
+df.to_excel(output_file_path+"%s.xls" % location)

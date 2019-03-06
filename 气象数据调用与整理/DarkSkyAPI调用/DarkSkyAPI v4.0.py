@@ -17,15 +17,14 @@ pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显
 # 参数设置
 year_days = 365  # 365
 date_start = 2018000
-API_KEY = "a5fc93a6781f6d55e7899ae443acd876"
+API_KEY = "1aa49cfd88b3904e0e26fd6d0a3d67e5"
 coordinate_file_path = "F:\\毕业论文程序\\MODIS\\坐标\\"
 output_file_path = "F:\\毕业论文程序\\气象数据\\数据\\"  # 气象数据输出路径
 error_information_path = "F:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
 time_out = 30  # 超时设置,10秒太短
-
 # 批量导入监测站坐标
 # JCZ_file = pd.read_excel("监测站坐标toDarkSkyAPI.xlsx")
-JCZ_file = pd.read_excel(coordinate_file_path+"剩余.xlsx")  # 监测站坐标toDarkSkyAPI
+JCZ_file = pd.read_excel(coordinate_file_path+"监测站坐标toDarkSkyAPI.xlsx")  # 监测站坐标toDarkSkyAPI
 JCZ = []
 for i in range(len(JCZ_file)):
     exec('JCZ%s = [JCZ_file["经度"][i],JCZ_file["纬度"][i],JCZ_file["城市"][i]+"-"+JCZ_file["监测点名称"][i]]' % i)
@@ -54,8 +53,8 @@ global t
 
 
 def get_outcome(date_time):
-    # 定义气象数据获取函数,增加了语言lang=["zh"]
-    monitoring_station = forecast(*MonitoringStation, time=date_time, timeout=time_out, lang=["zh"])  # 超时报错设置
+    # 定义气象数据获取函数. 可选项:中文语言lang=["zh"]
+    monitoring_station = forecast(*MonitoringStation, time=date_time, timeout=time_out)  # 超时报错设置
     darksky_outcome = monitoring_station['hourly']["data"]  # 输出一天24小时的数据,调用一次API
     # 第一天0时至23时
     # print(coordinate[3], monitoring_station['hourly']["data"]) 数据内容
@@ -76,7 +75,7 @@ for coordinate in jcz_list:
             t = dt(time[0], time[1], time[2], 00).isoformat()
             get_outcome(t)
             # 进度
-            print("完成:%s" % coordinate[3], "时间:%s" % t)
+            print("完成:%s" % coordinate[3], t)
         except Exception as e:
             print(t, "报错")
             error.append(t)  # 保存报错日期
