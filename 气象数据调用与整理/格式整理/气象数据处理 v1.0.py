@@ -8,7 +8,7 @@ import pandas as pd
 import datetime
 from datetime import datetime as dt
 
-DarkSky_file_name = "天津-勤俭路.xlsx"
+DarkSky_file_name = "北京-万寿西宫.xlsx"
 input_path = "F:\\毕业论文程序\\气象数据\\数据\\"+DarkSky_file_name
 output_path = "F:\\毕业论文程序\\气象数据\\整理\\"
 file_name = input_path.replace("F:\\毕业论文程序\\气象数据\\数据\\", "").replace(".xlsx", "")
@@ -20,7 +20,7 @@ data = data.set_index('Index')
 data = data.asfreq(freq='60min')
 data["time"] = data.index  # 补全信息
 for key in data.columns:
-    data["%s" % key] = data["%s" % key].interpolate()  # 线性填充
+    data["%s" % key] = data["%s" % key].interpolate()  # 线性填充 是否合理???????
 '''
 for key in data.columns:
     data["%s" % key] = data["%s" % key].fillna(method='ffill')
@@ -56,6 +56,8 @@ for key in index_time:
     loc_list.append(loc)
 print(len(loc_list))
 '''
+
+'''
 # 筛选10:00到14:00之间的数据,用于Aqua-Terra,12时数据
 data_combine = data[(data["time_only"] <= index_time[4]) & (data["time_only"] >= index_time[0])]
 # print(data_combine.head(5))
@@ -73,3 +75,10 @@ data_Aqua = data[(data["time_only"] <= index_time[4]) & (data["time_only"] >= in
 # print(data_Aqua.head(5))
 data_Aqua = data_Aqua.groupby("日期").mean()
 data_Aqua.to_excel(output_path+"Aqua\\%s.xlsx" % file_name)
+'''
+
+# 日均
+data_daily = data
+# print(data_Aqua.head(5))
+data_daily = data_daily.groupby("日期").mean()
+data_daily.to_excel(output_path+"日均\\%s.xlsx" % file_name)

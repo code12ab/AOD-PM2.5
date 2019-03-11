@@ -6,16 +6,16 @@
 import pandas as pd
 import os
 # 参数设置
-location = "天津"
-input_file_path = "F:\\毕业论文程序\\整合数据\\各监测站\\Terra\\"  # HDF文件位置 TTT
-output_file_path = "F:\\毕业论文程序\\整合数据\\各地区\\Terra\\"  # 结果的输出位置
+location = "-"
+input_file_path = "F:\\毕业论文程序\\整合数据\\各监测站\\Aqua\\"  # HDF文件位置 TTT
+output_file_path = "F:\\毕业论文程序\\整合数据\\各地区\\Aqua\\"  # 结果的输出位置
 
 # 批量读取
 file_name = os.listdir(input_file_path)  # 文件名
 
 file_location_name = []
 for name in file_name:
-    if location in name:
+    if location in name:  # 通过文件名包含关键字的方法进行文件筛选
         file_location_name.append(name)
 print(file_location_name)
 
@@ -38,14 +38,16 @@ df_std = pd.DataFrame(df.std())
 list_0 = []
 # print(df_sum.index)
 # print(df_sum[0]["AOD值"])
+'''
 for key in df_std.index:
     if df_std[0]["%s" % key] == 0:
         print("删除", key)
         list_0.append(key)
 df = df.drop(list_0, axis=1)
-
+'''
 # 索引
 df["日期"] = df["日期"].dt.date
 df = df.set_index('日期')
 # 导出
-df.to_excel(output_file_path+"%s.xls" % location)
+# df.to_csv(output_file_path+"%s.csv" % location)
+df.to_excel(output_file_path+"%s.xlsx" % "北京天津")

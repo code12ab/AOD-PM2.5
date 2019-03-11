@@ -37,7 +37,7 @@ for file_name in input_file_name:
     '''
     # 输出文件
     data["监测站"] = data["监测站_x"]
-    data["AOD值"] = (data["AOD值_x"]+data["AOD值_y"])*0.5
+    data["AOD值"] = (data["AOD值_x"]+data["AOD值_y"])*0.5  # 数值 + 空值 = 空值
     data = data.drop(["监测站_x", "监测站_y", "AOD值_x", "AOD值_y"], axis=1)
     data.to_excel("F:\\毕业论文程序\\气溶胶光学厚度\\combine\\%s.xlsx" % output_name)
     print("进度:%.2f%%" % float(100*i/len(input_file_name)))

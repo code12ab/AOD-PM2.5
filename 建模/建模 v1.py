@@ -22,26 +22,14 @@ from statsmodels.stats.outliers_influence import summary_table  # OLS模型
 # 多元线性回归
 from sklearn import linear_model  # 线性回归模型
 from sklearn.linear_model import LinearRegression  # 线性回归模型
-from sklearn.metrics import mean_absolute_error  # 线性回归 评估误差
+from sklearn.metrics import mean_absolute_error, mean_squared_error  # 线性回归 评估误差
 # 岭回归
 from sklearn.linear_model import Ridge, RidgeCV
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-file_name = "北京-昌平镇.xlsx"
+file_name = "北京-万寿西宫.xlsx"
 # 读取数据
 input_AOD = "F:\\毕业论文程序\\气溶胶光学厚度\\Aqua\\"+file_name
 input_sky = "F:\\毕业论文程序\\气象数据\\整理\\Aqua\\"+file_name
@@ -64,14 +52,15 @@ data = data[data["PM2.5浓度"] > 0]
 # 输出文件,格式xls
 # data.to_excel("F:\\毕业论文程序\\整合数据\\各监测站\\%s.xlsx" % output_name)  # 用于ArcGIS 10.2 Map
 # 删除部分自变量
-data = data.drop(["windGust", "apparentTemperature", ], axis=1)
+data = data.drop(["监测站", ], axis=1)
 # print(data[["windBearing", "windSpeed"]])
 
 
 # 划分自变量与因变量
 y_data = data.iloc[:, 1]
-x_data = data.iloc[:, 3:]
+x_data = data.iloc[:, 4:]
 # print(y_data, x_data)
+# print(x_data.columns)
 # 划分测试集,每次运行都随机划分
 x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, train_size=0.7, test_size=0.3, random_state=0)
 # 划分结果
@@ -106,7 +95,7 @@ d = c.sum()/len(c)  # 相对误差
 print(res.params)
 '''
 # 线性回归模型,LinearRegression
-'''
+
 # 多元线性回归回归没有使用最小二乘法
 # lr = LinearRegression(fit_intercept=True, normalize=False)
 lr = LinearRegression(normalize=True)
@@ -117,16 +106,20 @@ lr.fit(x_train, y_train)
 # 对测试集数据预测
 y_pred = lr.predict(x_test)
 # print(y_pred-y_test)
+
+
 lr_score = lr.score(x_train, y_train, sample_weight=None)  # 样本权重 sample_weight=
-print(lr_score)
+print("R^2", lr_score)
+
 # 评估模型
 EE = mean_absolute_error(y_test, y_pred)
-# print("平均绝对误差：", EE)
+EE2 = mean_squared_error(y_test, y_pred)
+print("平均绝对误差：", EE, "均方误差", EE2)
 # 交叉验证 CV
 scores = cross_val_score(lr, x_data, y_data, cv=10)  # cv为迭代次数。
 # print(scores)  # 打印输出每次准确度
 print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))  
-'''
+
 # 岭回归,Ridge,RidgeCV
 '''
 clf = Ridge(alpha=1, fit_intercept=True, normalize=True)
