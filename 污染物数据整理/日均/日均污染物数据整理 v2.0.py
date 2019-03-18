@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-# 日期: 2019/3/11 13:33
+# 日期: 2019/3/18 10:38
 # 作者: xcl
 # 工具：PyCharm
+
 
 import os
 import pandas as pd
 import warnings
 from datetime import datetime as dt
+import datetime
 
 # 第一部分
-'''
+
 # 按监测站编号建立污染物浓度文件
 
 # 相关库
@@ -40,7 +42,10 @@ for number in JCZ_number:
         date = dt.strptime(date, '%Y-%m-%d').date()
         try:
             data = pd.read_csv(input_file_path+file)
-            data = data[(data["type"] == "PM2.5") & (data["hour"] == 23)]
+            data = data[(data["type"] == "PM2.5") & (data["hour"] == 0)]
+            '''
+            今日0时的24小时平均滑动值是前一天的24小时PM2.5均值
+            '''
             data = data[["hour", "%s" % number]]  # 获取时间列,污染物数据列
             data["日期"] = date
             outcome_list.append(data)
@@ -55,7 +60,7 @@ for number in JCZ_number:
     outcome = outcome.set_index('日期')
     outcome.to_excel(output_file_path+"%s污染物浓度.xlsx" % number)
     pd.DataFrame(error).to_excel(error_path+"error.xlsx")
-'''
+
 
 warnings.filterwarnings('ignore')  # 代码中仅进行新列的赋值,不对数据源做修改,因此可以忽略该警告
 # 参数设置
@@ -86,9 +91,26 @@ for JCZ in input_file_name:
     data = pd.read_excel(input_file_path+JCZ+"污染物浓度.xlsx")
     data.columns = ["日期", "hour", "日均PM2.5"]
     data["日期"] = data["日期"].dt.date
+    '''
+          今日0时的24小时平均滑动值是前一天的24小时PM2.5均值
+    '''
+
+    def get_day(date, step=0):
+        """获取指定日期date(形如"xxxx-xx-xx")之前或之后的多少天的日期, 返回值为字符串格式的日期"""
+        l = date.split("-")
+        y = int(l[0])
+        m = int(l[1])
+        d = int(l[2])
+        old_date = datetime.datetime(y, m, d)
+        new_date = (old_date + datetime.timedelta(days=step)).strftime('%Y-%m-%d')
+        print(new_date)
+        return new_date
+
+
+    data["日期"] = data["日期"].dt.date
+    data["日期"] = data["日期"].map(lambda x: get_day(x, -1))  # 今日的0时PM2.5_24h对应前一天PM2.4日均值
     data = data.drop(["hour"], axis=1)
     data["X"] = JCZ_info["经度"][i]
     data["Y"] = JCZ_info["纬度"][i]
     data = data.set_index('日期')
     data.to_excel(output_file_path + "%s.xlsx" % JCZ_new_name)
-

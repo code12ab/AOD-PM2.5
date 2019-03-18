@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-# 日期: 2019/3/17 21:34
+# 日期: 2019/3/18 9:34
 # 作者: xcl
 # 工具：PyCharm
 
+
+
 from sklearn.utils import shuffle
-from sklearn.neural_network import MLPClassifier, MLPRegressor
+from sklearn.linear_model import LinearRegression
 import numpy as np
 from sklearn.utils import check_random_state
-from sklearn.ensemble import AdaBoostRegressor
+from sklearn.ensemble import BaggingRegressor
 import pandas as pd
 from sklearn.model_selection import KFold
 
@@ -29,21 +31,23 @@ data = shuffle(data)
 # k折分组
 kf = KFold(n_splits=10)  # 训练和测试 9:1
 
+
 error_AME = []
 error_MSE = []
 for train, test in kf.split(data):
     # 参数设置
     # 一个隐藏层 22个隐藏单元
-    mlp = MLPRegressor(hidden_layer_sizes=(8,), solver='adam', max_iter=10000, learning_rate="invscaling",
-                       activation="relu", learning_rate_init=0.001)
+    mlp = LinearRegression(fit_intercept=True)
     rng = check_random_state(0)
     # 划分
     x_train = data.iloc[train][independent].values
     x_test = data.iloc[test][independent].values
     y_train = data.iloc[train][dependent].values.ravel()
     y_test = data.iloc[test][dependent].values.ravel()
-    ensemble = AdaBoostRegressor(base_estimator=mlp, learning_rate=0.001,
-                                 loss='linear').fit(x_train, y_train)
+    ensemble = BaggingRegressor(base_estimator=mlp,
+                                max_features=1.0,
+                                bootstrap_features=False,
+                                random_state=rng).fit(x_train, y_train)
     res = ensemble.predict(x_test)
     # print(res, y_test)
     # 格式转换
@@ -61,3 +65,4 @@ for train, test in kf.split(data):
     error_MSE.append(e_MSE)
 print("交叉验证后的平均AME误差值:", np.average(error_AME), "\n", "预测结果的标准差", np.std(error_AME))
 print("交叉验证后的平均MSE误差值:", np.average(error_MSE), "\n", "预测结果的标准差", np.std(error_MSE))
+

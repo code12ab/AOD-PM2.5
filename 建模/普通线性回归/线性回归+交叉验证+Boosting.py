@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-# 日期: 2019/3/17 21:34
+# 日期: 2019/3/18 9:26
 # 作者: xcl
 # 工具：PyCharm
 
+
+from sklearn.linear_model import LinearRegression
 from sklearn.utils import shuffle
-from sklearn.neural_network import MLPClassifier, MLPRegressor
+
 import numpy as np
 from sklearn.utils import check_random_state
 from sklearn.ensemble import AdaBoostRegressor
@@ -29,13 +31,13 @@ data = shuffle(data)
 # k折分组
 kf = KFold(n_splits=10)  # 训练和测试 9:1
 
+
 error_AME = []
 error_MSE = []
 for train, test in kf.split(data):
     # 参数设置
     # 一个隐藏层 22个隐藏单元
-    mlp = MLPRegressor(hidden_layer_sizes=(8,), solver='adam', max_iter=10000, learning_rate="invscaling",
-                       activation="relu", learning_rate_init=0.001)
+    mlp = LinearRegression(fit_intercept=True)
     rng = check_random_state(0)
     # 划分
     x_train = data.iloc[train][independent].values
@@ -53,10 +55,10 @@ for train, test in kf.split(data):
     res.index = y_test.index
     data_pred = pd.concat([res, y_test], axis=1)
     data_pred.columns = ["pre", "true"]
-    # 计算误差
-    e_AME = abs(data_pred["pre"] - data_pred["true"]).mean()
+    # 计算误差AME
+    e_AME = abs(data_pred["pre"]-data_pred["true"]).mean()
     # print("AME误差:", e)
-    e_MSE = ((data_pred["pre"] - data_pred["true"]) ** 2).mean()
+    e_MSE = ((data_pred["pre"]-data_pred["true"])**2).mean()
     error_AME.append(e_AME)
     error_MSE.append(e_MSE)
 print("交叉验证后的平均AME误差值:", np.average(error_AME), "\n", "预测结果的标准差", np.std(error_AME))
