@@ -1,10 +1,12 @@
-cd Desktop
+f:
+cd 毕业论文程序
 cd MODIS
-cd 相关程序
-python MODIS_download.py -s https://ladsweb.modaps.eosdis.nasa.gov/archive/orders/501301319/  -d F:\MODIS\modis08_m3_T  -t 0199091A-1D26-11E9-A7F5-C3B17C49A85D
+cd 相关测试程序
+python MODIS_download.py -s https://ladsweb.modaps.eosdis.nasa.gov/archive/orders/501314682/  -d F:\MODIS\modis04_3km_T_2017  -t 0199091A-1D26-11E9-A7F5-C3B17C49A85D
 
-.143.014.55.409/archive/orders/501301319/
 
+
+目前在下17年
 
 备注：
 1.更换orders

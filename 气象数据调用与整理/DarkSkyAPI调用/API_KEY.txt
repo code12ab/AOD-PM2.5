@@ -9,7 +9,8 @@ liujiwei@cuc.edu.cn			1aa49cfd88b3904e0e26fd6d0a3d67e5
 xunchanglu0901@outlook.com	1875a6cd9baea3db91c31aa29bfa5638
 r1r1r1r1r1@vip.qq.com       b726c853b38c30d9b977bcce6fb2b37d
 luck.luck.luck@qq.com       a5fc93a6781f6d55e7899ae443acd876
-
+173420070104004@cuc.edu.cn  a7e8c6c0ade78c6ae03486be16e7faf0
+xunchanglu@foxmail.com      ea6ba6d12b5619189b54f10275557872
 
 https://api.darksky.net/forecast/ed7de1f3687f4c53316538a0ce968752/37.0964,114.5331
 

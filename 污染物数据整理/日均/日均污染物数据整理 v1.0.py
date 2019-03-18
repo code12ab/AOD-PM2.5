@@ -88,6 +88,8 @@ for JCZ in input_file_name:
     data.columns = ["日期", "hour", "日均PM2.5"]
     data["日期"] = data["日期"].dt.date
     data = data.drop(["hour"], axis=1)
+    data["X"] = JCZ_info["经度"][i]
+    data["Y"] = JCZ_info["纬度"][i]
     data = data.set_index('日期')
     data.to_excel(output_file_path + "%s.xlsx" % JCZ_new_name)
 

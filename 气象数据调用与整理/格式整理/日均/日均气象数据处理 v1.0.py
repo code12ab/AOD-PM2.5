@@ -28,9 +28,18 @@ for name in file_name_list:
     data["日期"] = data["time"].dt.date  # 新建日期列
     data = data.set_index('日期')
     data = data.drop(["time"], axis=1)  # 日均条件下删除无关列
-    data.to_excel(output_path+"%s.xlsx" % file_name)
 
-    # 日均数据,暂不进行填充
+    # 日均数据,填充
+    try:
+        data["precipAccumulation"] = data["precipAccumulation"][data["precipType"] == "snow"].interpolate()
+    except Exception as e:
+        print("错误信息", e)
+    try:
+        data["precipIntensity"] = data["precipIntensity"][data["precipType"] == "rain"].interpolate()
+    except Exception as e:
+        print("错误信息", e, "\n")
+    # 保存
+    data.to_excel(output_path + "%s.xlsx" % file_name)
     '''
     for key in data.columns:
         data["%s" % key] = data["%s" % key].interpolate()  # 线性填充
@@ -42,31 +51,3 @@ for name in file_name_list:
     data["time_only"] = data["time"].dt.time  # 时间列只保留时间
     '''
 
-    # 日均数据,不进行筛选
-    '''
-    # 时间生产函数,格式为str
-        def date_range(begindate, enddate):
-        dates = []
-        dt_object = dt.strptime(begindate, "%H:%M:%S")
-        date = begindate[:]
-        while date <= enddate:
-            dates.append(date)
-            dt_object = dt_object + datetime.timedelta(hours=1)
-            date = dt_object.strftime("%H:%M:%S")
-        return dates
-
-
-    hour_list = date_range("10:00:00", "14:00:00")
-    index_time = []
-    for key in hour_list:
-        key = dt.strptime(key, "%H:%M:%S").time()
-        index_time.append(key)
-
-    # 筛选
-    loc_list = []
-    for key in index_time:
-        # loc = data["time_only"][data["time_only"].values != key].index.tolist()
-        loc = data["time_only"][data["time_only"].values == key].index.tolist()
-        loc_list.append(loc)
-    print(len(loc_list))
-    '''
