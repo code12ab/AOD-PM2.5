@@ -51,7 +51,8 @@ data['windGust'] = data['windGust'].fillna(data['windGust'].mean())  # 线性填
 print(data.isnull().sum())  # 空值检查
 
 # 修改日期格式
-data["日期"] = data["日期"].dt.date
+# 日均下已经为dt.date
+# data["日期"] = data["日期"].dt.date
 
 
 # 保存

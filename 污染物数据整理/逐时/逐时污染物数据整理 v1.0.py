@@ -1,27 +1,26 @@
-# -*- coding: utf-8 -*-
-# 日期: 2019/3/18 10:38
-# 作者: xcl
+# -*- coding:utf-8 -*- 
+# 日期：2019/2/15 11:02
+# 作者：xcl
 # 工具：PyCharm
-
-
+# 版本：1.0
+# 处理PM2.5污染物浓度
 import os
 import pandas as pd
 import warnings
 from datetime import datetime as dt
-import datetime
-
 
 # 第一部分
-
+"""已完成"""
 # 按监测站编号建立污染物浓度文件
 
 # 相关库
 import time
 
+
 # 参数设置
-input_file_path = "F:\\MODIS DATA\\污染物浓度_2018\\"
+input_file_path = "F:\\MODIS DATA\\污染物_2018\\"
 input_file_name = os.listdir(input_file_path)  # 文件名
-output_file_path = "F:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\"
+output_file_path = "F:\\毕业论文程序\\污染物浓度\\污染物数据\\"
 error_path = "F:\\毕业论文程序\\污染物浓度\\error\\"
 JCZ_data = pd.read_excel("F:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
 JCZ_number = JCZ_data["监测点编码"]
@@ -42,16 +41,14 @@ for number in JCZ_number:
         date = dt.strptime(date, '%Y-%m-%d').date()
         try:
             data = pd.read_csv(input_file_path+file)
-            data = data[(data["type"] == "PM2.5_24h") & (data["hour"] == 0)]
-            
-            # 今日0时的24小时平均滑动值是前一天的24小时PM2.5均值
-            
+            data = data[data["type"] == "PM2.5"]
             data = data[["hour", "%s" % number]]  # 获取时间列,污染物数据列
+            data = data[(data["hour"] <= 14) & (data["hour"] >= 10)]
             data["日期"] = date
             outcome_list.append(data)
             # print(file, "正常")
         except Exception as e:
-            print(file, "报错:", e)
+            print(file, "报错")
             problem = file, e
             error.append(problem)
 
@@ -61,14 +58,14 @@ for number in JCZ_number:
     outcome.to_excel(output_file_path+"%s污染物浓度.xlsx" % number)
     pd.DataFrame(error).to_excel(error_path+"error.xlsx")
 
+'''
 
-# 第二部分
-
+# 第二部分,按过境时间计算均值
 warnings.filterwarnings('ignore')  # 代码中仅进行新列的赋值,不对数据源做修改,因此可以忽略该警告
 # 参数设置
-input_file_path = "F:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\"
+input_file_path = "F:\\毕业论文程序\\污染物浓度\\污染物数据\\"
 input_file_name = os.listdir(input_file_path)  # 文件名
-output_file_path = "F:\\毕业论文程序\\污染物浓度\\整理\\日均\\"
+output_file_path = "F:\\毕业论文程序\\污染物浓度\\整理\\"
 JCZ_NAME = pd.read_excel("F:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
 # JCZ_NAME格式为df,监测站编码,监测点名称,城市,经度,纬度
 # print(input_file_name)
@@ -91,28 +88,31 @@ for JCZ in input_file_name:
 
     # 读取数据
     data = pd.read_excel(input_file_path+JCZ+"污染物浓度.xlsx")
-    data.columns = ["日期", "hour", "日均PM2.5"]
+    data.columns = ["日期", "hour", "PM2.5浓度"]
     data["日期"] = data["日期"].dt.date
-    '''
-          今日0时的24小时平均滑动值是前一天的24小时PM2.5均值
-    '''
 
-    def get_day(date_input, step=0):
-        """获取指定日期date(形如"xxxx-xx-xx")之前或之后的多少天的日期, 返回值为字符串格式的日期"""
-        date_input = str(date_input)  # 转化为字符串方便合并
-        l_input = date_input.split("-")
-        y = int(l_input[0])
-        m = int(l_input[1])
-        d = int(l_input[2])
-        old_date = datetime.datetime(y, m, d)
-        new_date = (old_date + datetime.timedelta(days=step)).strftime('%Y-%m-%d')
-        # print(new_date)
-        return new_date
+    # 筛选10:00到14:00之间的数据,用于Aqua-Terra,12时数据
+    data_combine = data[(data["hour"] <= 14) & (data["hour"] >= 10)]
+    data_combine["X"] = JCZ_info["经度"][i]
+    data_combine["Y"] = JCZ_info["纬度"][i]
+    data_combine = data_combine.groupby("日期").mean()
+    # data_combine["日期"] = data_combine["日期"].dt.date
+    data_combine.to_excel(output_file_path + "combine\\%s.xlsx" % JCZ_new_name)
 
+    # 筛选10:00到11:00之间的数据,用于Terra,10:30时数据,上午过境
+    data_Terra = data[(data["hour"] <= 11) & (data["hour"] >= 10)]
+    data_Terra["X"] = JCZ_info["经度"][i]
+    data_Terra["Y"] = JCZ_info["纬度"][i]
+    data_Terra = data_Terra.groupby("日期").mean()
+    # data_Terra["日期"] = data_Terra["日期"].dt.date
+    data_Terra.to_excel(output_file_path + "Terra\\%s.xlsx" % JCZ_new_name)
 
-    data["日期"] = data["日期"].map(lambda x: get_day(x, -1))  # 今日的0时PM2.5_24h对应前一天PM2.4日均值
-    data = data.drop(["hour"], axis=1)
-    data["X"] = JCZ_info["经度"][i]
-    data["Y"] = JCZ_info["纬度"][i]
-    data = data.set_index('日期')
-    data.to_excel(output_file_path + "%s.xlsx" % JCZ_new_name)
+    # 筛选13:00到14:00之间的数据,用于Aqua,13:30时数据,下午过境
+    data_Aqua = data[(data["hour"] <= 14) & (data["hour"] >= 13)]
+    # print(data_Aqua.head(5))
+    data_Aqua["X"] = JCZ_info["经度"][i]
+    data_Aqua["Y"] = JCZ_info["纬度"][i]
+    data_Aqua = data_Aqua.groupby("日期").mean()
+    # data_Aqua["日期"] = data_Aqua["日期"].dt.date
+    data_Aqua.to_excel(output_file_path + "Aqua\\%s.xlsx" % JCZ_new_name)
+'''

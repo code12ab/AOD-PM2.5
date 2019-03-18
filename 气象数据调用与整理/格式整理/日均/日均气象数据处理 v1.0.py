@@ -26,6 +26,7 @@ for name in file_name_list:
     data = data.asfreq(freq='1440min')  # 补全信息,这个方法以后可能会经常使用到
     data["time"] = data.index
     data["日期"] = data["time"].dt.date  # 新建日期列
+    data["日期"] = data["日期"].map(lambda x: str(x))  # 改成字符串格式 方便日后合并
     data = data.set_index('日期')
     data = data.drop(["time"], axis=1)  # 日均条件下删除无关列
 
