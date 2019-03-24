@@ -44,6 +44,7 @@ for name in file_name_list:
     data["日期"] = data["日期"].map(lambda x: get_new_time(x))  # 今日的0时PM2.5_24h对应前一天PM2.4日均值,即1-24均值
     # print(data['日期'])
     data["日期"] = data["日期"].dt.date
+    data["日期"] = data["日期"].map(lambda x: str(x))
     data = data.groupby("日期").mean()
     data.to_excel(output_path + "%s.xlsx" % file_name)
 

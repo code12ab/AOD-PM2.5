@@ -11,7 +11,7 @@ import pandas as pd  # BDS
 # import datetime
 
 '''
-适用于"5.19"的情况
+适用于"5.19"的情况, 经邮件联系, 其数据提供商没有提供5.19之后的数据
 三次报错则放弃爬取
 '''
 
@@ -22,7 +22,7 @@ pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显
 
 
 # 参数设置
-year_days = 139  # 365为年度; 139适用于"5.19"
+year_days = 10  # 365为年度; 139适用于"5.19"
 date_start = 2018000
 API_KEY = "740c4d0fbd102f83a7753032c769b2b5"
 coordinate_file_path = "F:\\毕业论文程序\\MODIS\\坐标\\"
