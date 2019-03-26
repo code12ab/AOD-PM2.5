@@ -17,6 +17,7 @@ from numba import jit
 
 '''
 多线程 + 函数定义置于循环外
+未设置自动关机
 '''
 
 warnings.filterwarnings('ignore')  # 忽略"number/0"的情况
@@ -138,3 +139,5 @@ if __name__ == '__main__':
     p5.start()
     p6.start()
     print('=====主进程=====')
+
+
