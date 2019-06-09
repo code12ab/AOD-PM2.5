@@ -17,7 +17,7 @@ from pyhdf.SD import SD, SDC #批量导入HDF
 import os
 
 # HDF文件位置
-file_path = "F:\\MODIS\\modis04_3km_T_2017\\"
+file_path = "F:\\MODIS\\modis04_3km_T_2013\\"
 
 # 批量读取
 dir_str = file_path  # 文件位置

@@ -110,7 +110,7 @@ for JCZ in input_file_name:
         return new_date
 
 
-    data["日期"] = data["日期"].map(lambda x: get_day(x, -1))  # 今日的0时PM2.5_24h对应前一天PM2.4日均值
+    data["日期"] = data["日期"].map(lambda x: get_day(x, -1))  # 今日的0时PM2.5_24h对应前一天PM2.5日均值
     data = data.drop(["hour"], axis=1)
     data["X"] = JCZ_info["经度"][i]
     data["Y"] = JCZ_info["纬度"][i]

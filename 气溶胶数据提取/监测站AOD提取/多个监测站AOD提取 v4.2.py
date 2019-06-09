@@ -17,7 +17,7 @@ from numba import jit
 
 '''
 多线程 + 函数定义置于循环外
-未设置自动关机
+自动关机雏形已建立
 '''
 
 warnings.filterwarnings('ignore')  # 忽略"number/0"的情况
@@ -50,13 +50,13 @@ def get_aod_list(longitude_df, latitude_df, aod_df, item_df1, item_df2):
 
 # 参数设置
 r = 7500   # 参照文献;经纬度转换为的距离范围,监测站3KM半径范围内为观测区域
-file_path = "F:\\MODIS DATA\\modis04_3km_A_2017\\"  # HDF文件位置 TTT
-output_file_path = "F:\\毕业论文程序\\气溶胶光学厚度\\Aqua\\2017\\"  # 结果的输出位置
+file_path = "F:\\MODIS DATA\\modis04_3km_T_2013\\"  # HDF文件位置 TTT
+output_file_path = "F:\\毕业论文程序\\气溶胶光学厚度\\Terra\\2013\\"  # 结果的输出位置
 
 
 # 批量读取HDF文件,提取AOD值,并将结果添加到列表中
 file_name = os.listdir(file_path)  # 文件名
-print("总文件个数:", len(file_name))
+
 '''
 aod_outcome_list = []  # 输出到一个文件时
 '''
@@ -126,18 +126,32 @@ def get_aod_multiprocessing(location_xy):
 
 
 if __name__ == '__main__':
+    print('=====主进程=====')
+    print("总文件个数:", len(file_name))
+
     p1 = Process(target=get_aod_multiprocessing, args=('样例1',))
     p2 = Process(target=get_aod_multiprocessing, args=('样例2',))
     p3 = Process(target=get_aod_multiprocessing, args=('样例3',))
     p4 = Process(target=get_aod_multiprocessing, args=('样例4',))
     p5 = Process(target=get_aod_multiprocessing, args=('样例5',))
     p6 = Process(target=get_aod_multiprocessing, args=('样例6',))
+
     p1.start()
     p2.start()
     p3.start()
     p4.start()
     p5.start()
     p6.start()
-    print('=====主进程=====')
 
+    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码 
+    p5.join()
+    p4.join()
+    p3.join()
+    p2.join()
+    p1.join()
 
+    # 自动关机
+    print("程序已完成," + str(60) + '秒后将会关机')
+    time.sleep(60)
+    print('关机')
+    #os.system('shutdown -s -f -t 1')
