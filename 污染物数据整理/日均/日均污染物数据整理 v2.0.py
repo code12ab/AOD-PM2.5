@@ -19,11 +19,11 @@ import datetime
 import time
 
 # 参数设置
-input_file_path = "F:\\MODIS DATA\\污染物浓度_2018\\"
+input_file_path = "D:\\DATA\\2016\\"
 input_file_name = os.listdir(input_file_path)  # 文件名
-output_file_path = "F:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\"
-error_path = "F:\\毕业论文程序\\污染物浓度\\error\\"
-JCZ_data = pd.read_excel("F:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
+output_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\2016\\"
+error_path = "D:\\毕业论文程序\\污染物浓度\\error\\"
+JCZ_data = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
 JCZ_number = JCZ_data["监测点编码"]
 
 # 主程序
@@ -37,6 +37,7 @@ for number in JCZ_number:
     for file in input_file_name:
         # print(file)
         date = file.replace("china_sites_", "").replace(".csv", "")
+        #date = file.replace("china_cities_", "").replace(".csv", "")
         date = time.strptime(date, '%Y%m%d')
         date = time.strftime("%Y-%m-%d", date)
         date = dt.strptime(date, '%Y-%m-%d').date()
@@ -66,10 +67,10 @@ for number in JCZ_number:
 
 warnings.filterwarnings('ignore')  # 代码中仅进行新列的赋值,不对数据源做修改,因此可以忽略该警告
 # 参数设置
-input_file_path = "F:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\"
+input_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\2016\\"
 input_file_name = os.listdir(input_file_path)  # 文件名
-output_file_path = "F:\\毕业论文程序\\污染物浓度\\整理\\日均\\"
-JCZ_NAME = pd.read_excel("F:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
+output_file_path = "D:\\毕业论文程序\\污染物浓度\\整理\\日均\\2016\\"
+JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
 # JCZ_NAME格式为df,监测站编码,监测点名称,城市,经度,纬度
 # print(input_file_name)
 # print(JCZ_NAME.head())

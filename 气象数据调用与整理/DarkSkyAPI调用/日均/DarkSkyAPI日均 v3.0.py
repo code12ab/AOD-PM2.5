@@ -36,10 +36,10 @@ API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e9361
                 "1875a6cd9baea3db91c31aa29bfa5638", "b726c853b38c30d9b977bcce6fb2b37d",
                 "a5fc93a6781f6d55e7899ae443acd876", "a7e8c6c0ade78c6ae03486be16e7faf0",
                 "ea6ba6d12b5619189b54f10275557872"]
-coordinate_file_path = "F:\\毕业论文程序\\MODIS\\坐标\\"
+coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
 # 调整 日均 或 逐时
-output_file_path = "F:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % save_year  # 气象数据存储路径
-error_information_path = "F:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
+output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % save_year  # 气象数据存储路径
+error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
 time_out = 30  # 超时设置,10秒太短
 
 

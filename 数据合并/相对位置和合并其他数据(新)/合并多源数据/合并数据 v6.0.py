@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
-# 日期: 2019/6/8 22:04
+# 日期: 2019/6/10 23:38
 # 作者: xcl
 # 工具：PyCharm
 
-# -*- coding: utf-8 -*-
-# 日期: 2019/6/8 16:13
-# 作者: xcl
-# 工具：PyCharm
-
-
+###########################################自己的数据 相邻站点的PM数据 ######################################################
 
 # 相关库
 from math import radians, cos, sin, asin, sqrt
@@ -43,11 +38,7 @@ coordinates = pd.DataFrame()
 coordinates["xs"] = JCZ_file["经度"]
 coordinates["ys"] = JCZ_file["纬度"]
 coordinates["names"] = JCZ_file["城市"] + "-" + JCZ_file["监测点名称"]
-# print(coordinates)
-
-
 # 变量参数
-
 var_x = ["AOD", "日均PM2.5", 'temperature',
          'apparentTemperatureHigh',
          'apparentTemperatureLow',
@@ -72,7 +63,7 @@ data_location = pd.read_excel("位置距离.xlsx")
 data_aod = "F:\\毕业论文程序\\气溶胶光学厚度\\日均\\"
 data_pm = 'F:\\毕业论文程序\\污染物浓度\\整理\\日均\\'
 data_sky_daily = "F:\\毕业论文程序\\气象数据\\整理\\日均\\2018\\"
-data_sky_hourly = "F:\\毕业论文程序\\气象数据\\整理\\逐时均值\\"
+data_sky_hourly = "F:\\毕业论文程序\\气象数据\\整理\\逐时均值\\2018\\"
 for location in data_location["name"]:
     #print(data_location[data_location["name"] == location])  # 按行输出
     data_aod_outcome = pd.read_excel(data_aod + location + ".xlsx")
@@ -80,7 +71,7 @@ for location in data_location["name"]:
     data_need_to_extract = data_location[data_location["name"] == location]
     # 有待替换！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     same_area_A1 = []
-    same_area_A3 = []
+    same_area_A2 = []
     same_area_A3 = []
     same_area_A4 = []
     same_area_A5 = []
@@ -101,9 +92,9 @@ for location in data_location["name"]:
         if value_1 == "A-1":  # 第一个区划
             #print(value_1)
             same_area_A1.append(element)
-        if value_1 == "A-3":  # 第一个区划
+        if value_1 == "A-2":  # 第一个区划
             #print(value_1)
-            same_area_A3.append(element)
+            same_area_A2.append(element)
         if value_1 == "A-3":  # 第一个区划
             #print(value_1)
             same_area_A3.append(element)
@@ -146,8 +137,6 @@ for location in data_location["name"]:
         if value_1 == "B-8":  # 第一个区划
             #print(value_1)
             same_area_B8.append(element)
-    #print(same_area_A1)
-
 #####################################################################合并部分2########################################
 
     if len(same_area_A1) != 0:
@@ -167,6 +156,7 @@ for location in data_location["name"]:
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -182,8 +172,11 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'A-1-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["A-1-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            #######################逐时###########
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
+
     #######均值部分#############
     # 删除 Time变量 不然 下面的接着的循环 会出现 【最高温，最高温时间】这种列表
     for item_2 in data_aod_outcome.columns:  # 删除多的
@@ -204,29 +197,30 @@ for location in data_location["name"]:
         else:
             pass
 
-    ##################################################################A3
+    ##################################################################A2
 
-    if len(same_area_A3) != 0:
+    if len(same_area_A2) != 0:
         xi = 0
-        for area in same_area_A3:
+        for area in same_area_A2:
             xi = xi + 1
             data_to_merge = pd.read_excel(data_aod + area + ".xlsx")
             data_to_merge = data_to_merge.set_index('日期')
-            data_to_merge.rename(columns={'监测站': 'A-3-监测站-%s' % xi, 'AOD值': 'A-3-AOD值-%s' % xi}, inplace=True)  # 重命名
+            data_to_merge.rename(columns={'监测站': 'A-2-监测站-%s' % xi, 'AOD值': 'A-2-AOD值-%s' % xi}, inplace=True)  # 重命名
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             ##########以上几行完成了AOD
             data_to_merge_pm = pd.read_excel(data_pm + area + ".xlsx")
             data_to_merge_pm = data_to_merge_pm.set_index('日期')
-            data_to_merge_pm.rename(columns={'日均PM2.5': 'A-3-日均PM2.5-%s' % xi}, inplace=True)
+            data_to_merge_pm.rename(columns={'日均PM2.5': 'A-2-日均PM2.5-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_pm], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
-                data_to_merge_sky_daily.rename(columns={c_name: 'A-3-' + c_name + '-%s' % xi}, inplace=True)
+                data_to_merge_sky_daily.rename(columns={c_name: 'A-2-' + c_name + '-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_daily], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             ######################日均#########
@@ -235,9 +229,10 @@ for location in data_location["name"]:
             for d_name in data_to_merge_sky_hourly.columns:
                 if d_name != "temperature":
                     del data_to_merge_sky_hourly[d_name]
-            data_to_merge_sky_hourly.rename(columns={"temperature": 'A-3-temperature-%s' % xi}, inplace=True)
-            data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["A-3-temperature-%s" % xi]],
+            data_to_merge_sky_hourly.rename(columns={"temperature": 'A-2-temperature-%s' % xi}, inplace=True)
+            data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["A-2-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -250,12 +245,12 @@ for location in data_location["name"]:
     for bianliang in var_x:
         bianliang_list = []
         for item_xx in data_aod_outcome.columns:
-            if "A-3-" + bianliang in item_xx:
+            if "A-2-" + bianliang in item_xx:
                 bianliang_list.append(item_xx)
         if len(bianliang_list) != 0:
-            data_aod_outcome["A3-%s-MEAN" % bianliang] = data_aod_outcome[bianliang_list].mean(axis=1)
+            data_aod_outcome["A2-%s-MEAN" % bianliang] = data_aod_outcome[bianliang_list].mean(axis=1)
     for item_2 in data_aod_outcome.columns:  # 删除多的
-        if "A-3-" in item_2:
+        if "A-2-" in item_2:
             del data_aod_outcome[item_2]
         else:
             pass
@@ -279,6 +274,7 @@ for location in data_location["name"]:
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -294,6 +290,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'A-3-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["A-3-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -335,6 +332,7 @@ for location in data_location["name"]:
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -350,6 +348,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'A-4-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["A-4-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -391,6 +390,7 @@ for location in data_location["name"]:
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -406,6 +406,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'A-5-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["A-5-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -447,6 +448,7 @@ for location in data_location["name"]:
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -462,6 +464,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'A-6-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["A-6-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -503,6 +506,7 @@ for location in data_location["name"]:
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -518,6 +522,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'A-7-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["A-7-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -559,6 +564,7 @@ for location in data_location["name"]:
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -574,6 +580,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'A-8-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["A-8-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -596,7 +603,7 @@ for location in data_location["name"]:
         else:
             pass
 
-    #####################################################################合并部分2########################################
+    #####################################################################合并部分BBBB########################################
 
     if len(same_area_B1) != 0:
         xi = 0
@@ -615,6 +622,7 @@ for location in data_location["name"]:
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -630,6 +638,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'B-1-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["B-1-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -652,21 +661,21 @@ for location in data_location["name"]:
         else:
             pass
 
-    ##################################################################B3
+    ##################################################################B2
 
-    if len(same_area_B3) != 0:
+    if len(same_area_B2) != 0:
         xi = 0
-        for area in same_area_B3:
+        for area in same_area_B2:
             xi = xi + 1
             data_to_merge = pd.read_excel(data_aod + area + ".xlsx")
             data_to_merge = data_to_merge.set_index('日期')
-            data_to_merge.rename(columns={'监测站': 'B-3-监测站-%s' % xi, 'AOD值': 'B-3-AOD值-%s' % xi}, inplace=True)  # 重命名
+            data_to_merge.rename(columns={'监测站': 'B-2-监测站-%s' % xi, 'AOD值': 'B-2-AOD值-%s' % xi}, inplace=True)  # 重命名
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             ##########以上几行完成了AOD
             data_to_merge_pm = pd.read_excel(data_pm + area + ".xlsx")
             data_to_merge_pm = data_to_merge_pm.set_index('日期')
-            data_to_merge_pm.rename(columns={'日均PM2.5': 'B-3-日均PM2.5-%s' % xi}, inplace=True)
+            data_to_merge_pm.rename(columns={'日均PM2.5': 'B-2-日均PM2.5-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_pm], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
@@ -674,7 +683,7 @@ for location in data_location["name"]:
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
-                data_to_merge_sky_daily.rename(columns={c_name: 'B-3-' + c_name + '-%s' % xi}, inplace=True)
+                data_to_merge_sky_daily.rename(columns={c_name: 'B-2-' + c_name + '-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_daily], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             ######################日均#########
@@ -683,8 +692,8 @@ for location in data_location["name"]:
             for d_name in data_to_merge_sky_hourly.columns:
                 if d_name != "temperature":
                     del data_to_merge_sky_hourly[d_name]
-            data_to_merge_sky_hourly.rename(columns={"temperature": 'B-3-temperature-%s' % xi}, inplace=True)
-            data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["B-3-temperature-%s" % xi]],
+            data_to_merge_sky_hourly.rename(columns={"temperature": 'B-2-temperature-%s' % xi}, inplace=True)
+            data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["B-2-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
@@ -698,12 +707,12 @@ for location in data_location["name"]:
     for bianliang in var_x:
         bianliang_list = []
         for item_xx in data_aod_outcome.columns:
-            if "B-3-" + bianliang in item_xx:
+            if "B-2-" + bianliang in item_xx:
                 bianliang_list.append(item_xx)
         if len(bianliang_list) != 0:
-            data_aod_outcome["B3-%s-MEAN" % bianliang] = data_aod_outcome[bianliang_list].mean(axis=1)
+            data_aod_outcome["B2-%s-MEAN" % bianliang] = data_aod_outcome[bianliang_list].mean(axis=1)
     for item_2 in data_aod_outcome.columns:  # 删除多的
-        if "B-3-" in item_2:
+        if "B-2-" in item_2:
             del data_aod_outcome[item_2]
         else:
             pass
@@ -727,6 +736,7 @@ for location in data_location["name"]:
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
             #########PM2.5############################3
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -742,6 +752,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'B-3-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["B-3-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -782,7 +793,8 @@ for location in data_location["name"]:
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_pm], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
-            #########PM2.5############################3
+            #########PM2.5############################
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -798,6 +810,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'B-4-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["B-4-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -838,7 +851,8 @@ for location in data_location["name"]:
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_pm], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
-            #########PM2.5############################3
+            #########PM2.5############################
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -854,6 +868,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'B-5-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["B-5-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -894,7 +909,8 @@ for location in data_location["name"]:
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_pm], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
-            #########PM2.5############################3
+            #########PM2.5############################
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -910,6 +926,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'B-6-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["B-6-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -950,7 +967,8 @@ for location in data_location["name"]:
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_pm], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
-            #########PM2.5############################3
+            #########PM2.5############################
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -966,6 +984,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'B-7-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["B-7-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -1006,7 +1025,8 @@ for location in data_location["name"]:
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_pm], axis=1,
                                          join_axes=[data_aod_outcome.index])  # 合并
             data_aod_outcome = data_aod_outcome.drop(columns=["X", "Y"])
-            #########PM2.5############################3
+            #########PM2.5############################
+            '''
             data_to_merge_sky_daily = pd.read_excel(data_sky_daily + area + ".xlsx")
             data_to_merge_sky_daily = data_to_merge_sky_daily.set_index('日期')
             for c_name in data_to_merge_sky_daily.columns:
@@ -1022,6 +1042,7 @@ for location in data_location["name"]:
             data_to_merge_sky_hourly.rename(columns={"temperature": 'B-8-temperature-%s' % xi}, inplace=True)
             data_aod_outcome = pd.concat([data_aod_outcome, data_to_merge_sky_hourly["B-8-temperature-%s" % xi]],
                                          axis=1, join_axes=[data_aod_outcome.index])  # 合并
+            '''
     for c_name_2 in data_aod_outcome.columns:
         data_aod_outcome[c_name_2] = data_aod_outcome[c_name_2].fillna(0)
     #######均值部分#############
@@ -1045,7 +1066,25 @@ for location in data_location["name"]:
             pass
 
 
-    for cx_name_2 in data_aod_outcome.columns:
-        data_aod_outcome[cx_name_2] = data_aod_outcome[cx_name_2].fillna(0)
-    data_aod_outcome.to_excel("F:\\毕业论文程序\\整合数据\\整合1\\%s.xlsx" % location)
+    ############################################合并自己的数据########################################################
+    #input_AOD = "F:\\毕业论文程序\\气溶胶光学厚度\\日均\\"+location+".xlsx"
+    input_sky = "F:\\毕业论文程序\\气象数据\\整理\\日均\\2018\\"+location+".xlsx"
+    input_PM = "F:\\毕业论文程序\\污染物浓度\\整理\\日均\\2018\\"+location+".xlsx"
+    input_temperature_mean = "F:\\毕业论文程序\\气象数据\\整理\\逐时均值\\2018\\"+location+".xlsx"
+    data_PM = pd.read_excel(input_PM, index_col="日期")
+    #data_aod = pd.read_excel(input_AOD, index_col="日期")
+    data_sky = pd.read_excel(input_sky, index_col='日期')
+    # print(data_sky.head())
+    # 这里是插入一天内气温的平均值
+    data_temperature_mean = pd.read_excel(input_temperature_mean, index_col='日期')
+    data_temperature_mean = data_temperature_mean["temperature"]
+    #print(data_temperature_mean, location)  # 检测后发现索引列统一,没有问题
+    # 合并数据
+    #data = pd.concat([data_PM, data_aod_outcome, data_sky, data_temperature_mean], axis=1, sort=True)  # 会保留所有索引
+    data_final = pd.concat([data_PM, data_aod_outcome, data_sky, data_temperature_mean], axis=1, join_axes=[data_aod_outcome.index])
+    # print(data.head())
+    # print(data.isnull().sum())  # 空值检查
+    for cx_name_2 in data_final.columns:
+        data_final[cx_name_2] = data_final[cx_name_2].fillna(0)
+    data_final.to_excel("F:\\毕业论文程序\\整合数据\\整合2\\%s.xlsx" % location)
    # print(location)
