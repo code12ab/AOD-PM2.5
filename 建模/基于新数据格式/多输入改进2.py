@@ -141,7 +141,7 @@ for train, test in kf.split(data):
     error_AME.append(e_AME)
     error_MSE.append(e_MSE)
     # 相对误差百分比
-    r_e = abs((data_pred["pre"] - data_pred["true"])/data_pred["true"]).mean()
+    r_e = (abs(data_pred["pre"] - data_pred["true"])/abs(data_pred["true"])).mean()
     error_RE.append(r_e)
     print(error_RE)
 print("交叉验证后的平均AME误差值:", np.average(error_AME), "\n", "预测结果的标准差", np.std(error_AME))
