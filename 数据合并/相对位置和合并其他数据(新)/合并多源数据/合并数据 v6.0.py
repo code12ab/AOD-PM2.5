@@ -3,8 +3,8 @@
 # 作者: xcl
 # 工具：PyCharm
 
-###########################################自己的数据 相邻站点的PM数据 ######################################################
-
+################## 自己的数据 相邻站点的PM、AOD数据
+################## 没有使用循环编写，代码冗长
 # 相关库
 from math import radians, cos, sin, asin, sqrt
 from darksky import forecast  # DarkSkyAPI
@@ -27,12 +27,12 @@ distance1 = 50000
 distance2 = 100000
 
 # 读取文件
-coordinate_file_path = "F:\\毕业论文程序\\MODIS\\坐标\\"
+coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
 JCZ_file = pd.read_excel(coordinate_file_path + "监测站坐标toDarkSkyAPI.xlsx", sheet_name="汇总")  # 监测站坐标toDarkSkyAPI
 
-# 输出位置
+# 输出位置 停用该位置！！
+#out_path = "F:\\毕业论文程序\\整合数据\\整合1\\"
 
-out_path = "F:\\毕业论文程序\\整合数据\\整合1\\"
 # 创建新数据框
 coordinates = pd.DataFrame()
 coordinates["xs"] = JCZ_file["经度"]
@@ -60,15 +60,16 @@ Time_list = [ 'apparentTemperatureHighTime',
 
 data_location = pd.read_excel("位置距离.xlsx")
 # print(data_location.head())
-data_aod = "F:\\毕业论文程序\\气溶胶光学厚度\\日均\\"
-data_pm = 'F:\\毕业论文程序\\污染物浓度\\整理\\日均\\'
-data_sky_daily = "F:\\毕业论文程序\\气象数据\\整理\\日均\\2018\\"
-data_sky_hourly = "F:\\毕业论文程序\\气象数据\\整理\\逐时均值\\2018\\"
+data_aod = "D:\\毕业论文程序\\气溶胶光学厚度\\日均\\2015\\"
+data_pm = 'D:\\毕业论文程序\\污染物浓度\\整理\\日均\\2015\\'
+data_sky_daily = "D:\\毕业论文程序\\气象数据\\整理\\日均\\2015\\"
+data_sky_hourly = "D:\\毕业论文程序\\气象数据\\整理\\逐时均值\\2015\\"
 for location in data_location["name"]:
     #print(data_location[data_location["name"] == location])  # 按行输出
     data_aod_outcome = pd.read_excel(data_aod + location + ".xlsx")
     data_aod_outcome = data_aod_outcome.set_index('日期')
-    data_need_to_extract = data_location[data_location["name"] == location]
+    data_need_to_extract = data_location[data_location["name"] == location]  # 这是每一行， xx城市  A-1 C-3 B-2 [格式]
+    #print(data_need_to_extract)
     # 有待替换！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     same_area_A1 = []
     same_area_A2 = []
@@ -1067,10 +1068,10 @@ for location in data_location["name"]:
 
 
     ############################################合并自己的数据########################################################
-    #input_AOD = "F:\\毕业论文程序\\气溶胶光学厚度\\日均\\"+location+".xlsx"
-    input_sky = "F:\\毕业论文程序\\气象数据\\整理\\日均\\2018\\"+location+".xlsx"
-    input_PM = "F:\\毕业论文程序\\污染物浓度\\整理\\日均\\2018\\"+location+".xlsx"
-    input_temperature_mean = "F:\\毕业论文程序\\气象数据\\整理\\逐时均值\\2018\\"+location+".xlsx"
+    #input_AOD = "D:\\毕业论文程序\\气溶胶光学厚度\\日均\\"+location+".xlsx"
+    input_sky = "D:\\毕业论文程序\\气象数据\\整理\\日均\\2015\\"+location+".xlsx"
+    input_PM = "D:\\毕业论文程序\\污染物浓度\\整理\\日均\\2015\\"+location+".xlsx"
+    input_temperature_mean = "D:\\毕业论文程序\\气象数据\\整理\\逐时均值\\2015\\"+location+".xlsx"
     data_PM = pd.read_excel(input_PM, index_col="日期")
     #data_aod = pd.read_excel(input_AOD, index_col="日期")
     data_sky = pd.read_excel(input_sky, index_col='日期')
@@ -1086,5 +1087,5 @@ for location in data_location["name"]:
     # print(data.isnull().sum())  # 空值检查
     for cx_name_2 in data_final.columns:
         data_final[cx_name_2] = data_final[cx_name_2].fillna(0)
-    data_final.to_excel("F:\\毕业论文程序\\整合数据\\整合2\\%s.xlsx" % location)
+    #data_final.to_excel("D:\\毕业论文程序\\整合数据\\相邻站点PM_AOD\\2015\\%s.xlsx" % location)
    # print(location)

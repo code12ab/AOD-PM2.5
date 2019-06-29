@@ -10,10 +10,10 @@ import os
 
 # 批量读取
 
-for year_tag in range(2013, 2019):
+for year_tag in range(2017, 2018):
     print(year_tag)
-    input_path = "F:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % year_tag
-    output_path = "F:\\毕业论文程序\\气象数据\\整理\\日均\\%s\\" % year_tag
+    input_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % year_tag
+    output_path = "D:\\毕业论文程序\\气象数据\\整理\\日均\\%s\\" % year_tag
     file_name_list = os.listdir(input_path)  # 文件名
 
     for name in file_name_list:

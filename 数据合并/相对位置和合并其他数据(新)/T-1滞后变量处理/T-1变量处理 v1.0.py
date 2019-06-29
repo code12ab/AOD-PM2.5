@@ -9,8 +9,8 @@ import numpy as np
 import os
 
 
-input_file_path = "F:\\毕业论文程序\\整合数据\\整合2\\"
-outpu_file_path = "F:\\毕业论文程序\\整合数据\\T-1\\"
+input_file_path = "D:\\毕业论文程序\\整合数据\\自身与相邻站点PM_AOD\\2018\\"
+outpu_file_path = "D:\\毕业论文程序\\整合数据\\自身与相邻站点PM_AOD_T-1\\2018\\"
 input_file_name = os.listdir(input_file_path)  # 文件名列表
 print("文件个数:"+str(len(input_file_name)))
 

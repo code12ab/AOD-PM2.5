@@ -13,9 +13,13 @@ import pandas as pd
 from keras.utils import to_categorical
 from sklearn.utils import shuffle
 from sklearn.model_selection import KFold,StratifiedKFold
+import datetime  # 程序耗时
 
+# 开始计算耗时
+start_time = datetime.datetime.now()
 # 读取
 data = pd.read_excel("相邻位置仅留PM和T-1.xlsx")
+#data = pd.read_excel("自身与相邻站点PM_AOD_T-1_全样本.xlsx")
 #data = pd.read_excel("测试用数据.xlsx")
 # 设置变量
 data = data[data["AOD值"] > 0]
@@ -60,7 +64,7 @@ x = layers.Dense(4, activation="relu")(x)
 x = Model(inputs=inputA, outputs=x)
 # 输入2
 y = layers.Dense(64, activation="relu")(inputB)
-#y = layers.Dense(32, activation="relu")(y)
+y = layers.Dense(32, activation="relu")(y)
 y = layers.Dense(4, activation="relu")(y)
 y = Model(inputs=inputB, outputs=y)
 # 输入3
@@ -89,7 +93,7 @@ kf = KFold(n_splits=10)  # 参数shuffle=True
 
 error_AME = []
 error_MSE = []
-
+error_RE = []
 for train, test in kf.split(data):
 
     # 划分
@@ -121,7 +125,7 @@ for train, test in kf.split(data):
     res = ensemble.predict([x1_test_np, x2_test_np])
 
     '''
-    model.fit([x1_train_np, x2_train_np, x3_train_np], y_train_np, epochs=1000, batch_size=512)
+    model.fit([x1_train_np, x2_train_np, x3_train_np], y_train_np, epochs=1000, batch_size=2000)
     res = model.predict([x1_test_np, x2_test_np, x3_test_np])
 
     res = pd.DataFrame(res)
@@ -136,5 +140,12 @@ for train, test in kf.split(data):
     e_MSE = ((data_pred["pre"] - data_pred["true"]) ** 2).mean()
     error_AME.append(e_AME)
     error_MSE.append(e_MSE)
+    # 相对误差百分比
+    r_e = abs((data_pred["pre"] - data_pred["true"])/data_pred["true"]).mean()
+    error_RE.append(r_e)
+    print(error_RE)
 print("交叉验证后的平均AME误差值:", np.average(error_AME), "\n", "预测结果的标准差", np.std(error_AME))
 print("交叉验证后的平均MSE误差值:", np.average(error_MSE), "\n", "预测结果的标准差", np.std(error_MSE))
+print("相对误差:", np.average(error_RE), "\n", "预测结果的标准差", np.std(error_RE))
+end_time = datetime.datetime.now()
+print(str(end_time - start_time))
