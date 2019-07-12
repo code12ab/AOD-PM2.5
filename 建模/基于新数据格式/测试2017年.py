@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-# 作者：xcl
-# 时间：2019/6/20  23:52 
-# -*- coding: utf-8 -*-
-# 作者：xcl
-# 时间：2019/6/20  21:27
+# 作者: xcl
+# 时间: 2019/7/5 17:49
 
 from sklearn.ensemble import AdaBoostRegressor
 from keras.models import Sequential, Model
@@ -23,68 +20,50 @@ data = pd.read_excel("自身与相邻站点PM_AOD_T-1_全样本.xlsx")
 #data = pd.read_excel("测试用数据.xlsx")
 # 设置变量
 data = data[data["AOD值"] > 0]
-data["AOD值"] = data["AOD值"] / 1000
+
 data = data[data["日均PM2.5"] > 0]
-data = data[data["AOD值"] < 2001]
 
 
-independent = ["AOD值", 'cloudCover', 'dewPoint', 'humidity', 'precipAccumulation', 'precipIntensity', 'pressure',
-               'temperature', 'uvIndex', 'visibility', 'windSpeed', 'windBearing']
-T_1 = ["AOD值-t-1", 'cloudCover-t-1', 'dewPoint-t-1', 'humidity-t-1', 'precipAccumulation-t-1', 'precipIntensity-t-1',
+data2017 = data[data["year"] == 2016]
+data2018 = data[data["year"] == 2018]
+independent = ['cloudCover', 'dewPoint', 'humidity', 'precipAccumulation', 'precipIntensity', 'pressure', 'temperature',
+               'uvIndex', 'visibility', 'windSpeed', 'windBearing']
+T_1 = [ 'cloudCover-t-1', 'dewPoint-t-1', 'humidity-t-1', 'precipAccumulation-t-1', 'precipIntensity-t-1',
        'pressure-t-1', 'temperature-t-1', 'uvIndex-t-1', 'visibility-t-1', 'windSpeed-t-1', 'windBearing-t-1']
 PM_list = ["A1-日均PM2.5-MEAN-t-1", "A2-日均PM2.5-MEAN-t-1", "A3-日均PM2.5-MEAN-t-1", "A4-日均PM2.5-MEAN-t-1",
            "A5-日均PM2.5-MEAN-t-1", "A6-日均PM2.5-MEAN-t-1", "A7-日均PM2.5-MEAN-t-1", "A8-日均PM2.5-MEAN-t-1",
            "B1-日均PM2.5-MEAN-t-1", "B2-日均PM2.5-MEAN-t-1", "B3-日均PM2.5-MEAN-t-1", "B4-日均PM2.5-MEAN-t-1",
            "B5-日均PM2.5-MEAN-t-1", "B6-日均PM2.5-MEAN-t-1", "B7-日均PM2.5-MEAN-t-1", "B8-日均PM2.5-MEAN-t-1",
            "日均PM2.5-t-1"]
+PM_list = ["AOD值-t-1", "AOD值", "日均PM2.5-t-1"]
 dependent = ["日均PM2.5"]
 jcz = ["监测站"]
 xni = pd.get_dummies(data[jcz])
-
-
+xni2017 = xni[data["year"] == 2016]
+xni2018 = xni[data["year"] == 2018]
 # independent = list(set(independent) | set(T_1))  # 合集
-# 更改为数组格式与独热编码
-'''
-data_x1 = data[independent]
-data_x2 = data[PM_list]
-data_y = data[dependent]
-data_x1 = np.array(data_x1)
-data_x2 = np.array(data_x2)
-data_y = np.array(data_y)
-'''
-# print(len(data_x1))
 
-
-#  尝试独热编码
-'''
-data_x1 = to_categorical(data_x1)
-data_x2 = to_categorical(data_x2)
-data_y = to_categorical(data_y)
-'''
 ###################################################################################
-
-# 输入1和2的变量数,维度 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!是否可以不同维度
-inputA = Input(shape=(12,))
-inputB = Input(shape=(17,))
-inputC = Input(shape=(12,))
+inputA = Input(shape=(11,))
+inputB = Input(shape=(3,))  #pm
+inputC = Input(shape=(11,))
 inputD = Input(shape=(xni.shape[1],))
 # 输入1
-x = layers.Dense(24, activation="relu")(inputA)
+x = layers.Dense(36, activation="relu")(inputA)
 x = layers.Dense(6, activation="relu")(x)
 x = Model(inputs=inputA, outputs=x)
 # 输入2
-y = layers.Dense(32, activation="relu")(inputB)
-y = layers.Dense(16, activation="relu")(y)
-y = layers.Dense(4, activation="relu")(y)
+y = layers.Dense(15, activation="relu")(inputB)
+y = layers.Dense(8, activation="relu")(y)
 y = Model(inputs=inputB, outputs=y)
 # 输入3
-x3 = layers.Dense(5, activation="relu")(inputC)
-x3 = layers.Dense(4, activation="relu")(x3)
+x3 = layers.Dense(64, activation="relu")(inputC)
+x3 = layers.Dense(12, activation="relu")(x3)
 x3 = Model(inputs=inputC, outputs=x3)
 # 输入4
-x4 = layers.Dense(128, activation="relu")(inputD)
-x4 = layers.Dense(64, activation="relu")(x4)
-x4 = layers.Dense(16, activation="relu")(x4)
+x4 = layers.Dense(16, activation="relu")(inputD)
+x4 = layers.Dense(4, activation="relu")(x4)
+
 x4 = layers.Dense(2, activation="relu")(x4)
 x4 = Model(inputs=inputD, outputs=x4)
 # 合并多输入
@@ -98,56 +77,37 @@ model = Model(inputs=[x.input, y.input, x3.input, x4.input], outputs=z)
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
 
-print('#######打乱数据#######')
-# 打乱
-data = shuffle(data)  # , random_state=0
-print("样本量:", len(data))
-
-print('#######进行K折分组#######')
-# k折分组,训练和测试 9:1
-kf = KFold(n_splits=10)  # 参数shuffle=True
 
 error_AME = []
 error_MSE = []
 error_RE = []
-for train, test in kf.split(data):
 
-    # 划分
-    x1_train = data.iloc[train][independent]
-    x1_test = data.iloc[test][independent]
-    x2_train = data.iloc[train][PM_list]
-    x2_test = data.iloc[test][PM_list]
-    x3_train = data.iloc[train][T_1]
-    x3_test = data.iloc[test][T_1]
-    y_train = data.iloc[train][dependent]
-    y_test = data.iloc[test][dependent]
-
-    x4_train = xni.iloc[train]
-    x4_test = xni.iloc[test]
-
-
+x1_train = data2018[independent]
+x1_test = data2017[independent]
+x2_train = data2018[PM_list]
+x2_test = data2017[PM_list]
+x3_train = data2018[T_1]
+x3_test = data2017[T_1]
+y_train = data2018[dependent]
+y_test = data2017[dependent]
+x4_train = xni2018
+x4_test = xni2017
     # np 格式
 
-    x1_test_np = np.array(x1_test)
-    x1_train_np = np.array(x1_train)
-    x2_test_np = np.array(x2_test)
-    x2_train_np = np.array(x2_train)
-    x3_test_np = np.array(x3_test)
-    x3_train_np = np.array(x3_train)
-    y_test_np = np.array(y_test)
-    y_train_np = np.array(y_train)
+x1_test_np = np.array(x1_test)
+x1_train_np = np.array(x1_train)
+x2_test_np = np.array(x2_test)
+x2_train_np = np.array(x2_train)
+x3_test_np = np.array(x3_test)
+x3_train_np = np.array(x3_train)
+y_test_np = np.array(y_test)
+y_train_np = np.array(y_train)
 
-    x4_test_np = np.array(x4_test)
-    x4_train_np = np.array(x4_train)
-    # 模型计算
-    '''
-    ensemble = AdaBoostRegressor(base_estimator=model, learning_rate=0.001,
-                                 loss='linear')
-    ensemble.fit(X=[x1_train_np, x2_train_np], y=y_train_np)
-    res = ensemble.predict([x1_test_np, x2_test_np])
+x4_test_np = np.array(x4_test)
+x4_train_np = np.array(x4_train)
 
-    '''
-    model.fit([x1_train_np, x2_train_np, x3_train_np, x4_train_np], y_train_np, epochs=1000, batch_size=256)
+for count in range(0, 10):
+    model.fit([x1_train_np, x2_train_np, x3_train_np, x4_train_np], y_train_np, epochs=2000, batch_size=256)
     res = model.predict([x1_test_np, x2_test_np, x3_test_np, x4_test_np])
 
     res = pd.DataFrame(res)
@@ -171,4 +131,4 @@ print("交叉验证后的平均AME误差值:", np.average(error_AME), "预测结
 print("交叉验证后的平均MSE误差值:", np.average(error_MSE), "预测结果的标准差", np.std(error_MSE))
 print("相对误差:", np.average(error_RE),  "预测结果的标准差", np.std(error_RE))
 end_time = datetime.datetime.now()
-print(str(end_time - start_time))
+print("TIME COST:", str(end_time - start_time))

@@ -6,11 +6,11 @@ from pyhdf.SD import SD
 import os
 import pandas as pd
 
-output_file_path = "C:\\Users\\寻常鹿\\Desktop\\"
-dir_str = "F:\\MODIS\\modis04_3km_test\\"
+output_file_path = "C:\\Users\\iii\\Desktop\\"
+dir_str = "D:\\MODIS\\MCD19A2_1km_2015\\"
 file_name = os.listdir(dir_str)
 file_dir = [os.path.join(dir_str, x) for x in file_name]
-print(file_dir)
+#print(file_dir)
 for hdf in file_dir:
     HDF_FILR_URL = hdf
     file = SD(HDF_FILR_URL)
@@ -20,10 +20,13 @@ for hdf in file_dir:
     for idx, sds in enumerate(datasets_dic.keys()):
         print(idx, sds)
     # 输出某项数据
-    sds_obj = file.select('Solar_Zenith_Mean_Mean')  # 选择数据
+
+    sds_obj = file.select('Injection_Height')  # 选择数据
     sds_obj = sds_obj.get()
-    sds_obj = pd.DataFrame(sds_obj)
-    sds_obj.to_excel(output_file_path+"data.xlsx")
+    print(len(sds_obj[1]))
+    #sds_obj = pd.DataFrame(sds_obj)
+    #sds_obj.to_excel(output_file_path+"data.xlsx")
     # index输出
     # pd.DataFrame(datasets_dic.keys()).to_excel(output_file_path+"index.xlsx")
     # print(sds_obj[360][3], sds_obj.shape, sep="\n")
+    break

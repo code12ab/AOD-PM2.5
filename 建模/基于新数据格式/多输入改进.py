@@ -11,8 +11,8 @@ from keras.utils import to_categorical
 
 # 读取
 
-data = pd.read_excel("相邻位置仅留PM和T-1.xlsx")
-#data = pd.read_excel("测试用数据.xlsx")
+#data = pd.read_excel("相邻位置仅留PM和T-1.xlsx")
+data = pd.read_excel("测试用数据.xlsx")
 # 设置变量
 data = data[data["AOD值"] > 0]
 independent = ["AOD值", 'cloudCover', 'dewPoint', 'humidity', 'precipAccumulation', 'precipIntensity', 'pressure',
