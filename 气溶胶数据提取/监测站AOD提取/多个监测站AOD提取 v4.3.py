@@ -3,7 +3,6 @@
 # 作者: xcl
 # 工具：PyCharm
 
-
 from multiprocessing import Process  # 多线程,提高CPU利用率
 import warnings
 from math import radians, cos, sin, asin, sqrt  # 经纬度计算距离
@@ -87,16 +86,21 @@ def get_aod_multiprocessing(location_xy):
             longitude = sds_obj1.get()  # 读取数据
             latitude = sds_obj2.get()
             aod = sds_obj3.get()
+            # 本身已经是np.array
+            '''
             longitude = np.array(longitude)  # 格式转换
             latitude = np.array(latitude)
             aod = np.array(aod)
-        # 距离计算，提取监测站半径为r范围内的AOD值
-            aod_list = get_aod_list(longitude, latitude, aod, item[0], item[1])
-            aod_outcome = "%s文件" % hdf, "%s" % item[2], np.average(aod_list)
-            # 进度
-            print("完成 %s文件" % hdf, "%s" % item[2])
-            aod_outcome_list.append(aod_outcome)
-
+            '''
+            if np.min(longitude) <= item[0] <= np.max(longitude) and np.min(latitude) <= item[1] <= np.max(latitude):
+            # 距离计算，提取监测站半径为r范围内的AOD值!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                aod_list = get_aod_list(longitude, latitude, aod, item[0], item[1])
+                aod_outcome = "%s文件" % hdf, "%s" % item[2], np.average(aod_list)
+                # 进度
+                print("完成 %s文件" % hdf, "%s" % item[2])
+                aod_outcome_list.append(aod_outcome)
+            else:
+                print("该站点不包含于该文件范围中")
         aod_outcome_list_v2 = []
         for element in aod_outcome_list:
             element = pd.Series(element)  # 格式转换
