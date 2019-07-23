@@ -1,0 +1,27 @@
+D:
+cd 毕业论文程序
+cd MODIS
+cd 相关测试程序
+python MODIS_download.py -s https://ladsweb.modaps.eosdis.nasa.gov/archive/orders/501352803/ -d D:\MODIS\MCD19A2_1km_2015  -t 0199091A-1D26-11E9-A7F5-C3B17C49A85D
+
+/archive/orders/501352803/
+
+
+
+
+
+f:
+cd 毕业论文程序
+cd MODIS
+cd 相关测试程序
+python MODIS_download.py -s https://ladsweb.modaps.eosdis.nasa.gov/archive/orders/501321661/  -d F:\MODIS\modis04_3km_A_2014  -t 0199091A-1D26-11E9-A7F5-C3B17C49A85D
+
+/archive/orders/501321661/   AAAAAAAAAAA
+
+
+
+备注：
+1.更换orders
+2.更换储存位置
+3.京津冀鲁坐标：114.0-123.0; 34.0-42.0
+
