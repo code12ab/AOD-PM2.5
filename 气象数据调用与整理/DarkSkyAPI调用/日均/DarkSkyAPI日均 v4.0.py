@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-# 日期: 2019/4/14 16:03
 # 作者: xcl
-# 工具：PyCharm
-
+# 时间: 2019/7/21 18:17
 
 import os
 from darksky import forecast  # DarkSkyAPI
@@ -26,11 +24,14 @@ pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显
 
 # 参数设置
 save_year = 2013
+date_start = int(str(save_year)+"000")
 
-date_start = 2013000
-year_days = 365  # 365为年度; 139适用于"5.19"; 334+31适用于13年
+if save_year % 4 == 0:
+    year_days = 366  # 365为年度; 139适用于"5.19"; 334+31适用于13年
+else:
+    year_days = 365
 
-start_count = 4380   # 刘家园超出次数，没完成
+start_count = 4067  # 刘家园超出次数，没完成
 
 
 API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e936148728",
@@ -42,7 +43,7 @@ API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e9361
 coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
 # 调整 日均 或 逐时
 output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % save_year  # 气象数据存储路径
-error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
+error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  #  报错信息输出路径
 time_out = 30  # 超时设置,10秒太短
 
 
@@ -66,9 +67,11 @@ for j in range(year_days):
     time_list.append(date)
 
 # 基本信息
-print("监测站个数:", len(JCZ_file), "天数:", len(time_list),
+print("监测站个数:", len(JCZ_file), "\n",
+      "天数:", len(time_list), "\n",
       "即" + str(time_list[0]) + "至" + str(time_list[-1]))
 
+time.sleep(10)
 # 主程序
 global t
 
