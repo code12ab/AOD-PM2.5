@@ -21,6 +21,7 @@ PM_list = ["A1-日均PM2.5-MEAN-t-1", "A2-日均PM2.5-MEAN-t-1", "A3-日均PM2.5
            "A5-日均PM2.5-MEAN-t-1", "A6-日均PM2.5-MEAN-t-1", "A7-日均PM2.5-MEAN-t-1", "A8-日均PM2.5-MEAN-t-1",
            "B1-日均PM2.5-MEAN-t-1", "B2-日均PM2.5-MEAN-t-1", "B3-日均PM2.5-MEAN-t-1", "B4-日均PM2.5-MEAN-t-1",
            "B5-日均PM2.5-MEAN-t-1", "B6-日均PM2.5-MEAN-t-1", "B7-日均PM2.5-MEAN-t-1", "B8-日均PM2.5-MEAN-t-1"]
+# ================可以用临近AOD
 dependent = ["日均PM2.5"]
 independent = list(set(independent) | set(T_1))  # 合集
 
@@ -49,7 +50,7 @@ inputB = Input(shape=(13,))
 # the first branch operates on the first input
 x = layers.Dense(8, activation="relu")(inputA)
 x = layers.Dense(4, activation="relu")(x)
-x = Model(inputs=inputA, outputs=x)
+#x = Model(inputs=inputA, outputs=x)
 
 # the second branch opreates on the second input
 y = layers.Dense(64, activation="relu")(inputB)

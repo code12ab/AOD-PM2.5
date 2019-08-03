@@ -74,7 +74,7 @@ model = Model(inputs=[x.input, y.input], outputs=z)
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 model.fit([data_x1, data_x2], data_y, epochs=1000, batch_size=128)
 
-
+print(model.summary())
 
 # 使用模型进行预测
 out1 = model.predict([data_x1, data_x2])

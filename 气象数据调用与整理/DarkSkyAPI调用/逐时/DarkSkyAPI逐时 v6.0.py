@@ -1,26 +1,19 @@
 # -*- coding: utf-8 -*-
+# 日期: 2019/5/11 11:17
 # 作者: xcl
-# 时间: 2019/7/21 18:17
+# 工具：PyCharm
 
-import os
 from darksky import forecast  # DarkSkyAPI
 import time  # 年度时间范围生成
 from datetime import datetime as dt  # 时间戳日期转换
 import pandas as pd  # BDS
-import math  # 向下取整
 # import datetime
-
-'''
-雏形：不需要设置API_KEY,程序自己更换。
-
-下一步尝试：修改更换条件为Bad response
-'''
-
+import math
+import os
 # 文件格式设置
 pd.set_option('display.width', 6666)  # 设置字符显示宽度
 pd.set_option('display.max_rows', None)  # 设置显示最大行
 pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显示所有列
-
 
 # 参数设置
 save_year = 2012
@@ -31,8 +24,7 @@ if save_year % 4 == 0:
 else:
     year_days = 365
 
-start_count = -1  # 刘家园超出次数，没完成
-
+start_count = -1 # 刘家园超出次数，没完成
 
 API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e936148728",
                 "ed7de1f3687f4c53316538a0ce968752", "740c4d0fbd102f83a7753032c769b2b5",
@@ -40,12 +32,11 @@ API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e9361
                 "1875a6cd9baea3db91c31aa29bfa5638", "b726c853b38c30d9b977bcce6fb2b37d",
                 "a5fc93a6781f6d55e7899ae443acd876", "a7e8c6c0ade78c6ae03486be16e7faf0",
                 "ea6ba6d12b5619189b54f10275557872"]
-coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
-# 调整 日均 或 逐时
-output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % save_year  # 气象数据存储路径
-error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  #  报错信息输出路径
-time_out = 30  # 超时设置,10秒太短
 
+coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
+output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\逐时\\%s\\" % save_year  # 气象数据存储路径
+error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
+time_out = 30  # 超时设置,10秒太短
 
 # 批量导入监测站坐标
 # JCZ_file = pd.read_excel("监测站坐标toDarkSkyAPI.xlsx")
@@ -54,7 +45,6 @@ JCZ = []
 for i in range(len(JCZ_file)):
     exec('JCZ%s = [JCZ_file["经度"][i],JCZ_file["纬度"][i],JCZ_file["城市"][i]+"-"+JCZ_file["监测点名称"][i]]' % i)
     exec("JCZ.append(JCZ%s)" % i)  # exec可以执行字符串指令
-
 
 # 一年日期
 time_list = []
@@ -67,24 +57,19 @@ for j in range(year_days):
     time_list.append(date)
 
 # 基本信息
-print("监测站个数:", len(JCZ_file), "\n",
-      "天数:", len(time_list), "\n",
+print("监测站个数:", len(JCZ_file), "天数:", len(time_list),
       "即" + str(time_list[0]) + "至" + str(time_list[-1]))
 
-time.sleep(10)
 # 主程序
 global t
-
-# 再次调整日均或逐时
 
 
 def get_outcome(date_time):
     # 定义气象数据获取函数. 可选项:中文语言lang=["zh"]
     monitoring_station = forecast(*MonitoringStation, time=date_time, timeout=time_out)  # 超时报错设置
-    # darksky_outcome = monitoring_station['hourly']["data"]  # 输出一天24小时的数据,调用一次API
+    darksky_outcome = monitoring_station['hourly']["data"]  # 输出一天24小时的数据,调用一次API
     # 第一天0时至23时
-    darksky_outcome = monitoring_station["daily"]["data"]  # 输出日均数据,调用一次API
-    # print(darksky_outcome)
+    # print(coordinate[3], monitoring_station['hourly']["data"]) 数据内容
     # 输出到文件
     outcome.append(darksky_outcome)
     return outcome
@@ -92,7 +77,8 @@ def get_outcome(date_time):
 
 # 设置计数
 i = start_count
-# 监测站循环
+
+# 监测站
 for jcz in JCZ:
     # 放在下一个for里面？？？？？？？？？？
     '''
@@ -127,7 +113,6 @@ for jcz in JCZ:
     # while len(error) != 0:  # 有报错信息则重新爬去,直到全部爬取
         count_error += 1
         error_update = []
-
         for error_time in error:
             i += 1
             API_KEY = API_KEY_LIST[math.floor(i / 1000)]
@@ -159,9 +144,6 @@ for jcz in JCZ:
         error = pd.DataFrame(error)
         # error.columns = ["Index", '日期']
         error.to_excel(error_information_path+"%s报错.xlsx" % coordinate[3])
-
-print("完成啦")
-
 
 # 自动关机
 print("程序已完成," + str(60) + '秒后将会关机')

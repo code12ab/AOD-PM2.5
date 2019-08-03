@@ -26,16 +26,15 @@ pd.set_option('display.max_rows', None)  # 设置显示最大行
 pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显示所有列
 
 # 参数设置
-distance1 = 50000
+distance1 = 20000
 distance2 = 100000
 
 # 读取文件
-coordinate_file_path = "F:\\毕业论文程序\\MODIS\\坐标\\"
+coordinate_file_path = "d:\\毕业论文程序\\MODIS\\坐标\\"
 JCZ_file = pd.read_excel(coordinate_file_path + "监测站坐标toDarkSkyAPI.xlsx", sheet_name="测试")  # 监测站坐标toDarkSkyAPI
 
 # 输出位置
-
-out_path = "F:\\毕业论文程序\\整合数据\\整合1\\"
+out_path = "d:\\毕业论文程序\\整合数据\\整合1\\"
 # 创建新数据框
 coordinates = pd.DataFrame()
 coordinates["xs"] = JCZ_file["经度"]
@@ -201,3 +200,5 @@ for namess in table2.columns:
 table3['name'] = coordinates["names"]
 table3 = table3.set_index('name')
 table3.to_excel("table3.xlsx")
+
+#os.remove("data6.xlsx", "data8-2.xlsx" )
