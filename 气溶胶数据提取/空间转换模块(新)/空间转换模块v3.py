@@ -185,7 +185,7 @@ def get_aod_multiprocessing(location_xy):
                 # 进度提示
                 print("完成 %s文件" % hdf, "%s" % item[2])
             else:
-                print("不在 %s文件中: %s站点" % (item[2], hdf))
+                print("不在 %s文件中: %s站点" % (hdf, item[2]))
         # 上一个for循环结束
         aod_outcome_list_result = []
         for element in aod_outcome_list:
