@@ -31,7 +31,7 @@ if save_year % 4 == 0:
 else:
     year_days = 365
 
-start_count = -1  # 刘家园超出次数，没完成
+start_count = 5123  # 刘家园超出次数，没完成
 
 
 API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e936148728",
@@ -43,7 +43,7 @@ API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e9361
 coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
 # 调整 日均 或 逐时
 output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % save_year  # 气象数据存储路径
-error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  #  报错信息输出路径
+error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
 time_out = 30  # 超时设置,10秒太短
 
 

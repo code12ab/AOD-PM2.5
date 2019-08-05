@@ -1,47 +1,46 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
 # 时间: 2019/7/18 9:58
-
-import pandas as pd
-import numpy as np
-from scipy import stats
-import numpy as np
-data = pd.read_excel("Dental_2390022.xls")
-
-miaoshu = data.describe()
-#miaoshu.to_excel("描述统计.xls")
-
-for i in range(len(data["DFMT"])):
-    if data['DFMT'][i] != 0:
-        data['DFMT'][i] = 1
-
-for i in range(len(data["DFMT"])):
-    if data['DepCat'][i] != 7:
-        data['DepCat'][i] = 0
-    else:
-        data['DepCat'][i] = 1
-
-#print(data)
-ttfc = stats.levene(data["DFMT"][data["DepCat"]==1],data["DFMT"][data["DepCat"]==0])
-ttest_b = stats.ttest_ind(data["DFMT"][data["DepCat"]==1],data["DFMT"][data["DepCat"]==0], equal_var = False)
-print("方差检验",ttfc,"\n","t检验",ttest_b)
-
-jiaocha = pd.pivot_table(data,values = 'DFMT',index = ['DepCat'],aggfunc=len)
-print(jiaocha)
-
-# 交叉表格
-
-#jiaocha = pd.pivot_table(data,values = 'DFMT',index = ['DepCat'],aggfunc=len)
-#print(jiaocha)
-#ttest1 = stats.ttest_ind(data["DFMT"][data["DepCat"]==4],data["DFMT"][data["DepCat"]==6])
-#ttest2 = stats.ttest_ind(data["DFMT"][data["DepCat"]==4],data["DFMT"][data["DepCat"]==7])
-#ttest3 = stats.ttest_ind(data["DFMT"][data["DepCat"]==6],data["DFMT"][data["DepCat"]==7])
-#print(ttest1,ttest2,ttest3,sep="\n")
-
-# 置信区间
-#x = data["DFMT"][data["DepCat"]==6]
-#interval=stats.t.interval(0.95,len(x)-1,x.mean(),x.std())
-#print(interval)
+import math
+from math import *
+# 计算方位角函数
+def azimuthAngle( x1,  y1,  x2,  y2):
+    angle = 0.0;
+    dx = x2 - x1
+    dy = y2 - y1
+    if  x2 == x1:
+        angle = math.pi / 2.0
+        if  y2 == y1 :
+            angle = 0.0
+        elif y2 < y1 :
+            angle = 3.0 * math.pi / 2.0
+    elif x2 > x1 and y2 > y1:
+        angle = math.atan(dx / dy)
+    elif  x2 > x1 and  y2 < y1 :
+        angle = math.pi / 2 + math.atan(-dy / dx)
+    elif  x2 < x1 and y2 < y1 :
+        angle = math.pi + math.atan(dx / dy)
+    elif  x2 < x1 and y2 > y1 :
+        angle = 3.0 * math.pi / 2.0 + math.atan(dy / -dx)
+    return (angle * 180 / math.pi)
 
 
-################################################Q22222222222222
+def getDegree(latA, lonA, latB, lonB):
+    radLatA = radians(latA)
+    radLonA = radians(lonA)
+    radLatB = radians(latB)
+    radLonB = radians(lonB)
+    dLon = radLonB - radLonA
+    y = sin(dLon) * cos(radLatB)
+    x = cos(radLatA) * sin(radLatB) - sin(radLatA) * cos(radLatB) * cos(dLon)
+    brng = degrees(atan2(y, x))
+    brng = (brng + 360) % 360
+    return brng
+
+
+a = azimuthAngle(12,3,2,2)
+
+b = getDegree(13,3,2,2)
+
+print("a:", a)
+print("b", b)

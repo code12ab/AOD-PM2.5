@@ -33,7 +33,7 @@ setup(name='darkskylib',
       packages=['darksky'],
       install_requires=[
           'future',
-          'requests',
+          'requests', 'pandas', 'numba'
       ],
       zip_safe=True
       )

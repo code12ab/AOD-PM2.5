@@ -42,7 +42,7 @@ def get_aod_list(longitude_df, latitude_df, aod_df, item_df1, item_df2):
     aod_def_list = []
     for row in range(longitude_df.shape[0]):  # 行 676
         for column in range(longitude_df.shape[1]):  # 列 451
-            if item_df1-0.1 <= longitude_df[row][column] <= item_df1+ 0.1 and item_df2 - 0.075 <= latitude_df[row][column] <= item_df2 + 0.075:
+            if item_df1-0.1 <= longitude_df[row][column] <= item_df1 + 0.1 and item_df2 - 0.075 <= latitude_df[row][column] <= item_df2 + 0.075:
                 d = geo_distance(longitude_df[row][column], latitude_df[row][column], item_df1, item_df2)  # item[0],item[1]
             else:
                 d = -9999  # 表示缺失
