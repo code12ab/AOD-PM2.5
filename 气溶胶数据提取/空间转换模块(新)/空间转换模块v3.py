@@ -22,8 +22,8 @@ dis2 = 20000
 dis3 = 50000
 
 # 文件设置
-output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\"  # 结果的输出位置
-MODIS_input_file_path = "D:\\test\\"  # HDF文件位置 TTT
+output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra\\2018\\"  # 结果的输出位置
+MODIS_input_file_path = "E:\\MOD04_3K_2018\\"  # HDF文件位置 TTT
 location_xy_input_file = "D:\\毕业论文程序\\MODIS\\坐标\\站点列表-2018.11.08起.xlsx"
 # 定义经纬度距离公式
 @jit
@@ -244,28 +244,28 @@ if __name__ == '__main__':
     print("总文件个数:", len(file_name))
 
     p1 = Process(target=get_aod_multiprocessing, args=('样例1',))
-    #p2 = Process(target=get_aod_multiprocessing, args=('样例2',))
-    #p3 = Process(target=get_aod_multiprocessing, args=('样例3',))
-    #p4 = Process(target=get_aod_multiprocessing, args=('样例4',))
-    #p5 = Process(target=get_aod_multiprocessing, args=('样例5',))
-    #p6 = Process(target=get_aod_multiprocessing, args=('样例6',))
+    p2 = Process(target=get_aod_multiprocessing, args=('样例2',))
+    p3 = Process(target=get_aod_multiprocessing, args=('样例3',))
+    p4 = Process(target=get_aod_multiprocessing, args=('样例4',))
+    p5 = Process(target=get_aod_multiprocessing, args=('样例5',))
+    p6 = Process(target=get_aod_multiprocessing, args=('样例6',))
 
     p1.start()
-    # p2.start()
-    # p3.start()
-    # p4.start()
-    # p5.start()
-    # p6.start()
+    p2.start()
+    p3.start()
+    p4.start()
+    p5.start()
+    p6.start()
 
-    # p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
-    # p5.join()
-    # p4.join()
-    # p3.join()
-    # p2.join()
+    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
+    p5.join()
+    p4.join()
+    p3.join()
+    p2.join()
     p1.join()
 
     # 自动关机
     print("程序已完成," + str(60) + '秒后将会关机')
     time.sleep(60)
     print('关机')
-    # os.system('shutdown -s -f -t 1')
+    os.system('shutdown -s -f -t 1')
