@@ -70,20 +70,20 @@ JCZ_NAME = pd.read_excel("F:\\毕业论文程序\\MODIS\\坐标\\监测站坐标
 i = -1
 for JCZ in input_file_name:
     i += 1
-    print("进度:%.2f%%" % (i/(len(input_file_name)-1)*100))
+    print("进度:%.2f%%" % (i / (len(input_file_name) - 1) * 100))
     # print(JCZ)
     JCZ = JCZ.replace("污染物浓度.xlsx", "")
     # 获取对应监测点编码的名称和坐标信息
     JCZ_info = JCZ_NAME[JCZ_NAME["监测点编码"] == JCZ]
     # 为统一数据保存命名方式为"城市-监测站名称"
-    JCZ_new_name = JCZ_info["城市"]+"-"+JCZ_info["监测点名称"]
+    JCZ_new_name = JCZ_info["城市"] + "-" + JCZ_info["监测点名称"]
     # JCZ_new_name = pd.DataFrame(JCZ_new_name)
     JCZ_new_name = JCZ_new_name.values[0]
     # print(JCZ_new_name.values)
     # print(JCZ_info.__class__)
 
     # 读取数据
-    data = pd.read_excel(input_file_path+JCZ+"污染物浓度.xlsx")
+    data = pd.read_excel(input_file_path + JCZ + "污染物浓度.xlsx")
     data.columns = ["日期", "hour", "日均PM2.5"]
     data["日期"] = data["日期"].dt.date
     data = data.drop(["hour"], axis=1)
@@ -91,4 +91,3 @@ for JCZ in input_file_name:
     data["Y"] = JCZ_info["纬度"][i]
     data = data.set_index('日期')
     data.to_excel(output_file_path + "%s.xlsx" % JCZ_new_name)
-
