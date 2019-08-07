@@ -1,46 +1,38 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
-# 时间: 2019/7/18 9:58
-import math
-from math import *
-# 计算方位角函数
-def azimuthAngle( x1,  y1,  x2,  y2):
-    angle = 0.0;
-    dx = x2 - x1
-    dy = y2 - y1
-    if  x2 == x1:
-        angle = math.pi / 2.0
-        if  y2 == y1 :
-            angle = 0.0
-        elif y2 < y1 :
-            angle = 3.0 * math.pi / 2.0
-    elif x2 > x1 and y2 > y1:
-        angle = math.atan(dx / dy)
-    elif  x2 > x1 and  y2 < y1 :
-        angle = math.pi / 2 + math.atan(-dy / dx)
-    elif  x2 < x1 and y2 < y1 :
-        angle = math.pi + math.atan(dx / dy)
-    elif  x2 < x1 and y2 > y1 :
-        angle = 3.0 * math.pi / 2.0 + math.atan(dy / -dx)
-    return (angle * 180 / math.pi)
+# 时间: 2019/8/6 16:59
 
+# 库
+import pandas as pd
+import numpy as np
+import os
 
-def getDegree(latA, lonA, latB, lonB):
-    radLatA = radians(latA)
-    radLonA = radians(lonA)
-    radLatB = radians(latB)
-    radLonB = radians(lonB)
-    dLon = radLonB - radLonA
-    y = sin(dLon) * cos(radLatB)
-    x = cos(radLatA) * sin(radLatB) - sin(radLatA) * cos(radLatB) * cos(dLon)
-    brng = degrees(atan2(y, x))
-    brng = (brng + 360) % 360
-    return brng
+a = [1, 4, 4, 0]
+b = [4, 4, 4, 0]
+c = [np.nan, 4, np.nan, 3]
+d = [4, 4, np.nan, np.nan]
 
+c = pd.DataFrame([a, b, c, d])
+'''             weight
+KNN        0.476610
+ewm        0.032811
+IDW        0.476610
+Iterative  0.013969
+运行完成!
+             weight
+KNN        0.241128
+ewm        0.205460
+IDW        0.419197
+Iterative  0.134215
+运行完成!'''
+print(c)
+print("\n", c.std())
+print("\n", c.mean())  # mean(1) 横向均值 mean() 顺着均值，列的
 
-a = azimuthAngle(12,3,2,2)
+mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2018\\北京-定陵.xlsx"
 
-b = getDegree(13,3,2,2)
+data_KNN = pd.read_excel(mean_output_file_path, sheet_name="KNN")
+print(data_KNN.index)
+print(data_KNN.columns)
 
-print("a:", a)
-print("b", b)
+print(data_KNN[["日期", "AOD_0"]])

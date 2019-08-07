@@ -4,11 +4,13 @@
       <w>brng</w>
       <w>creat</w>
       <w>crossentropy</w>
+      <w>lnfij</w>
       <w>otherpollution</w>
       <w>regressor</w>
       <w>rmsprop</w>
       <w>softmax</w>
       <w>timestation</w>
+      <w>xytodis</w>
     </words>
   </dictionary>
 </component>
