@@ -22,16 +22,20 @@ path_list = ["D:\\站点_20140513-20141231\\",
              "D:\\站点_20160101-20161231\\",
              "D:\\站点_20170101-20171231\\",
              "D:\\站点_20180101-20181231\\"]
+year = 2014
+
+# 文件夹循环
 for path in path_list:
     input_file_path = path
     input_file_name = os.listdir(input_file_path)  # 文件名
-    output_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\2019\\"
+    output_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\%s\\" % year
+    year += 1
     error_path = "D:\\毕业论文程序\\污染物浓度\\error\\"
     JCZ_data = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
     # JCZ_data = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="北京2019")  # 适用于北京2019年
     JCZ_number = JCZ_data["监测点编码"]
 
-    # 主程序
+    # 主程序, 主要部分
     i = 0
     for number in JCZ_number:
         i += 1
