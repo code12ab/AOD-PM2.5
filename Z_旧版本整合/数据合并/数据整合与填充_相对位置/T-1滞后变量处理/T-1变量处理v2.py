@@ -13,7 +13,6 @@ for year in range(2013,2019):
     input_file_name = os.listdir(input_file_path)  # 文件名列表
     print("文件个数:"+str(len(input_file_name)))
 
-
     for file_name in input_file_name:
         print("处理监测站:"+file_name)
         data = pd.read_excel(input_file_path + file_name)

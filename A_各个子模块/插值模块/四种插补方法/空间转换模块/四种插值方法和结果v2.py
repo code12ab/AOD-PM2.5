@@ -51,6 +51,7 @@ for input_file_name in input_file_names:
         for count in range(len(input_data.index)):
             data_to_add = pd.DataFrame(list(input_data.iloc[count]))  # 某一行
             data_to_dis = pd.concat([data_to_add, xytodis], axis=1)  # 坐标和某一行合并
+            print(data_to_dis)
             data_to_dis.columns = ["value", "index", "longitude", "latitude"]
             # 对这一行进行操作 对每一行输出一下
             for count_2 in range(len(data_to_dis["value"])):
@@ -151,7 +152,7 @@ for input_file_name in input_file_names:
         sheet_name_count = 1 + sheet_name_count
     writer.save()
 
-    # AQ.mean(1)
+    # AQ.mean(1) 对两颗卫星去均值, 列的横向均值
     writer = pd.ExcelWriter(mean_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")))
     for methods_output in sheet_name:
         data_to_mean = pd.read_excel(merge_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")), sheet_name=methods_output)

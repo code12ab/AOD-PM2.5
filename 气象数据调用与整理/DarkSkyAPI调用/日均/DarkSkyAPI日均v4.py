@@ -23,13 +23,14 @@ pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显
 
 
 # 参数设置
-save_year = 2012
-date_start = int(str(save_year)+"000")
+save_year = 2018
+dayinyear_start = "139"
+date_start = int(str(save_year)+dayinyear_start)
 
 if save_year % 4 == 0:
-    year_days = 366  # 365为年度; 139适用于"5.19"; 334+31适用于13年
+    year_days = 366-int(dayinyear_start)  # 365为年度; 139适用于"5.19"; 334+31适用于13年
 else:
-    year_days = 365
+    year_days = 365-int(dayinyear_start)
 
 start_count = 5123  # 刘家园超出次数，没完成
 
@@ -123,11 +124,10 @@ for jcz in JCZ:
     print("接下来执行报错日期数据重新获取")
     count_error = 0
     print("%s 未获取数据的天数:" % coordinate[3], len(error))
-    while count_error != 2:  # 多次报错则放弃爬取
+    while count_error != 1:  # 多次报错则放弃爬取;这里重新爬取一次
     # while len(error) != 0:  # 有报错信息则重新爬去,直到全部爬取
         count_error += 1
         error_update = []
-
         for error_time in error:
             i += 1
             API_KEY = API_KEY_LIST[math.floor(i / 1000)]
@@ -165,4 +165,4 @@ print("完成啦")
 
 # 自动关机
 print("程序已完成," + str(60) + '秒后将会关机')
-#os.system('shutdown -s -f -t 60')
+# os.system('shutdown -s -f -t 60')

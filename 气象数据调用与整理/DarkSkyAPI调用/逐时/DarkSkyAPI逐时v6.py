@@ -24,7 +24,7 @@ if save_year % 4 == 0:
 else:
     year_days = 365
 
-start_count = -1 # 刘家园超出次数，没完成
+start_count = 273  # 刘家园超出次数，没完成
 
 API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e936148728",
                 "ed7de1f3687f4c53316538a0ce968752", "740c4d0fbd102f83a7753032c769b2b5",

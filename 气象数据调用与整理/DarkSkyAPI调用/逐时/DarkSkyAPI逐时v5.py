@@ -16,9 +16,9 @@ pd.set_option('display.max_rows', None)  # 设置显示最大行
 pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显示所有列
 
 # 参数设置
-year_days = 365  # 365为年度; 139适用于"5.19"; 334+31适用于13年
-date_start = 2013000
-start_count = -1  # 刘家园超出次数，没完成
+year_days = 365-139 # 365为年度; 139适用于"5.19"; 334+31适用于13年
+date_start = 2018139
+start_count = 8888  # 刘家园超出次数，没完成
 save_year = 2013
 
 API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e936148728",

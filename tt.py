@@ -3,13 +3,11 @@
 # 时间: 2019/8/6 20:32
 
 import math
+from darksky.api import DarkSky, DarkSkyAsync
+from darksky.types import languages, units, weather
+
+API_KEY = "ea6ba6d12b5619189b54f10275557872"
 
 
-r = 35
-
-degree = (0.125*math.pi)*1
-
-x = math.cos(degree)*r
-y = math.sin(degree)*r
-
-print("x:", x, "\n", "y:", y)
+# Synchronous way
+darksky = DarkSky(API_KEY)
