@@ -3,11 +3,11 @@
 # 时间: 2019/8/6 20:32
 
 import math
-from darksky.api import DarkSky, DarkSkyAsync
-from darksky.types import languages, units, weather
+path_list = [
+             "D:\\站点_20170101-20171231\\",
+             "D:\\站点_20180101-20181231\\"]
 
-API_KEY = "ea6ba6d12b5619189b54f10275557872"
+year = path_list[0][6:10]
 
-
-# Synchronous way
-darksky = DarkSky(API_KEY)
+print(year,year.__class__
+)

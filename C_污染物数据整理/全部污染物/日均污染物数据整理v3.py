@@ -17,12 +17,19 @@ import datetime
 import time
 
 # 参数设置
+'''
 path_list = ["D:\\站点_20140513-20141231\\",
              "D:\\站点_20150101-20151231\\",
              "D:\\站点_20160101-20161231\\",
              "D:\\站点_20170101-20171231\\",
              "D:\\站点_20180101-20181231\\"]
-year = 2014
+'''
+
+path_list = [
+             "D:\\站点_20170101-20171231\\",
+             "D:\\站点_20180101-20181231\\"]
+
+year = path_list[0][6:10]  # year = 2017
 
 # 文件夹循环
 for path in path_list:
@@ -158,6 +165,8 @@ for path in path_list:
         # 输出
         outcome.to_excel(output_file_path + "%s污染物浓度.xlsx" % number)
         pd.DataFrame(error).to_excel(error_path + "error.xlsx")
+
+
 
 # 第二部分
 """
