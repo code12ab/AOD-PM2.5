@@ -2,29 +2,19 @@
 # 作者: xcl
 # 时间: 2019/8/9 1:10
 
-
+# 库
 import os
 import pandas as pd
 import warnings
-from datetime import datetime as dt
 import datetime
-
-# 第一部分
-
-# 按监测站编号建立污染物浓度文件
-
-# 相关库
+from datetime import datetime as dt
 import time
 
-# 参数设置
-'''
-path_list = ["D:\\站点_20140513-20141231\\",
-             "D:\\站点_20150101-20151231\\",
-             "D:\\站点_20160101-20161231\\",
-             "D:\\站点_20170101-20171231\\",
-             "D:\\站点_20180101-20181231\\"]
-'''
+# 第一部分: 按监测站编号建立污染物浓度文件
+# 路径设置
+path_list = ["D:\\站点_20140513-20141231\\", "D:\\站点_20150101-20151231\\", "D:\\站点_20160101-20161231\\", "D:\\站点_20170101-20171231\\", "D:\\站点_20180101-20181231\\"]
 
+"""
 path_list = [
     "D:\\站点_20170101-20171231\\",
     "D:\\站点_20180101-20181231\\"]
@@ -211,69 +201,71 @@ for path in path_list:
         outcome.to_excel(output_file_path + "%s污染物浓度.xlsx" % number)
         pd.DataFrame(error).to_excel(error_path + "error.xlsx")
 
+"""
 
-# 第二部分
+
+# 第二部分: 更改日期为T-1, 增加站点名称列
 
 warnings.filterwarnings('ignore')  # 代码中仅进行新列的赋值,不对数据源做修改,因此可以忽略该警告
-# 参数设置
-input_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\2019\\"
-input_file_name = os.listdir(input_file_path)  # 文件名
-output_file_path = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\"
-JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
-# JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="北京2019")  # 适用于北京2019年
-# JCZ_NAME格式为df,监测站编码,监测点名称,城市,经度,纬度
-# print(input_file_name)
-# print(JCZ_NAME.head())
 
-i = -1
-for JCZ in input_file_name:
-    i += 1
-    print("进度:%.2f%%" % (i/(len(input_file_name)-1)*100))
-    # print(JCZ)
-    JCZ = JCZ.replace("污染物浓度.xlsx", "")
-    # 获取对应监测点编码的名称和坐标信息
-    JCZ_info = JCZ_NAME[JCZ_NAME["监测点编码"] == JCZ]
-    # 为统一数据保存命名方式为"城市-监测站名称"
-    JCZ_new_name = JCZ_info["城市"]+"-"+JCZ_info["监测点名称"]
-    # JCZ_new_name = pd.DataFrame(JCZ_new_name)
-    JCZ_new_name = JCZ_new_name.values[0]
-    # print(JCZ_new_name.values)
-    # print(JCZ_info.__class__)
+year_list = [2017, 2018]
+for year in year_list:
+    # 参数设置
+    input_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\%s\\" % year
+    input_file_name = os.listdir(input_file_path)  # 文件名
+    output_file_path = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\%s\\" % year
+    JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
+    # JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="北京2019")  # 适用于北京2019年
+    # JCZ_NAME格式为df,监测站编码,监测点名称,城市,经度,纬度
+    # print(input_file_name)
+    # print(JCZ_NAME.head())
 
-    # 读取数据
-    data = pd.read_excel(input_file_path+JCZ+"污染物浓度.xlsx")
-    data["日期"] = data["日期"].dt.date
-    '''
-          今日0时的24小时平均滑动值是前一天的24小时PM2.5均值
-    '''
+    i = -1
+    for JCZ in input_file_name:
+        i += 1
+        print("进度:%.2f%%" % (i/(len(input_file_name)-1)*100))
+        # print(JCZ)
+        JCZ = JCZ.replace("污染物浓度.xlsx", "")
+        # 获取对应监测点编码的名称和坐标信息
+        JCZ_info = JCZ_NAME[JCZ_NAME["监测点编码"] == JCZ]
+        # 为统一数据保存命名方式为"城市-监测站名称"
+        JCZ_new_name = JCZ_info["城市"]+"-"+JCZ_info["监测点名称"]
+        # JCZ_new_name = pd.DataFrame(JCZ_new_name)
+        JCZ_new_name = JCZ_new_name.values[0]
+        # print(JCZ_new_name.values)
+        # print(JCZ_info.__class__)
 
-    def get_day(date_input, step=0):
-        # 获取指定日期date(形如"xxxx-xx-xx")之前或之后的多少天的日期, 返回值为字符串格式的日期
-        date_input = str(date_input)  # 转化为字符串方便合并
-        l_input = date_input.split("-")
-        y = int(l_input[0])
-        m = int(l_input[1])
-        d = int(l_input[2])
-        old_date = datetime.datetime(y, m, d)
-        new_date = (old_date + datetime.timedelta(days=step)).strftime('%Y-%m-%d')
-        # print(new_date)
-        return new_date
+        # 读取数据
+        data = pd.read_excel(input_file_path+JCZ+"污染物浓度.xlsx")
+        data["日期"] = data["日期"].dt.date
+        '''
+        今日0时的24小时平均滑动值是前一天的24小时PM2.5均值
+        '''
+        def get_day(date_input, step=0):  # step 默认为0
+            # 获取指定日期date(形如"xxxx-xx-xx")之前或之后的多少天的日期, 返回值为字符串格式的日期
+            date_input = str(date_input)  # 转化为字符串方便合并
+            l_input = date_input.split("-")
+            y = int(l_input[0])
+            m = int(l_input[1])
+            d = int(l_input[2])
+            old_date = datetime.datetime(y, m, d)
+            new_date = (old_date + datetime.timedelta(days=step)).strftime('%Y-%m-%d')
+            # print(new_date)
+            return new_date
 
 
-    data["日期"] = data["日期"].map(lambda x: get_day(x, -1))  # 今日的0时PM2.5_24h对应前一天PM2.5日均值
-    data = data.drop(["hour"], axis=1)
-    print(JCZ_info)
-
-    data["X"] = JCZ_info["经度"][i]
-    data["Y"] = JCZ_info["纬度"][i]
-
-    # 以下仅在北京2019年下使用
-    '''
-    data["X"] = JCZ_info["经度"]
-    data["Y"] = JCZ_info["纬度"]
-    data['X'] = data['X'].fillna(method='pad')
-    data['Y'] = data['Y'].fillna(method='pad')  # 用前一个值补充坐标
-    '''
-    # 输出
-    data = data.set_index('日期')
-    data.to_excel(output_file_path + "%s.xlsx" % JCZ_new_name)
+        data["日期"] = data["日期"].map(lambda x: get_day(x, -1))  # 今日的0时PM2.5_24h对应前一天PM2.5日均值
+        '''
+        data["X"] = JCZ_info["经度"][i]
+        data["Y"] = JCZ_info["纬度"][i]
+        '''
+        # 以下仅在北京2019年下使用
+        '''
+        data["X"] = JCZ_info["经度"]
+        data["Y"] = JCZ_info["纬度"]
+        data['X'] = data['X'].fillna(method='pad')
+        data['Y'] = data['Y'].fillna(method='pad')  # 用前一个值补充坐标
+        '''
+        # 输出
+        data = data.set_index('日期')
+        data.to_excel(output_file_path + "%s.xlsx" % JCZ_new_name)
