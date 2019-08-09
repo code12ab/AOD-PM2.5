@@ -1,0 +1,166 @@
+# -*- coding: utf-8 -*-
+# 作者: xcl
+# 时间: 2019/8/7 11:10
+
+
+# 库
+import pandas as pd
+import numpy as np
+from fancyimpute import KNN, IterativeImputer
+
+# 路径
+input_file_path_Aqua = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\2018\\北京-定陵.xlsx"
+input_file_path_Terra = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra\\2018\\北京-定陵.xlsx"
+xytodis = pd.read_excel("D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\xytodis.xlsx")
+# 读取
+data_Aqua = pd.read_excel(input_file_path_Aqua)
+data_Terra = pd.read_excel(input_file_path_Terra)
+
+# 时间：
+# 局部：KNN
+# 最近邻估算，使用两行都具有观测数据的特征的均方差来对样本进行加权。然后用加权的结果进行特征值填充
+# 相当于A0D17个点为特征进行近邻,则参数K为时间,即时间上最近的16行按特征的均方差进行加权，即哪个时间点的权重大一些
+del data_Terra["监测站"]
+del data_Aqua["监测站"]
+data_Aqua = data_Aqua.set_index('日期')
+data_Terra = data_Terra.set_index('日期')
+
+data_Aqua_KNN = KNN(k=30).fit_transform(data_Aqua)
+data_Aqua_KNN = pd.DataFrame(data_Aqua_KNN)  # 结果中有许多零值,应为空值
+data_Terra_KNN = KNN(k=30).fit_transform(data_Terra)
+data_Terra_KNN = pd.DataFrame(data_Terra_KNN)  # 结果中有许多零值,应为空值
+
+
+# 全局: 平滑,常用于股市
+data_Aqua_ewm = pd.DataFrame.ewm(
+    self=data_Aqua,
+    com=0.5,
+    ignore_na=True,
+    adjust=True).mean()
+data_Terra_ewm = pd.DataFrame.ewm(
+    self=data_Terra,
+    com=0.5,
+    ignore_na=True,
+    adjust=True).mean()
+
+
+# 空间:
+# IDW 局部
+def get_IDW(input_data):
+    list_to_concat = []
+    for count in range(len(input_data.index)):
+        data_to_add = pd.DataFrame(list(input_data.iloc[count]))  # 某一行
+        data_to_dis = pd.concat([data_to_add, xytodis], axis=1)  # 坐标和某一行合并
+        data_to_dis.columns = ["value", "index", "longitude", "latitude"]
+        # 对这一行进行操作 对每一行输出一下
+        for count_2 in range(len(data_to_dis["value"])):
+            res_list = []
+            if pd.isnull(data_to_dis.iloc[count_2]['value']):
+                data_to_weight = data_to_dis[data_to_dis["value"] > 0]
+                if len(data_to_weight["value"]) > 0:
+                    for item in range(len(data_to_weight["value"])):
+                        dx = 1 * (data_to_weight.iloc[item]["longitude"] -
+                                  data_to_dis.iloc[count_2]['longitude'])
+                        dy = 1 * (data_to_weight.iloc[item]["latitude"] -
+                                  data_to_dis.iloc[count_2]['latitude'])
+                        weight = 1 / ((dx * dx + dy * dy) ** 0.5)
+                        # weight = inf ?
+                        res = weight * data_to_weight.iloc[item]["value"]
+                        res_list.append(res)
+                    res_output = np.sum(np.array(res_list))  # sum
+                    try:
+                        data_to_dis.loc[count_2, 'value'] = res_output
+                    except Exception as e:
+                        print("缺失严重, 插值未定义:", e)
+        data_to_dis = data_to_dis.drop(["latitude", "longitude"], axis=1)
+        data_to_dis = data_to_dis.drop(["index"], axis=1)
+        list_to_concat.append(data_to_dis.T)
+    data_last = pd.concat(list_to_concat)
+    return data_last
+
+
+data_Aqua_IDW = get_IDW(data_Aqua)
+data_Terra_IDW = get_IDW(data_Terra)
+
+# 迭代函数法,缺失特征作为y，其他特征作为x 全局插值
+data_Aqua_Iterative = IterativeImputer(max_iter=10).fit_transform(data_Aqua)
+data_Aqua_Iterative = pd.DataFrame(data_Aqua_Iterative)
+data_Terra_Iterative = IterativeImputer(max_iter=10).fit_transform(data_Terra)
+data_Terra_Iterative = pd.DataFrame(data_Terra_Iterative)
+
+# 对结果的0值取np.nan
+data_Aqua_KNN.replace(0, np.nan, inplace=True)
+data_Terra_KNN.replace(0, np.nan, inplace=True)
+data_Aqua_ewm.replace(0, np.nan, inplace=True)
+data_Terra_ewm.replace(0, np.nan, inplace=True)
+data_Aqua_IDW.replace(0, np.nan, inplace=True)
+data_Terra_IDW.replace(0, np.nan, inplace=True)
+data_Aqua_Iterative.replace(0, np.nan, inplace=True)
+data_Terra_Iterative.replace(0, np.nan, inplace=True)
+
+# 合并相同方法的结果
+data_Aqua_KNN = data_Aqua_KNN.set_index(data_Aqua.index)
+data_Aqua_KNN.columns = data_Aqua.columns
+data_Aqua_KNN["日期合并用"] = data_Aqua_KNN.index
+data_Aqua_ewm = data_Aqua_ewm.set_index(data_Aqua.index)
+data_Aqua_ewm.columns = data_Aqua.columns
+data_Aqua_ewm["日期合并用"] = data_Aqua_ewm.index
+data_Aqua_IDW = data_Aqua_IDW.set_index(data_Aqua.index)
+data_Aqua_IDW.columns = data_Aqua.columns
+data_Aqua_IDW["日期合并用"] = data_Aqua_IDW.index
+data_Aqua_Iterative = data_Aqua_Iterative.set_index(data_Aqua.index)
+data_Aqua_Iterative.columns = data_Aqua.columns
+data_Aqua_Iterative["日期合并用"] = data_Aqua_Iterative.index
+
+data_Terra_KNN = data_Terra_KNN.set_index(data_Terra.index)
+data_Terra_KNN.columns = data_Terra.columns
+data_Terra_KNN["日期合并用"] = data_Terra_KNN.index
+data_Terra_ewm = data_Terra_ewm.set_index(data_Terra.index)
+data_Terra_ewm.columns = data_Terra.columns
+data_Terra_ewm["日期合并用"] = data_Terra_ewm.index
+data_Terra_IDW = data_Terra_IDW.set_index(data_Terra.index)
+data_Terra_IDW.columns = data_Terra.columns
+data_Terra_IDW["日期合并用"] = data_Terra_IDW.index
+data_Terra_Iterative = data_Terra_Iterative.set_index(data_Terra.index)
+data_Terra_Iterative.columns = data_Terra.columns
+data_Terra_Iterative["日期合并用"] = data_Terra_Iterative.index
+
+
+# 合并不同方法下的A/T
+# 合并不同方法下的A/T
+sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
+sheet_name_count = 0
+writer = pd.ExcelWriter('MergeAT.xlsx')
+for methods_output in [[data_Aqua_KNN, data_Terra_KNN], [data_Aqua_ewm, data_Terra_ewm], [
+        data_Aqua_IDW, data_Terra_IDW], [data_Aqua_Iterative, data_Terra_Iterative]]:
+    if len(methods_output[0].index) >= len(methods_output[1].index):
+        data_merge_AT = pd.merge(
+            methods_output[0],
+            methods_output[1],
+            how='left',
+            on=["日期"])
+        data_merge_AT.to_excel(writer, sheet_name=sheet_name[sheet_name_count])
+    else:
+        data_merge_AT = pd.merge(
+            methods_output[0],
+            methods_output[1],
+            how='right',
+            on=["日期"])
+        data_merge_AT.to_excel(writer, sheet_name=sheet_name[sheet_name_count])
+    sheet_name_count = 1 + sheet_name_count
+writer.save()
+
+
+# AQ.mean(1)
+writer = pd.ExcelWriter('datasdasd.xlsx')
+for methods_output in sheet_name:
+    data_to_mean = pd.read_excel("MergeAT.xlsx", sheet_name=methods_output)
+    data_to_mean = data_to_mean.set_index("日期")
+    for area_numb in range(0, 17):
+        d1 = data_to_mean[['AOD_%s_x' % area_numb, "AOD_%s_y" % area_numb]]
+        d2 = d1.mean(1)
+        data_to_mean["AOD_%s" % area_numb] = d2
+        data_to_mean.drop(['AOD_%s_x' % area_numb, "AOD_%s_y" % area_numb], inplace=True, axis=1)
+    data_to_mean.drop(['日期合并用_y', "日期合并用_x"], inplace=True, axis=1)
+    data_to_mean.to_excel(writer, sheet_name=methods_output)
+writer.save()
