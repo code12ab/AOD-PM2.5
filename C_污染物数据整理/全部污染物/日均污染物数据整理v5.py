@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
+# 时间: 2019/8/9 15:10
+
+'''
+说明:
+    v4 分年份输出
+    v5 多年份合一,省去拼接
+'''
+
+# -*- coding: utf-8 -*-
+# 作者: xcl
 # 时间: 2019/8/9 1:10
 
 
@@ -25,19 +35,14 @@ path_list = ["D:\\站点_20140513-20141231\\",
              "D:\\站点_20180101-20181231\\"]
 '''
 
-"""
-path_list = [
-    "D:\\站点_20170101-20171231\\",
-    "D:\\站点_20180101-20181231\\"]
+path_list = ["D:\\站点14-18\\"]
 
-year = path_list[0][6:10]  # year = 2017
 
 # 文件夹循环
 for path in path_list:
     input_file_path = path
     input_file_name = os.listdir(input_file_path)  # 文件名
-    output_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\%s\\" % year
-    year += 1
+    output_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\total\\"
     error_path = "D:\\毕业论文程序\\污染物浓度\\error\\"
     JCZ_data = pd.read_excel(
         "D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx",
@@ -212,16 +217,15 @@ for path in path_list:
         outcome.to_excel(output_file_path + "%s污染物浓度.xlsx" % number)
         pd.DataFrame(error).to_excel(error_path + "error.xlsx")
 
-"""
 
-
+print("================ 开始第二部分 ==================")
 # 第二部分: 更改日期为T-1, 增加站点名称列
 
 warnings.filterwarnings('ignore')  # 代码中仅进行新列的赋值,不对数据源做修改,因此可以忽略该警告
 # 参数设置
-input_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\2019\\"
+input_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\total\\"
 input_file_name = os.listdir(input_file_path)  # 文件名
-output_file_path = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\"
+output_file_path = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\多年合一\\"
 JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
 # JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="北京2019")  # 适用于北京2019年
 # JCZ_NAME格式为df,监测站编码,监测点名称,城市,经度,纬度
@@ -265,7 +269,6 @@ for JCZ in input_file_name:
 
     data["日期"] = data["日期"].map(lambda x: get_day(x, -1))  # 今日的0时PM2.5_24h对应前一天PM2.5日均值
     data = data.drop(["hour"], axis=1)
-    print(JCZ_info)
     '''
     data["X"] = JCZ_info["经度"][i]
     data["Y"] = JCZ_info["纬度"][i]
