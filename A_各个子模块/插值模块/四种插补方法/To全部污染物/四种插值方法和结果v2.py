@@ -100,16 +100,15 @@ for input_file_name in input_file_names:
     concat_list = []
     for item in JCZ_info["监测站"]:    # 不同于气溶胶插值方法
         if item != name:
-            lng1 = JCZ_info[JCZ_info["监测站"] == name]["经度"]
-            lat1 = JCZ_info[JCZ_info["监测站"] == name]["纬度"]
-            lng2 = JCZ_info[JCZ_info["监测站"] == item]["经度"]
-            lat2 = JCZ_info[JCZ_info["监测站"] == item]["纬度"]
-            dis_1 = geo_distance(lng1, lat1, lng2, lat2)  # 两站地理距离
-            if dis_1 < 50000:
+            lng_1 = JCZ_info[JCZ_info["监测站"] == name]["经度"]
+            lat_1 = JCZ_info[JCZ_info["监测站"] == name]["纬度"]
+            lng_2 = JCZ_info[JCZ_info["监测站"] == item]["经度"]
+            lat_2 = JCZ_info[JCZ_info["监测站"] == item]["纬度"]
+            dis_2 = geo_distance(lng_1, lat_1, lng_2, lat_2)  # 两站地理距离
+            if dis_2 < 50000:
                 data_to_add_in_to_Iterative = pd.read_excel(input_file_path_pollution + item + ".xlsx")
                 data_to_add_in_to_Iterative = data_to_add_in_to_Iterative.set_index("日期")
                 concat_list.append(data_to_add_in_to_Iterative)
-
     if len(concat_list) > 0:
         data_to_Iterative = pd.concat([data_pollution, concat_list], axis=1, sort=False)
     else:
