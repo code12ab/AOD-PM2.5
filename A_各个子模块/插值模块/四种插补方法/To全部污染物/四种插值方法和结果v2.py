@@ -97,6 +97,7 @@ for input_file_name in input_file_names:
     data_pollution_IDW = get_IDW(data_pollution)
 
     # 空间全局: 迭代函数法,缺失特征作为y，其他特征作为x
+    concat_list = []
     for item in JCZ_info["监测站"]:    # 不同于气溶胶插值方法
         if item != name:
             lng1 = JCZ_info[JCZ_info["监测站"] == name]["经度"]
@@ -106,8 +107,13 @@ for input_file_name in input_file_names:
             dis_1 = geo_distance(lng1, lat1, lng2, lat2)  # 两站地理距离
             if dis_1 < 50000:
                 data_to_add_in_to_Iterative = pd.read_excel(input_file_path_pollution + item + ".xlsx")
-                data_to_Iterative = pd.concat([data_pollution,data_to_add_in_to_Iterative], axis=1, sort=False)
+                data_to_add_in_to_Iterative = data_to_add_in_to_Iterative.set_index("日期")
+                concat_list.append(data_to_add_in_to_Iterative)
 
+    if len(concat_list) > 0:
+        data_to_Iterative = pd.concat([data_pollution, concat_list], axis=1, sort=False)
+    else:
+        data_to_Iterative = data_pollution.copy()
     data_pollution_Iterative = IterativeImputer(max_iter=10).fit_transform(data_to_Iterative)
     data_pollution_Iterative = pd.DataFrame(data_pollution_Iterative)
 
