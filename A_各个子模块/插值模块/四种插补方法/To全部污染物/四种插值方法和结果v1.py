@@ -38,8 +38,8 @@ for input_file_name in input_file_names:
 
     # 时间局部：KNN
     # 最近邻估算，使用两行都具有观测数据的特征的均方差来对样本进行加权。然后用加权的结果进行特征值填充
-    # 相当于A0D17个点为特征进行近邻,则参数K为时间,即时间上最近的16行按特征的均方差进行加权，即哪个时间点的权重大一些
-    data_pollution_KNN = KNN(k=30).fit_transform(data_pollution)
+    # 相当于A0D17个点为特征进行近邻,则参数K为时间,即时间上最近的7行按特征的均方差进行加权，即哪个时间点的权重大一些
+    data_pollution_KNN = KNN(k=7).fit_transform(data_pollution)
     data_pollution_KNN = pd.DataFrame(data_pollution_KNN)  # 结果中有许多零值,应为空值
 
     # 时间全局: 平滑,常用于股市
