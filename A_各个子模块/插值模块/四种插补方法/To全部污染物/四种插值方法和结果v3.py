@@ -53,6 +53,7 @@ def get_IDW(input_data):
                 print("缺失严重, 插值未定义:", e)
     return input_data
 
+
 # 路径
 input_file_path_pollution = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\多年合一\\"
 merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\多年合一\\"
@@ -61,6 +62,7 @@ JCZ_info["监测站"] = JCZ_info["城市"]+"-"+JCZ_info["监测点名称"]
 input_file_names = os.listdir(input_file_path_pollution)  # 文件名列表, **.xlsx
 
 for input_file_name in input_file_names:
+    print("========正在计算%s========" % input_file_name)
     # 读取数据源
     data_pollution = pd.read_excel(input_file_path_pollution + input_file_name)
     data_pollution = data_pollution.set_index('日期')
