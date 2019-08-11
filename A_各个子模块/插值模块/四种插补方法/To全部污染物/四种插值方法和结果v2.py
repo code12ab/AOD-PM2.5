@@ -48,13 +48,12 @@ for input_file_name in input_file_names:
         com=0.5,
         ignore_na=True,
         adjust=True).mean()
-    data_pollution_ewm = data_pollution.copy()
+    data_pollution_ewm = data_pollution.copy()  # 区别于气溶胶插值方法
     for columname in data_pollution_ewm.columns:
         if data_pollution[columname].count() != len(data_pollution):
             loc = data_pollution[columname][data_pollution[columname].isnull().values == True].index.tolist()
             for nub in loc:
                 data_pollution_ewm[columname][nub] = data_pollution_ewm_mid[columname][nub]
-
 
     # 空间局部: IDW
     name = str(input_file_name).replace(".xlsx", "")  # 定义相关变量
@@ -98,8 +97,18 @@ for input_file_name in input_file_names:
     data_pollution_IDW = get_IDW(data_pollution)
 
     # 空间全局: 迭代函数法,缺失特征作为y，其他特征作为x
-    data_pollution_Iterative = IterativeImputer(
-        max_iter=10).fit_transform(data_pollution)
+    for item in JCZ_info["监测站"]:    # 不同于气溶胶插值方法
+        if item != name:
+            lng1 = JCZ_info[JCZ_info["监测站"] == name]["经度"]
+            lat1 = JCZ_info[JCZ_info["监测站"] == name]["纬度"]
+            lng2 = JCZ_info[JCZ_info["监测站"] == item]["经度"]
+            lat2 = JCZ_info[JCZ_info["监测站"] == item]["纬度"]
+            dis_1 = geo_distance(lng1, lat1, lng2, lat2)  # 两站地理距离
+            if dis_1 < 50000:
+                data_to_add_in_to_Iterative = pd.read_excel(input_file_path_pollution + item + ".xlsx")
+                data_to_Iterative = pd.concat([data_pollution,data_to_add_in_to_Iterative], axis=1, sort=False)
+
+    data_pollution_Iterative = IterativeImputer(max_iter=10).fit_transform(data_to_Iterative)
     data_pollution_Iterative = pd.DataFrame(data_pollution_Iterative)
 
     # 对结果的0值取np.nan
