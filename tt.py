@@ -4,15 +4,18 @@
 
 
 # 库
-from math import radians, cos, sin, asin, sqrt
 import pandas as pd
 import numpy as np
 
-import os
-# 路径
-# 地理距离公式
+data_pollution = pd.DataFrame(np.arange(12).reshape(4,3), index=list('abcd'), columns=list('xyz'))
+df2 = pd.DataFrame(np.arange(12).reshape(4,3), index=list('abcd'), columns=list('xyz'))
+data_pollution.x = np.nan
+data_pollutionX = data_pollution.copy()
+for columname in data_pollution.columns:
+    if data_pollution[columname].count() != len(data_pollution):
+        loc = data_pollution[columname][data_pollution[columname].isnull().values == True].index.tolist()
+        for nub in loc:
+            data_pollutionX[columname][nub] = df2[columname][nub]
 
-
-a = "dsadasdasdsa"
-if "ds1a" not in a:
-    print("saddasdasdasdsadadasdasdas")
+print(data_pollution)
+print(data_pollutionX)

@@ -43,11 +43,18 @@ for input_file_name in input_file_names:
     data_pollution_KNN = pd.DataFrame(data_pollution_KNN)  # 结果中有许多零值,应为空值
 
     # 时间全局: 平滑,常用于股市
-    data_pollution_ewm = pd.DataFrame.ewm(
+    data_pollution_ewm_mid = pd.DataFrame.ewm(
         self=data_pollution,
         com=0.5,
         ignore_na=True,
         adjust=True).mean()
+    data_pollution_ewm = data_pollution.copy()
+    for columname in data_pollution_ewm.columns:
+        if data_pollution[columname].count() != len(data_pollution):
+            loc = data_pollution[columname][data_pollution[columname].isnull().values == True].index.tolist()
+            for nub in loc:
+                data_pollution_ewm[columname][nub] = data_pollution_ewm_mid[columname][nub]
+
 
     # 空间局部: IDW
     name = str(input_file_name).replace(".xlsx", "")  # 定义相关变量
@@ -115,7 +122,7 @@ for input_file_name in input_file_names:
     data_pollution_Iterative.columns = data_pollution.columns
     # data_pollution_Iterative["日期合并用"] = data_pollution_Iterative.index
 
-    # 合并不同方法下的A/T为一个文件
+    # 合并不同方法为一个文件
     sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
     sheet_name_count = 0  # 为什么显示without usage ?  因为: 上面如果if为false则..
     writer = pd.ExcelWriter(merge_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")))
