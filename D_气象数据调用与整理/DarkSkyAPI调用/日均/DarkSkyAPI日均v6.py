@@ -11,7 +11,7 @@ import math  # 向下取整
 # import datetime
 
 '''
-部分地区20180519-20190807缺失
+根据报错原因选择是否重新爬取
 '''
 
 # 文件格式设置
@@ -129,8 +129,11 @@ for jcz in JCZ:
             outcome.append(res)
             print("完成:%s" % coordinate[3], t)
         except Exception as e:
-            print("报错:%s" % coordinate[3], t, "内容为:", e)
-            error.append(t)  # 保存报错日期
+            if "daily" not in str(e):
+                print("报错:%s" % coordinate[3], t, "内容为:", e)
+                error.append(t)  # 保存报错日期
+            else:
+                print("报错:%s" % coordinate[3], t, "内容为:", e)
     # print("old", error)
     # 报错日期循环
     print("接下来执行报错日期数据重新获取")
