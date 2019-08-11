@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
-# 时间: 2019/8/9 15:10
+# 时间: 2019/8/9 1:10
 
 '''
 说明:
@@ -8,11 +8,8 @@
     v5 多年份合一,省去拼接
 '''
 
-# -*- coding: utf-8 -*-
-# 作者: xcl
-# 时间: 2019/8/9 1:10
-
-
+# 相关库
+import time
 import os
 import pandas as pd
 import warnings
@@ -20,12 +17,6 @@ from datetime import datetime as dt
 import datetime
 
 # 第一部分
-
-
-
-# 相关库
-import time
-
 # 参数设置
 '''
 path_list = ["D:\\站点_20140513-20141231\\",
@@ -55,7 +46,7 @@ for path in path_list:
     i = 0
     for number in JCZ_number:
         i += 1
-        print("当前进度:%.2f%%" % (i / len(JCZ_number) * 100))
+        print("当前进度:%.2f%%" % (i / (len(JCZ_number)*len(path_list)) * 100))
         error = []
         outcome_list_PM25 = []
         outcome_list_PM10 = []
@@ -268,7 +259,6 @@ for JCZ in input_file_name:
 
 
     data["日期"] = data["日期"].map(lambda x: get_day(x, -1))  # 今日的0时PM2.5_24h对应前一天PM2.5日均值
-    data = data.drop(["hour"], axis=1)
     '''
     data["X"] = JCZ_info["经度"][i]
     data["Y"] = JCZ_info["纬度"][i]

@@ -19,9 +19,9 @@ def geo_distance(lng1, lat1, lng2, lat2):
     dis = 2 * asin(sqrt(a)) * 6371.393 * 1000  # 地球半径
     return dis  # 输出结果的单位为“米”
 
-input_file_path_pollution = "D: \\毕业论文程序\\污染物浓度\\整理\\全部污染物\\"
-merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018\\"
-mean_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Mean\\2018\\"
+input_file_path_pollution = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\多年合一\\"
+merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\多年合一\\"
+mean_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Mean\\多年合一\\"
 
 JCZ_info = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
 JCZ_info["监测站"] = JCZ_info["城市"]+"-"+JCZ_info["监测点名称"]
@@ -32,7 +32,7 @@ for input_file_name in input_file_names:
     data_pollution = pd.read_excel(input_file_path_pollution + input_file_name)
 
     # 删除字符串,便于计算
-    del data_pollution["监测站"]
+    # del data_pollution["监测站"]
 
     data_pollution = data_pollution.set_index('日期')
 
