@@ -52,26 +52,26 @@ def cal_weight(x):
     return w
 
 
-mean_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Mean\\2018\\"
+Merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018\\"
 res_output_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Res\\2018\\"
 
-input_file_names = os.listdir(mean_output_file_path)  # 文件名列表
+input_file_names = os.listdir(Merge_output_file_path)  # 文件名列表
 for input_file_name in input_file_names:
     # 读取
     data_KNN = pd.read_excel(
-        mean_output_file_path +
+        Merge_output_file_path +
         input_file_name,
         sheet_name="KNN")
     data_ewm = pd.read_excel(
-        mean_output_file_path +
+        Merge_output_file_path +
         input_file_name,
         sheet_name="ewm")
     data_IDW = pd.read_excel(
-        mean_output_file_path +
+        Merge_output_file_path +
         input_file_name,
         sheet_name="IDW")
     data_Iterative = pd.read_excel(
-        mean_output_file_path +
+        Merge_output_file_path +
         input_file_name,
         sheet_name="Iterative")
     # 结果列表

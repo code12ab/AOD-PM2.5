@@ -21,7 +21,7 @@ def geo_distance(lng1, lat1, lng2, lat2):
 
 input_file_path_pollution = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\多年合一\\"
 merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\多年合一\\"
-mean_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Mean\\多年合一\\"
+
 
 JCZ_info = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
 JCZ_info["监测站"] = JCZ_info["城市"]+"-"+JCZ_info["监测点名称"]
