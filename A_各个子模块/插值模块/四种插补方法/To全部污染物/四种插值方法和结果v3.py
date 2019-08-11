@@ -10,7 +10,7 @@ import numpy as np
 from fancyimpute import KNN, IterativeImputer
 import os
 # 路径
-# 地理距离公式
+# 地理距离公式???
 def geo_distance(lng1, lat1, lng2, lat2):
     lng1, lat1, lng2, lat2 = map(radians, [lng1, lat1, lng2, lat2])
     d_lon = lng2 - lng1
