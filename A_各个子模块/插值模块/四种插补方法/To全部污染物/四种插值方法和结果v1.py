@@ -54,13 +54,13 @@ for input_file_name in input_file_names:
 
     def get_IDW(input_data):
         for pollution in ["PM25", "PM10", "SO2", "NO2", "O3", "CO"]:
-            data_1 = input_data[pollution]  # 单一某污染物列
+            # data_1 = input_data[pollution]  # 单一某污染物列
             # for count_1 in range(len(input_data.index)):
             for indx in input_data.index:
                 res_list = []
                 weight_list = []
                 # if pd.isnull(data_1.iloc[count_1][pollution]):
-                if pd.isnull(data_1[pollution][indx]):
+                if pd.isnull(input_data[pollution][indx]):
                     lng1 = JCZ_info[JCZ_info["监测站"] == name]["经度"]
                     lat1 = JCZ_info[JCZ_info["监测站"] == name]["纬度"]
                     for item in JCZ_info["监测站"]:
@@ -78,11 +78,12 @@ for input_file_name in input_file_names:
                             dis_1 = geo_distance(lng1, lat1, lng2, lat2)  # 两站地理距离
                             if dis_1 < 50000:
                                 data_to_add_in = pd.read_excel(input_file_path_pollution+item+".xlsx")
-                                res = (dis_1/weight_sum) * data_to_add_in[pollution][indx]
-                                res_list.append(res)
+                                if indx in data_to_add_in.index:
+                                    res = (dis_1/weight_sum) * data_to_add_in[pollution][indx]
+                                    res_list.append(res)
                     res_output = np.sum(np.array(res_list))
                     try:
-                        data_1[pollution][indx] = res_output
+                        input_data[pollution][indx] = res_output
                     except Exception as e:
                         print("缺失严重, 插值未定义:", e)
         return input_data
