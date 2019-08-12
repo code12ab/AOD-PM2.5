@@ -17,11 +17,11 @@ xytodis = pd.read_excel("D:\\毕业论文程序\\气溶胶光学厚度\\插值�
 input_file_names = os.listdir(input_file_path_Aqua)  # 文件名列表
 
 
-# 空间局部公式
+# 空间局部公式: 不存在插值为1*nan=nan的插值结果;只存在nan*nan=nan -> 因为使用的插值数据已经筛选为'>0'的部分.
 def get_IDW(input_data):
     list_to_concat = []
     for count in range(len(input_data.index)):
-        data_to_add = pd.DataFrame(list(input_data.iloc[count]))  # 把某一行 转换成 列表 从而把行转化成 df中的列
+        data_to_add = pd.DataFrame(list(input_data.iloc[count]))  # 把某一行 转换成 列表 从而把行转化成 df中的列,不会修改原数据
         data_to_dis = pd.concat([data_to_add, xytodis], axis=1)  # 坐标和某一行合并
         # 这里使用简单合并的原因: 每行格式都是一致的,AOD0-16完美对应xytodis
         # print(data_to_dis, input_data.iloc[count], "================================", sep="\n")
@@ -52,14 +52,14 @@ def get_IDW(input_data):
                         weight_dis = 1 / ((dx * dx + dy * dy) ** 0.5)
                         res = (weight_dis/weight_sum) * data_to_weight.iloc[item]["value"]
                         res_list.append(res)
-                    res_output = np.sum(np.array(res_list))
+                    res_output = np.sum(np.array(res_list))  # 插补的数值
                     try:
-                        data_to_dis.loc[count_2, 'value'] = res_output
+                        data_to_dis.loc[count_2, 'value'] = res_output  # 进行插补
                     except Exception as e:
                         print("缺失严重, 插值未定义:", e)
-        data_to_dis = data_to_dis.drop(["latitude", "longitude"], axis=1)
+        data_to_dis = data_to_dis.drop(["latitude", "longitude"], axis=1)   # 删除无用列
         data_to_dis = data_to_dis.drop(["index"], axis=1)
-        list_to_concat.append(data_to_dis.T)
+        list_to_concat.append(data_to_dis.T)  # 添加,行转化为列,合并中最终数据.
     data_last = pd.concat(list_to_concat)
     return data_last
 
@@ -145,7 +145,7 @@ for input_file_name in input_file_names:
 
     # 合并不同方法下的A/T为一个文件
     sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
-    sheet_name_count = 0  # 为什么显示without usage ?  因为 下面如果if为false则..
+    sheet_name_count = 0  # 为什么显示without usage ?  因为下面如果if为false则..
     writer = pd.ExcelWriter(merge_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")))
     for methods_output in [[data_Aqua_KNN, data_Terra_KNN], [data_Aqua_ewm, data_Terra_ewm], [
             data_Aqua_IDW, data_Terra_IDW], [data_Aqua_Iterative, data_Terra_Iterative]]:
