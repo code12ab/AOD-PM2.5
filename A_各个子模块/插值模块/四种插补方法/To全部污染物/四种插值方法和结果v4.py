@@ -9,7 +9,7 @@ import copy
 from math import radians, cos, sin, asin, sqrt
 import pandas as pd
 import numpy as np
-from fancyimpute import KNN, IterativeImputer
+from fancyimpute import KNN, IterativeImputer  # 方法创建新的数据框,不覆盖原始数据
 import os
 
 # 路径
@@ -79,13 +79,13 @@ def get4method(xx152):
         # 时间局部：最近邻KNN,是使用K行都具有全部特征的样本,使用其他特征的均方差进行加权,判断最接近的时间点.
         data_pollution_KNN = KNN(k=7).fit_transform(data_pollution)
         data_pollution_KNN = pd.DataFrame(data_pollution_KNN)
-        # 时间全局: 平滑,常用于股市
+        # 时间全局: 平滑,常用于股市;创建新的数据框,不会覆盖原始数据
         data_pollution_ewm_mid = pd.DataFrame.ewm(
             self=data_pollution,
             com=0.5,
             ignore_na=True,
             adjust=True).mean()
-        data_pollution_ewm = copy.deepcopy(data_pollution)
+        data_pollution_ewm = copy.deepcopy(data_pollution)  # 避免覆盖原始数据
         for columname in data_pollution_ewm.columns:
             if data_pollution[columname].count() != len(data_pollution):
                 loc = data_pollution[columname][data_pollution[columname].isnull().values == True].index.tolist()
