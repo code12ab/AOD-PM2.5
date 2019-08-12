@@ -9,14 +9,63 @@ import numpy as np
 from fancyimpute import KNN, IterativeImputer
 import os
 # 路径
-
 input_file_path_Aqua = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\2018\\"
 input_file_path_Terra = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra\\2018\\"
 merge_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Merge\\2018\\"
 mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2018\\"
 xytodis = pd.read_excel("D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\xytodis.xlsx")  # 17个区域的投影坐标
 input_file_names = os.listdir(input_file_path_Aqua)  # 文件名列表
+
+
+# 空间局部公式
+def get_IDW(input_data):
+    list_to_concat = []
+    for count in range(len(input_data.index)):
+        data_to_add = pd.DataFrame(list(input_data.iloc[count]))  # 把某一行 转换成 列表 从而把行转化成 df中的列
+        data_to_dis = pd.concat([data_to_add, xytodis], axis=1)  # 坐标和某一行合并
+        # 这里使用简单合并的原因: 每行格式都是一致的,AOD0-16完美对应xytodis
+        # print(data_to_dis, input_data.iloc[count], "================================", sep="\n")
+        data_to_dis.columns = ["value", "index", "longitude", "latitude"]
+        # 对这一行进行操作 对每一行输出一下
+        for count_2 in range(len(data_to_dis["value"])):
+            res_list = []
+            weight_list = []
+            if pd.isnull(data_to_dis.iloc[count_2]['value']):
+                data_to_weight = data_to_dis[data_to_dis["value"] > 0]
+                if len(data_to_weight["value"]) > 0:
+                    # 先求权重
+                    for item in range(len(data_to_weight["value"])):
+                        dx = 1 * (data_to_weight.iloc[item]["longitude"] -
+                                  data_to_dis.iloc[count_2]['longitude'])
+                        dy = 1 * (data_to_weight.iloc[item]["latitude"] -
+                                  data_to_dis.iloc[count_2]['latitude'])
+                        weight_dis = 1 / ((dx * dx + dy * dy) ** 0.5)
+                        # weight = inf ?
+                        weight_list.append(weight_dis)
+                    weight_sum = np.sum(np.array(weight_list))
+                    # 计算结果
+                    for item in range(len(data_to_weight["value"])):
+                        dx = 1 * (data_to_weight.iloc[item]["longitude"] -
+                                  data_to_dis.iloc[count_2]['longitude'])
+                        dy = 1 * (data_to_weight.iloc[item]["latitude"] -
+                                  data_to_dis.iloc[count_2]['latitude'])
+                        weight_dis = 1 / ((dx * dx + dy * dy) ** 0.5)
+                        res = (weight_dis/weight_sum) * data_to_weight.iloc[item]["value"]
+                        res_list.append(res)
+                    res_output = np.sum(np.array(res_list))
+                    try:
+                        data_to_dis.loc[count_2, 'value'] = res_output
+                    except Exception as e:
+                        print("缺失严重, 插值未定义:", e)
+        data_to_dis = data_to_dis.drop(["latitude", "longitude"], axis=1)
+        data_to_dis = data_to_dis.drop(["index"], axis=1)
+        list_to_concat.append(data_to_dis.T)
+    data_last = pd.concat(list_to_concat)
+    return data_last
+
+
 for input_file_name in input_file_names:
+    print("========正在计算%s========" % input_file_name)
     # 读取
     data_Aqua = pd.read_excel(input_file_path_Aqua + input_file_name)
     data_Terra = pd.read_excel(input_file_path_Terra + input_file_name)
@@ -46,51 +95,6 @@ for input_file_name in input_file_names:
         adjust=True).mean()
 
     # 空间局部: IDW
-    def get_IDW(input_data):
-        list_to_concat = []
-        for count in range(len(input_data.index)):
-            data_to_add = pd.DataFrame(list(input_data.iloc[count]))  # 把某一行 转换成 列表 从而把行转化成 df中的列
-            data_to_dis = pd.concat([data_to_add, xytodis], axis=1)  # 坐标和某一行合并
-            # 这里使用简单合并的原因: 每行格式都是一致的,AOD0-16完美对应xytodis
-            # print(data_to_dis, input_data.iloc[count], "================================", sep="\n")
-            data_to_dis.columns = ["value", "index", "longitude", "latitude"]
-            # 对这一行进行操作 对每一行输出一下
-            for count_2 in range(len(data_to_dis["value"])):
-                res_list = []
-                weight_list = []
-                if pd.isnull(data_to_dis.iloc[count_2]['value']):
-                    data_to_weight = data_to_dis[data_to_dis["value"] > 0]
-                    if len(data_to_weight["value"]) > 0:
-                        # 先求权重
-                        for item in range(len(data_to_weight["value"])):
-                            dx = 1 * (data_to_weight.iloc[item]["longitude"] -
-                                      data_to_dis.iloc[count_2]['longitude'])
-                            dy = 1 * (data_to_weight.iloc[item]["latitude"] -
-                                      data_to_dis.iloc[count_2]['latitude'])
-                            weight_dis = 1 / ((dx * dx + dy * dy) ** 0.5)
-                            # weight = inf ?
-                            weight_list.append(weight_dis)
-                        weight_sum = np.sum(np.array(weight_list))
-                        # 计算结果
-                        for item in range(len(data_to_weight["value"])):
-                            dx = 1 * (data_to_weight.iloc[item]["longitude"] -
-                                      data_to_dis.iloc[count_2]['longitude'])
-                            dy = 1 * (data_to_weight.iloc[item]["latitude"] -
-                                      data_to_dis.iloc[count_2]['latitude'])
-                            weight_dis = 1 / ((dx * dx + dy * dy) ** 0.5)
-                            res = (weight_dis/weight_sum) * data_to_weight.iloc[item]["value"]
-                            res_list.append(res)
-                        res_output = np.sum(np.array(res_list))
-                        try:
-                            data_to_dis.loc[count_2, 'value'] = res_output
-                        except Exception as e:
-                            print("缺失严重, 插值未定义:", e)
-            data_to_dis = data_to_dis.drop(["latitude", "longitude"], axis=1)
-            data_to_dis = data_to_dis.drop(["index"], axis=1)
-            list_to_concat.append(data_to_dis.T)
-        data_last = pd.concat(list_to_concat)
-        return data_last
-
     data_Aqua_IDW = get_IDW(data_Aqua)
     data_Terra_IDW = get_IDW(data_Terra)
 
