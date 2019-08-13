@@ -9,6 +9,7 @@ import math
 from numpy import array
 import os
 
+# 去掉空值后计算...权重均为1/4
 
 # 定义熵值法函数
 def cal_weight(x):
@@ -52,8 +53,8 @@ def cal_weight(x):
     return w
 
 
-Merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018\\"
-res_output_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Res\\2018\\"
+Merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\多年合一\\"
+res_output_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Res\\多年合一\\"
 
 input_file_names = os.listdir(Merge_output_file_path)  # 文件名列表
 for input_file_name in input_file_names:
@@ -76,16 +77,17 @@ for input_file_name in input_file_names:
         sheet_name="Iterative")
     # 结果列表
     res = []
-    for area_numb in range(0, 17):
-        d1 = data_KNN[["日期", 'AOD_%s' % area_numb]]
-        d2 = data_ewm[["日期", 'AOD_%s' % area_numb]]
+    # for area_numb in range(0, 17):  # 这里需要修改
+    for column_name in ["PM25", "PM10", "SO2", "NO2", "O3", "CO"]:
+        d1 = data_KNN[["日期", column_name]]
+        d2 = data_ewm[["日期", column_name]]
         data_Time = pd.merge(d1,
                              d2,
                              how='left',
                              on=["日期"])
 
-        d3 = data_IDW[["日期", 'AOD_%s' % area_numb]]
-        d4 = data_Iterative[["日期", 'AOD_%s' % area_numb]]
+        d3 = data_IDW[["日期", column_name]]
+        d4 = data_Iterative[["日期", column_name]]
         data_Station = pd.merge(
             d3,
             d4,
@@ -104,7 +106,7 @@ for input_file_name in input_file_names:
         w = cal_weight(data_aod_to_weight)  # 调用cal_weight
         w.index = data_aod.columns
         w.columns = ['weight']
-        # print(w)
+        print(w)
         '''
         value_weight= data_aod["KNN"] * w.weight[0] + data_aod["ewm"] * \
             w.weight[1] + data_aod["IDW"] * w.weight[2] + data_aod["Iterative"] * w.weight[3]
@@ -191,7 +193,7 @@ for input_file_name in input_file_names:
             # print(value_weight)
         value_weight_list = pd.DataFrame(value_weight_list)
         value_weight_list = value_weight_list.set_index(data_aod.index)
-        value_weight_list.columns = ["AOD_%s" % area_numb]
+        value_weight_list.columns = [column_name]
         connect_data = pd.merge(
             data_aod,
             value_weight_list,

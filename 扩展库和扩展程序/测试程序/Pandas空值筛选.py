@@ -11,11 +11,14 @@ import pandas as pd
 import numpy as np
 import os
 
-# 思路
-# K循环 插补 去 参数b
+a = [[np.nan, 2, np.nan], [np.nan, 5, 6], [7, 8, 9]]
 
-x = 16/3
+a = pd.DataFrame(a)
 
-stc = x**3 - 8*x**2 + 22*x + 90
-tr = x * 22
-print(stc-tr)
+a.columns = ["A", "B", "C"]
+
+d = a[(a["A"] == np.nan) & (a["B"] == np.nan) & (a["C"] == np.nan)]
+
+d2 = a[pd.isnull(a["A"]) & pd.isnull(a["C"])]
+
+print(a, d2, sep="\n")
