@@ -29,7 +29,7 @@ if save_year % 4 == 0:
     year_days = 366 - int(dayinyear_start)
 else:
     year_days = 365 - int(dayinyear_start)
-start_count = -1  # 刘家园超出次数，没完成
+start_count = -1
 
 # API KEY
 API_KEY_LIST = [
