@@ -9,7 +9,7 @@ import math
 from numpy import array
 import os
 
-# 去掉空值后计算...权重均为1/4
+# 问题: 去掉空值后计算...权重大部分均为1/4; 如何改善?
 
 # 定义熵值法函数
 def cal_weight(x):
