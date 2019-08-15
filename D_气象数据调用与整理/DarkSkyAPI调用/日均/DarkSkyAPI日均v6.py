@@ -29,7 +29,7 @@ if save_year % 4 == 0:
     year_days = 366 - int(dayinyear_start)
 else:
     year_days = 365 - int(dayinyear_start)
-start_count = 4944
+start_count = 7158
 
 # API KEY
 API_KEY_LIST = [
@@ -83,9 +83,8 @@ time.sleep(10)
 # 主程序
 global t
 
+
 # 再次调整日均或逐时
-
-
 def get_outcome(date_time):
     # 定义气象数据获取函数. 可选项:中文语言lang=["zh"]
     monitoring_station = forecast(
@@ -107,6 +106,9 @@ i = start_count
 for jcz in JCZ:
     outcome = []
     error = []
+    # 终止条件
+    if i > 10086:
+        break
     # 一年循环
     for time in time_list:
         i += 1
@@ -133,7 +135,7 @@ for jcz in JCZ:
     print("接下来执行报错日期数据重新获取")
     count_error = 0
     print("%s 未获取数据的天数:" % coordinate[3], len(error))
-    while count_error != 1:  # 多次报错则放弃爬取;这里重新爬取一次
+    while count_error != 2:  # 多次报错则放弃爬取;这里重新爬取一次
         # while len(error) != 0:  # 有报错信息则重新爬去,直到全部爬取
         count_error += 1
         error_update = []
@@ -176,4 +178,4 @@ print("完成啦")
 
 # 自动关机
 print("程序已完成," + str(60) + '秒后将会关机')
-# os.system('shutdown -s -f -t 60')
+os.system('shutdown -s -f -t 60')

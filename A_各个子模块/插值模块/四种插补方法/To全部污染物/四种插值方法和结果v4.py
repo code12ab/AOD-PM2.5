@@ -13,8 +13,8 @@ from fancyimpute import KNN, IterativeImputer  # 方法创建新的数据框,不
 import os
 
 # 路径
-input_file_path_pollution = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\多年合一\\"
-merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\多年合一\\"
+input_file_path_pollution = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\2018\\"
+merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018\\"
 JCZ_info = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")  # 152个
 JCZ_info["监测站"] = JCZ_info["城市"] + "-" + JCZ_info["监测点名称"]
 
@@ -187,4 +187,4 @@ if __name__ == '__main__':
     # 自动关机
     print("程序已完成," + str(60) + '秒后将会关机')
     print('关机')
-    os.system('shutdown -s -f -t 60')
+    #os.system('shutdown -s -f -t 60')

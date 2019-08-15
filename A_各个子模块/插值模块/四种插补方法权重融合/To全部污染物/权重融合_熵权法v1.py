@@ -53,8 +53,8 @@ def cal_weight(x):
     return w
 
 
-Merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\多年合一\\"
-res_output_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Res\\多年合一\\"
+Merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018\\"
+res_output_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Res\\2018\\"
 
 input_file_names = os.listdir(Merge_output_file_path)  # 文件名列表
 for input_file_name in input_file_names:

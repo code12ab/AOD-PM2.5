@@ -1,0 +1,16 @@
+D:
+cd 毕业论文程序
+cd MODIS
+cd 扩展库和扩展程序
+cd 测试程序
+python MODIS_download.py -s https://ladsweb.modaps.eosdis.nasa.gov/archive/orders/501365267/ -d E:\MYD04_3K_2017  -t 0199091A-1D26-11E9-A7F5-C3B17C49A85D
+
+
+2017 Aqua 1-4	/archive/orders/501363440/			/archive/orders/501365267/
+	
+
+备注：
+1.更换orders
+2.更换储存位置
+3.京津冀鲁坐标：114.0-123.0; 34.0-42.0
+
