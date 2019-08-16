@@ -32,50 +32,40 @@ import glob
 import gdal
 import pandas as pd
 from pandas import DataFrame
-#首先读取tif文件
-path = r"D:\DATA\try.tif"
+
+# 首先读取tif文件
+# path = r"D:\DATA\try.tif"
 hdf = "C:\\Users\\iii\\Desktop\\MYD13A2.A2019121.h26v03.006.2019137234541.hdf"
 
 dataset = gdal.Open(hdf)
-im_width = dataset.RasterXSize;#获取宽度
-im_height = dataset.RasterYSize;#获取长度
+im_width = dataset.RasterXSize  # 获取宽度
+im_height = dataset.RasterYSize  # 获取长度
+data1 = dataset.ReadAsArray(0,0,im_width,im_height)  # 读取ndvi时序数据，三维矩阵
 
-
-data1 = dataset.ReadAsArray(0,0,im_width,im_height)  #读取ndvi时序数据，三维矩阵
-
-# print(dir(dataset))
-# print(dataset.GetMetadata_List())
-
-
-
+#############################################
 in_ds = gdal.Open(hdf)
 datasets = in_ds.GetSubDatasets()
-gdal.Warp('D:/reprojection02.tif', datasets[0][0], dstSRS='EPSG:4326')   # 等经纬度投影
+# gdal.Warp('D:/reprojection02.tif', datasets[0][0], dstSRS='EPSG:4326')   # 等经纬度投影
+gdal.Warp('D:/reprojection01.tif', datasets[0][0], dstSRS='EPSG:32649')
 # print(datasets[0][0])  # 1 km 16 days NDVI
 root_ds = None
 
 
-
 list_tif = glob.glob('D:\data\*.tif')
 out_path = 'D:/'
-
 for tif in list_tif:
     in_ds = gdal.Open(tif)
     (filepath, fullname) = os.path.split(tif)
     (prename, suffix) = os.path.splitext(fullname)
-
     if in_ds is None:
         print('Could not open the file ' + tif)
     else:
         # 将MODIS原始数据类型转化为反射率
         red = in_ds.GetRasterBand(1).ReadAsArray() * 0.0001  # 1km ndvi 转化
-        print(red)
-        print(dir(in_ds))
-
-        print(in_ds.RasterXSize)
 
 
 
+#############################################################################
 from osgeo import gdal
 
 gdal.AllRegister()
@@ -83,14 +73,15 @@ dataset = gdal.Open('D:\\reprojection02.tif')
 
 adfGeoTransform = dataset.GetGeoTransform()
 
+
 # 左上角地理坐标
-print(adfGeoTransform[0])
-print(adfGeoTransform[3])
+# print(adfGeoTransform[0])
+# print(adfGeoTransform[3])
 
-nXSize = dataset.RasterXSize #列数
-nYSize = dataset.RasterYSize #行数
-
-arrSlope = [] # 用于存储每个像素的（X，Y）坐标
+nXSize = dataset.RasterXSize  # 列数
+nYSize = dataset.RasterYSize  # 行数
+print("行数:", nYSize, "列数:", nXSize)
+arrSlope = []  # 用于存储每个像素的（X，Y）坐标
 for i in range(nYSize):
     row = []
     for j in range(nXSize):
@@ -100,7 +91,7 @@ for i in range(nYSize):
         row.append(col)
     arrSlope.append(row)
 
-#  print(len(arrSlope))
+# print(len(arrSlope))
+# arrSlope = pd.DataFrame(arrSlope)
+# arrSlope.to_excel("xy.xlsx")
 
-arrSlope = pd.DataFrame(arrSlope)
-arrSlope.to_excel("xy.xlsx")
