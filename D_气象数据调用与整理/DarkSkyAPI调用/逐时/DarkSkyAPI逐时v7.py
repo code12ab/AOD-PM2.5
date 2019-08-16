@@ -105,11 +105,8 @@ for jcz in JCZ:
             # 进度
             print("完成:%s" % coordinate[3], t)
         except Exception as e:
-            if "hourly" not in str(e):
-                print("报错:%s" % coordinate[3], t, "内容为:", e)
-                error.append(t)  # 保存报错日期
-            else:
-                print("报错:%s" % coordinate[3], t, "内容为:", e)
+            print("报错:%s" % coordinate[3], t, "内容为:", e)
+            error.append(t)  # 保存报错日期
     # print("old", error)
     # 报错日期循环
     print("接下来执行报错日期数据重新获取")
