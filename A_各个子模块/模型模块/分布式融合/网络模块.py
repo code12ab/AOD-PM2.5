@@ -201,8 +201,7 @@ model_timestation = Model(
 
 
 ##########################################################################
-# 第五个模块 时空元属性模块
-# 整体影响模块
+# 第五个模块 整体影响模块
 # 因素融合层
 allin_concat = concatenate([Meteorology_input,
                             Weather_input,

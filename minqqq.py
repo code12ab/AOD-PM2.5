@@ -7,32 +7,34 @@ import pandas as pd
 import numpy as np
 import os
 
-a = [1, 4, 4, 0]
-b = [4, 4, 4, 0]
-c = [np.nan, 4, np.nan, 3]
-d = [4, 4, np.nan, np.nan]
+# -*- coding: utf-8 -*-
+# 时间    : 2019/1/31 11:12
+# 作者    : xcl
 
-c = pd.DataFrame([a, b, c, d])
-'''             weight
-KNN        0.476610
-ewm        0.032811
-IDW        0.476610
-Iterative  0.013969
-运行完成!
-             weight
-KNN        0.241128
-ewm        0.205460
-IDW        0.419197
-Iterative  0.134215
-运行完成!'''
-print(c)
-print("\n", c.std())
-print("\n", c.mean())  # mean(1) 横向均值 mean() 顺着均值，列的
+from pyhdf.SD import SD, SDC
+import os, gdal
+import pandas as pd
 
-mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2018\\北京-定陵.xlsx"
+hdf = "C:\\Users\\iii\\Desktop\\MYD13A2.A2019121.h26v03.006.2019137234541.hdf"
 
-data_KNN = pd.read_excel(mean_output_file_path, sheet_name="KNN")
-print(data_KNN.index)
-print(data_KNN.columns)
 
-print(data_KNN[["日期", "AOD_0"]])
+hdf = SD(hdf, SDC.READ)
+
+print(hdf.datasets())
+
+data = hdf.select('1 km 16 days NDVI')
+attr = hdf.attributes(full=1)
+attNames = attr.keys()
+
+print(attNames)
+t = attr['ArchiveMetadata.0']
+print(t[0])
+
+import osr
+proj = osr.SpatialReference()
+proj.ImportFromEPSG(4326)
+proj.ExportToWkt()
+
+print(proj)
+
+hdf.SetProjection(proj)

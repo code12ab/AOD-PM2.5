@@ -29,7 +29,7 @@ if save_year % 4 == 0:
     year_days = 366 - int(dayinyear_start)
 else:
     year_days = 365 - int(dayinyear_start)
-start_count = 7158
+start_count = 5500
 
 # API KEY
 API_KEY_LIST = [
@@ -106,12 +106,12 @@ i = start_count
 for jcz in JCZ:
     outcome = []
     error = []
-    # 终止条件
-    if i > 10086:
-        break
     # 一年循环
     for time in time_list:
         i += 1
+        # 终止条件
+        if i > 10086:
+            break
         API_KEY = API_KEY_LIST[math.floor(i / 1000)]
         print(i, API_KEY)
         # API_KEY,纬度,经度,监测站,注意格式是先"纬度"后"经度"
@@ -178,4 +178,4 @@ print("完成啦")
 
 # 自动关机
 print("程序已完成," + str(60) + '秒后将会关机')
-os.system('shutdown -s -f -t 60')
+# os.system('shutdown -s -f -t 60')

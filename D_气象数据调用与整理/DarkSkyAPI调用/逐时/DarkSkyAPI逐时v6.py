@@ -16,7 +16,7 @@ pd.set_option('display.max_rows', None)  # 设置显示最大行
 pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显示所有列
 
 # 参数设置
-save_year = 2012
+save_year = 2018
 date_start = int(str(save_year)+"000")
 
 if save_year % 4 == 0:
@@ -24,7 +24,7 @@ if save_year % 4 == 0:
 else:
     year_days = 365
 
-start_count = -1  # 刘家园超出次数，没完成
+start_count = 5666  # 刘家园超出次数，没完成
 
 API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e936148728",
                 "ed7de1f3687f4c53316538a0ce968752", "740c4d0fbd102f83a7753032c769b2b5",
@@ -91,6 +91,9 @@ for jcz in JCZ:
     # 一年循环
     for time in time_list:
         i += 1
+        # 终止条件
+        if i > 10086:
+            break
         API_KEY = API_KEY_LIST[math.floor(i / 1000)]
         print(i, API_KEY)
         coordinate = API_KEY, jcz[1], jcz[0], jcz[2]  # API_KEY,纬度,经度,监测站,注意格式是先"纬度"后"经度"
