@@ -1,40 +1,50 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
-# 时间: 2019/8/6 16:59
+# 时间: 2019/8/16 23:53
 
-# 库
 import pandas as pd
-import numpy as np
-import os
+from osgeo import gdal
 
-# -*- coding: utf-8 -*-
-# 时间    : 2019/1/31 11:12
-# 作者    : xcl
-
-from pyhdf.SD import SD, SDC
-import os, gdal
-import pandas as pd
-
+# 路径
 hdf = "C:\\Users\\iii\\Desktop\\MYD13A2.A2019121.h26v03.006.2019137234541.hdf"
+# 读取
+in_ds = gdal.Open(hdf)
+# 重投影
+datasets = in_ds.GetSubDatasets()
+gdal.Warp('D:/reprojection02.tif', datasets[0][0], dstSRS='EPSG:4326')   # 等经纬度投影, 即地理坐标系投影GCS_WGS_1984
+#gdal.Warp('D:/reprojection02.tif', datasets[0][0], dstSRS='EPSG:32649')
+# print(datasets[0][0])  # 1 km 16 days NDVI
+root_ds = None
 
+# dataset = gdal.Open(hdf)
+gdal.AllRegister()
+dataset = gdal.Open('D:\\reprojection02.tif')
 
-hdf = SD(hdf, SDC.READ)
+adfGeoTransform = dataset.GetGeoTransform()
 
-print(hdf.datasets())
+print(dir(dataset))
+# 左上角地理坐标
+# print(adfGeoTransform[0])
+# print(adfGeoTransform[3])
+data = dataset.GetRasterBand(1).ReadAsArray()  #  1km edvi 转化行后
+print(data, data.shape)
+nXSize = dataset.RasterXSize  # 列数
+nYSize = dataset.RasterYSize  # 行数
+print("行数:", nYSize, "列数:", nXSize)
 
-data = hdf.select('1 km 16 days NDVI')
-attr = hdf.attributes(full=1)
-attNames = attr.keys()
+for i in range(nYSize):
+    arrSlopeX = []  # 用于存储每个像素的（X，Y）坐标
+    arrSlopeY = []
 
-print(attNames)
-t = attr['ArchiveMetadata.0']
-print(t[0])
+    for j in range(nXSize):
+        px = adfGeoTransform[0] + i * adfGeoTransform[1] + j * adfGeoTransform[2]
+        py = adfGeoTransform[3] + i * adfGeoTransform[4] + j * adfGeoTransform[5]
+        col = [px, py]
 
-import osr
-proj = osr.SpatialReference()
-proj.ImportFromEPSG(4326)
-proj.ExportToWkt()
+        arrSlopeX.append(px)
+        arrSlopeY.append(py)
 
-print(proj)
-
-hdf.SetProjection(proj)
+arrSlopeX = pd.DataFrame(arrSlopeX)
+arrSlopeY = pd.DataFrame(arrSlopeY)
+arrSlopeY.to_excel("yy.xlsx")
+arrSlopeX.to_excel("xx.xlsx")

@@ -45,8 +45,8 @@ data1 = dataset.ReadAsArray(0,0,im_width,im_height)  # 读取ndvi时序数据，
 #############################################
 in_ds = gdal.Open(hdf)
 datasets = in_ds.GetSubDatasets()
-# gdal.Warp('D:/reprojection02.tif', datasets[0][0], dstSRS='EPSG:4326')   # 等经纬度投影
-gdal.Warp('D:/reprojection01.tif', datasets[0][0], dstSRS='EPSG:32649')
+gdal.Warp('D:/reprojection02.tif', datasets[0][0], dstSRS='EPSG:4326')   # 等经纬度投影
+#gdal.Warp('D:/reprojection01.tif', datasets[0][0], dstSRS='EPSG:32649')
 # print(datasets[0][0])  # 1 km 16 days NDVI
 root_ds = None
 
@@ -92,6 +92,6 @@ for i in range(nYSize):
     arrSlope.append(row)
 
 # print(len(arrSlope))
-# arrSlope = pd.DataFrame(arrSlope)
-# arrSlope.to_excel("xy.xlsx")
+arrSlope = pd.DataFrame(arrSlope)
+arrSlope.to_excel("xyv1.xlsx")
 
