@@ -22,8 +22,8 @@ dis2 = 20000
 dis3 = 50000
 
 # 文件设置
-output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra\\2018\\"  # 结果的输出位置
-MODIS_input_file_path = "E:\\MOD04_3K_2018\\"  # HDF文件位置 Terra-MOD; Aqua-MYD
+output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\2015\\"  # 结果的输出位置
+MODIS_input_file_path = "D:\\MYD04_3K_2015\\"  # HDF文件位置 Terra-MOD; Aqua-MYD
 location_xy_input_file = "D:\\毕业论文程序\\MODIS\\坐标\\站点列表-2018.11.08起_152.xlsx"
 exist_file_list = os.listdir(output_file_path)
 # 定义经纬度距离公式
