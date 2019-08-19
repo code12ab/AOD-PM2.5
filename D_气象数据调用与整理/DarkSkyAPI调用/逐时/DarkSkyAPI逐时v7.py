@@ -24,7 +24,7 @@ if save_year % 4 == 0:
 else:
     year_days = 365
 
-start_count = 365  # 刘家园超出次数，没完成
+start_count = 374  # 刘家园超出次数，没完成
 
 API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e936148728",
                 "ed7de1f3687f4c53316538a0ce968752", "740c4d0fbd102f83a7753032c769b2b5",
@@ -105,15 +105,18 @@ for jcz in JCZ:
             # 进度
             print("完成:%s" % coordinate[3], t)
         except Exception as e:
-            print("报错:%s" % coordinate[3], t, "内容为:", e)
-            error.append(t)  # 保存报错日期
+            if "hourly" not in str(e):
+                print("报错:%s" % coordinate[3], t, "内容为:", e)
+                error.append(t)  # 保存报错日期
+            else:
+                print("报错:%s" % coordinate[3], t, "内容为:", e)
     # print("old", error)
     # 报错日期循环
     print("接下来执行报错日期数据重新获取")
     count_error = 0
     print("%s 未获取数据的天数:" % coordinate[3], len(error))
-    while count_error != 2:  # 多次报错则放弃爬取
-    # while len(error) != 0:  # 有报错信息则重新爬去,直到全部爬取
+    # while count_error != 2:  # 多次报错则放弃爬取
+    while len(error) != 0:  # 有报错信息则重新爬去,直到全部爬取
         count_error += 1
         error_update = []
         for error_time in error:

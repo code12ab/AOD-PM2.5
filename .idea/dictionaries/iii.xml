@@ -5,12 +5,18 @@
       <w>columname</w>
       <w>creat</w>
       <w>crossentropy</w>
+      <w>dataset</w>
       <w>dayinyear</w>
+      <w>edvi</w>
       <w>indx</w>
       <w>lnfij</w>
+      <w>ndvi</w>
       <w>otherpollution</w>
       <w>regressor</w>
+      <w>reprojection</w>
       <w>rmsprop</w>
+      <w>slopex</w>
+      <w>slopey</w>
       <w>softmax</w>
       <w>timestation</w>
       <w>xytodis</w>
