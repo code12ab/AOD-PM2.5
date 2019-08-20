@@ -10,15 +10,10 @@ import pandas as pd  # BDS
 import math  # 向下取整
 # import datetime
 
-'''
-根据报错原因选择是否重新爬取
-'''
-
 # 文件格式设置
 pd.set_option('display.width', 6666)  # 设置字符显示宽度
 pd.set_option('display.max_rows', None)  # 设置显示最大行
 pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显示所有列
-
 
 # 参数设置
 save_year = 2018
@@ -46,11 +41,9 @@ API_KEY_LIST = [
     "ea6ba6d12b5619189b54f10275557872"]
 # 路径
 coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
-# 调整 日均 或 逐时
 output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % save_year  # 气象数据存储路径
 error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
 time_out = 30  # 超时设置,10秒太短
-
 
 # 批量导入监测站坐标
 # JCZ_file = pd.read_excel("监测站坐标toDarkSkyAPI.xlsx")
@@ -62,7 +55,6 @@ for i in range(len(JCZ_file)):
         'JCZ%s = [JCZ_file["经度"][i],JCZ_file["纬度"][i],JCZ_file["城市"][i]+"-"+JCZ_file["监测点名称"][i]]' %
         i)
     exec("JCZ.append(JCZ%s)" % i)  # exec可以执行字符串指令
-
 
 # 一年日期
 time_list = []
@@ -84,7 +76,6 @@ time.sleep(10)
 global t
 
 
-# 再次调整日均或逐时
 def get_outcome(date_time):
     # 定义气象数据获取函数. 可选项:中文语言lang=["zh"]
     monitoring_station = forecast(
@@ -94,14 +85,10 @@ def get_outcome(date_time):
     # darksky_outcome = monitoring_station['hourly']["data"]  # 输出一天24小时的数据,调用一次API
     # 第一天0时至23时
     darksky_outcome = monitoring_station["daily"]["data"]  # 输出日均数据,调用一次API
-    # print(darksky_outcome)
-    # 输出到文件
-
     return darksky_outcome
 
 
-# 设置计数
-i = start_count
+i = start_count  # 设置计数
 # 监测站循环
 for jcz in JCZ:
     outcome = []
@@ -135,8 +122,8 @@ for jcz in JCZ:
     print("接下来执行报错日期数据重新获取")
     count_error = 0
     print("%s 未获取数据的天数:" % coordinate[3], len(error))
-    while count_error != 2:  # 多次报错则放弃爬取;这里重新爬取一次
-        # while len(error) != 0:  # 有报错信息则重新爬去,直到全部爬取
+    # while count_error != 2:  # 多次报错则放弃爬取;这里重新爬取一次
+    while len(error) != 0:  # 有报错信息则重新爬去,直到全部爬取
         count_error += 1
         error_update = []
         for error_time in error:
@@ -150,11 +137,15 @@ for jcz in JCZ:
             print("重新获取%s" % coordinate[3], error_time)
             # noinspection PyBroadException
             try:
-                get_outcome(error_time)
+                res_error = get_outcome(error_time)
+                outcome.append(res_error)  # "逐时"定义时,方程包含.append步骤
                 print("重新获取成功")
             except Exception as e:
-                print("重新获取失败,稍后重新获取,失败原因:", e)
-                error_update.append(error_time)
+                if "daily" not in str(e):
+                    print("重新获取失败, 报错:%s" % coordinate[3], t, "内容为:", e)
+                    error_update.append(error_time)
+                else:
+                    print("重新获取失败, 报错:%s" % coordinate[3], t, "内容为:", e)
         error = error_update
     df = []
     for item in outcome:
@@ -172,9 +163,6 @@ for jcz in JCZ:
         error = pd.DataFrame(error)
         # error.columns = ["Index", '日期']
         error.to_excel(error_information_path + "%s报错.xlsx" % coordinate[3])
-
-print("完成啦")
-
 
 # 自动关机
 print("程序已完成," + str(60) + '秒后将会关机')

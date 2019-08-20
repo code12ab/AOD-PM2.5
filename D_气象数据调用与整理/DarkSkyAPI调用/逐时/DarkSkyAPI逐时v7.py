@@ -17,21 +17,27 @@ pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显
 
 # 参数设置
 save_year = 2018
-date_start = int(str(save_year)+"000")
+date_start = int(str(save_year) + "000")
 
 if save_year % 4 == 0:
     year_days = 366  # 365为年度; 139适用于"5.19"; 334+31适用于13年
 else:
     year_days = 365
 
-start_count = 374  # 刘家园超出次数，没完成
+start_count = 2680  # 刘家园超出次数，没完成
 
-API_KEY_LIST = ["2ab378a4b9a0daee27f74037217b2632", "d086b1f48cd072dae24ee6e936148728",
-                "ed7de1f3687f4c53316538a0ce968752", "740c4d0fbd102f83a7753032c769b2b5",
-                "f2c02fb86fe5164b4ed839d52c3a1a42", "1aa49cfd88b3904e0e26fd6d0a3d67e5",
-                "1875a6cd9baea3db91c31aa29bfa5638", "b726c853b38c30d9b977bcce6fb2b37d",
-                "a5fc93a6781f6d55e7899ae443acd876", "a7e8c6c0ade78c6ae03486be16e7faf0",
-                "ea6ba6d12b5619189b54f10275557872"]
+API_KEY_LIST = [
+    "2ab378a4b9a0daee27f74037217b2632",
+    "d086b1f48cd072dae24ee6e936148728",
+    "ed7de1f3687f4c53316538a0ce968752",
+    "740c4d0fbd102f83a7753032c769b2b5",
+    "f2c02fb86fe5164b4ed839d52c3a1a42",
+    "1aa49cfd88b3904e0e26fd6d0a3d67e5",
+    "1875a6cd9baea3db91c31aa29bfa5638",
+    "b726c853b38c30d9b977bcce6fb2b37d",
+    "a5fc93a6781f6d55e7899ae443acd876",
+    "a7e8c6c0ade78c6ae03486be16e7faf0",
+    "ea6ba6d12b5619189b54f10275557872"]
 
 coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
 output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\逐时\\%s\\" % save_year  # 气象数据存储路径
@@ -40,10 +46,13 @@ time_out = 30  # 超时设置,10秒太短
 
 # 批量导入监测站坐标
 # JCZ_file = pd.read_excel("监测站坐标toDarkSkyAPI.xlsx")
-JCZ_file = pd.read_excel(coordinate_file_path+"监测站坐标toDarkSkyAPI.xlsx")  # 监测站坐标toDarkSkyAPI
+JCZ_file = pd.read_excel(coordinate_file_path +
+                         "监测站坐标toDarkSkyAPI.xlsx")  # 监测站坐标toDarkSkyAPI
 JCZ = []
 for i in range(len(JCZ_file)):
-    exec('JCZ%s = [JCZ_file["经度"][i],JCZ_file["纬度"][i],JCZ_file["城市"][i]+"-"+JCZ_file["监测点名称"][i]]' % i)
+    exec(
+        'JCZ%s = [JCZ_file["经度"][i],JCZ_file["纬度"][i],JCZ_file["城市"][i]+"-"+JCZ_file["监测点名称"][i]]' %
+        i)
     exec("JCZ.append(JCZ%s)" % i)  # exec可以执行字符串指令
 
 # 一年日期
@@ -66,12 +75,16 @@ global t
 
 def get_outcome(date_time):
     # 定义气象数据获取函数. 可选项:中文语言lang=["zh"]
-    monitoring_station = forecast(*MonitoringStation, time=date_time, timeout=time_out)  # 超时报错设置
-    darksky_outcome = monitoring_station['hourly']["data"]  # 输出一天24小时的数据,调用一次API
+    monitoring_station = forecast(
+        *MonitoringStation,
+        time=date_time,
+        timeout=time_out)  # 超时报错设置
+    # 输出一天24小时的数据,调用一次API
+    darksky_outcome = monitoring_station['hourly']["data"]
     # 第一天0时至23时
     # print(coordinate[3], monitoring_station['hourly']["data"]) 数据内容
     # 输出到文件
-    outcome.append(darksky_outcome)
+    outcome.append(darksky_outcome)  # 这里区别于"日均"的定义.
     return outcome
 
 
@@ -80,12 +93,6 @@ i = start_count
 
 # 监测站
 for jcz in JCZ:
-    # 放在下一个for里面？？？？？？？？？？
-    '''
-    API_KEY = API_KEY_LIST[math.floor(i/1000)]  
-    coordinate = API_KEY, jcz[1], jcz[0], jcz[2]  # API_KEY,纬度,经度,监测站,注意格式是先"纬度"后"经度"
-    MonitoringStation = coordinate[0:3]  # API_KEY、纬度、经度
-    '''
     outcome = []
     error = []
     # 一年循环
@@ -96,7 +103,8 @@ for jcz in JCZ:
             break
         API_KEY = API_KEY_LIST[math.floor(i / 1000)]
         print(i, API_KEY)
-        coordinate = API_KEY, jcz[1], jcz[0], jcz[2]  # API_KEY,纬度,经度,监测站,注意格式是先"纬度"后"经度"
+        # API_KEY,纬度,经度,监测站,注意格式是先"纬度"后"经度"
+        coordinate = API_KEY, jcz[1], jcz[0], jcz[2]
         MonitoringStation = coordinate[0:3]  # API_KEY、纬度、经度
         # noinspection PyBroadException
         try:
@@ -123,7 +131,8 @@ for jcz in JCZ:
             i += 1
             API_KEY = API_KEY_LIST[math.floor(i / 1000)]
             print(i, API_KEY)
-            coordinate = API_KEY, jcz[1], jcz[0], jcz[2]  # API_KEY,纬度,经度,监测站,注意格式是先"纬度"后"经度"
+            # API_KEY,纬度,经度,监测站,注意格式是先"纬度"后"经度"
+            coordinate = API_KEY, jcz[1], jcz[0], jcz[2]
             MonitoringStation = coordinate[0:3]  # API_KEY、纬度、经度
             # print(error_time)
             print("重新获取%s" % coordinate[3], error_time)
@@ -132,8 +141,11 @@ for jcz in JCZ:
                 get_outcome(error_time)
                 print("重新获取成功")
             except Exception as e:
-                print("重新获取失败,稍后重新获取,失败原因:", e)
-                error_update.append(error_time)
+                if "hourly" not in str(e):
+                    print("重新获取失败, 报错:%s" % coordinate[3], t, "内容为:", e)
+                    error_update.append(error_time)
+                else:
+                    print("重新获取失败, 报错:%s" % coordinate[3], t, "内容为:", e)
         error = error_update
     df = []
     for item in outcome:
@@ -142,14 +154,15 @@ for jcz in JCZ:
         df.append(item)
     if len(df) != 0:
         df_output = pd.concat(df, sort=True)
-        df_output['time'] = df_output['time'].map(lambda x: dt.fromtimestamp(x))  # datetime.datetime
+        df_output['time'] = df_output['time'].map(
+            lambda x: dt.fromtimestamp(x))  # datetime.datetime
         df_output = df_output.sort_values("time", ascending=True)
         df_output = df_output.set_index('time')
-        df_output.to_excel(output_file_path+"%s.xlsx" % coordinate[3])
+        df_output.to_excel(output_file_path + "%s.xlsx" % coordinate[3])
     if len(error) != 0:  # 空列表不输出,代码经过修改已经没有"error"列表了,以防万一保存了该部分代码
         error = pd.DataFrame(error)
         # error.columns = ["Index", '日期']
-        error.to_excel(error_information_path+"%s报错.xlsx" % coordinate[3])
+        error.to_excel(error_information_path + "%s报错.xlsx" % coordinate[3])
 
 # 自动关机
 print("程序已完成," + str(60) + '秒后将会关机')
