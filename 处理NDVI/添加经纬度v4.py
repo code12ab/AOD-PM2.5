@@ -61,6 +61,6 @@ for name in file_name:
     y_out = pd.concat([arrSlope_y], axis=0)
     data_out = pd.DataFrame(data)
     # 存
-    x_out.to_csv(x_output_path+"x.csv")
-    y_out.to_csv(y_output_path+"y.csv")
-    data_out.to_csv(ndvi_raw_output_path+"data.csv")
+    x_out.to_csv(x_output_path+"%s.csv" % save_name)
+    y_out.to_csv(y_output_path+"%s.csv" % save_name)
+    data_out.to_csv(ndvi_raw_output_path+"%s.csv" % save_name)
