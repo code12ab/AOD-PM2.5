@@ -12,13 +12,17 @@ import os
 hdf_input = "e:\\NDVI\\MOD2018\\"
 file_name = os.listdir(hdf_input)
 # 输出
-tif_output_path = "D:\\毕业论文程序\\NDVI\\TIF\\"
-ndvi_raw_output_path = "D:\\毕业论文程序\\NDVI\\NDVI_RAW\\"
-x_output_path = "D:\\毕业论文程序\\NDVI\\X\\"
-y_output_path = "D:\\毕业论文程序\\NDVI\\Y\\"
-
+tif_output_path = "E:\\NDVI\\TIF\\MOD2018\\"
+ndvi_raw_output_path = "E:\\NDVI\\NDVI_RAW\\MOD2018\\"
+x_output_path = "E:\\NDVI\\X\\MOD2018\\"
+y_output_path = "E:\\NDVI\\Y\\MOD2018\\"
+# 检查重复
+saved_file_list = os.listdir(ndvi_raw_output_path)
+saved_file_list = map(lambda x: str(x).replace(".csv", ".hdf"), [x for x in saved_file_list])  # map, lambda
 # 转换格式
 for name in file_name:
+    if name in saved_file_list:
+        continue
     # 读取
     in_ds = gdal.Open(hdf_input+name)
     save_name = str(name).replace(".hdf", "")
@@ -40,7 +44,6 @@ for name in file_name:
     # print(data, data.shape)
     nXSize = dataset.RasterXSize  # 列数
     nYSize = dataset.RasterYSize  # 行数
-    print("行数:", nYSize, "列数:", nXSize)
     arrSlope_x = []  # 用于存储每个像素的（X，Y）坐标
     arrSlope_y = []
     for i in range(nYSize):
@@ -64,3 +67,4 @@ for name in file_name:
     x_out.to_csv(x_output_path+"%s.csv" % save_name)
     y_out.to_csv(y_output_path+"%s.csv" % save_name)
     data_out.to_csv(ndvi_raw_output_path+"%s.csv" % save_name)
+    print("行数:", nYSize, "列数:", nXSize, "已保存")
