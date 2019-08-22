@@ -9,12 +9,13 @@ import numpy as np
 from fancyimpute import KNN, IterativeImputer
 import os
 # 路径
-input_file_path_Aqua = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\2017_日期补全\\"
-input_file_path_Terra = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra\\2017_日期补全\\"
-merge_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Merge\\2017\\"
-mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2017\\"
+input_file_path_Aqua = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\多年合一_日期补全\\"
+input_file_path_Terra = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra\\多年合一_日期补全\\"
+merge_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Merge\\多年合一\\"
+mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\多年合一\\"
 xytodis = pd.read_excel("D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\xytodis.xlsx")  # 17个区域的投影坐标
 input_file_names = os.listdir(input_file_path_Aqua)  # 文件名列表
+saved_list = os.listdir(mean_output_file_path)
 
 
 # 空间局部公式: 不存在插值为1*nan=nan的插值结果;只存在nan*nan=nan -> 因为使用的插值数据已经筛选为'>0'的部分.
@@ -65,6 +66,9 @@ def get_IDW(input_data):
 
 
 for input_file_name in input_file_names:
+    if input_file_name in saved_list:
+        print("已经完成%s" % input_file_name)
+        continue
     print("========正在计算%s========" % input_file_name)
     # 读取
     data_Aqua = pd.read_excel(input_file_path_Aqua + input_file_name)

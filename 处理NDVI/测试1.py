@@ -135,17 +135,17 @@ dis2 = 20000
 dis3 = 50000
 
 # 文件路径
-x_input = 'D:\\毕业论文程序\\NDVI\\X\\'
-y_input = 'D:\\毕业论文程序\\NDVI\\Y\\'
-data_input = 'D:\\毕业论文程序\\NDVI\\DATA\\'
-ndvi_output = 'D:\\毕业论文程序\\NDVI\\NDVI_RAW\\'
+x_input = 'E:\\NDVI\\X\\MOD2018\\'
+y_input = 'E:\\NDVI\\Y\\MOD2018\\'
+ndvi_output = 'E:\\NDVI\\DATA\\MOD2018\\'
+data_input = 'E:\\NDVI\\NDVI_RAW\\MOD2018\\'
 location_xy_input_file = "D:\\毕业论文程序\\MODIS\\坐标\\站点列表-2018.11.08起_152.xlsx"
 exist_file_list = os.listdir(ndvi_output)
 
 # 读取
-data = pd.read_csv("data.csv", index_col=[0])
-x = pd.read_csv("x.csv", index_col=[0])
-y = pd.read_csv("y.csv", index_col=[0])
+# data = pd.read_csv("data.csv", index_col=[0])
+# x = pd.read_csv("x.csv", index_col=[0])
+# y = pd.read_csv("y.csv", index_col=[0])
 # print(y.head(5), y.shape)
 
 # 批量导入监测站
@@ -162,39 +162,40 @@ for item in JCZ:
         continue
     ndvi_outcome_list = []
     # 数据读取
-    data = pd.read_csv(data_input+item[2]+".csv", index_col=[0])
-    x = pd.read_csv(x_input+item[2]+".csv", index_col=[0])
-    y = pd.read_csv(y_input+item[2]+".csv", index_col=[0])  # 忽视索引列
-    # 格式转换
-    data = np.array(data)
-    x = np.array(x)
-    y = np.array(y)
-    if np.min(x) - 0.8 <= item[0] <= np.max(x) + 0.8 and \
-            np.min(y) - 0.5 <= item[1] <= np.max(y) + 0.5:
-        ndvi_list = get_ndvi_list(
-            x,
-            y,
-            data,
-            item[0],
-            item[1])  # 内含一个文件的17个列表
-        list_value = "%s文件" % item, "%s" % item[2], np.average(ndvi_list[0]), np.average(ndvi_list[1]), \
-                     np.average(ndvi_list[2]), np.average(ndvi_list[3]), np.average(ndvi_list[4]), \
-                     np.average(ndvi_list[5]), np.average(ndvi_list[6]), np.average(ndvi_list[7]), \
-                     np.average(ndvi_list[8]), np.average(ndvi_list[9]), np.average(ndvi_list[10]), \
-                     np.average(ndvi_list[11]), np.average(ndvi_list[12]), np.average(ndvi_list[13]), \
-                     np.average(ndvi_list[14]), np.average(ndvi_list[15]), np.average(ndvi_list[16])
-        # 添加进列表
-        ndvi_outcome_list.append(list_value)
-        # 进度提示
-        print("完成 %s文件" % item[2], "%s" % item[2])
-    else:
-        print("不在 %s文件中: %s站点" % (item[2], item[2]))
+    for csv in os.listdir(data_input):
+        data = pd.read_csv(data_input+csv, index_col=[0])
+        x = pd.read_csv(x_input+csv, index_col=[0])
+        y = pd.read_csv(y_input+csv, index_col=[0])  # 忽视索引列
+        # 格式转换
+        data = np.array(data)
+        x = np.array(x)
+        y = np.array(y)
+        if np.min(x) - 0.8 <= item[0] <= np.max(x) + 0.8 and \
+                np.min(y) - 0.5 <= item[1] <= np.max(y) + 0.5:
+            ndvi_list = get_ndvi_list(
+                x,
+                y,
+                data,
+                item[0],
+                item[1])  # 内含一个文件的17个列表
+            list_value = "%s文件" % csv, "%s" % item[2], np.average(ndvi_list[0]), np.average(ndvi_list[1]), \
+                         np.average(ndvi_list[2]), np.average(ndvi_list[3]), np.average(ndvi_list[4]), \
+                         np.average(ndvi_list[5]), np.average(ndvi_list[6]), np.average(ndvi_list[7]), \
+                         np.average(ndvi_list[8]), np.average(ndvi_list[9]), np.average(ndvi_list[10]), \
+                         np.average(ndvi_list[11]), np.average(ndvi_list[12]), np.average(ndvi_list[13]), \
+                         np.average(ndvi_list[14]), np.average(ndvi_list[15]), np.average(ndvi_list[16])
+            # 添加进列表
+            ndvi_outcome_list.append(list_value)
+            # 进度提示
+            print("完成 %s文件" % csv, "%s" % item[2])
+        else:
+            print("不在 %s文件中: %s站点" % (csv, item[2]))
     # 上一个for循环结束
     ndvi_outcome_list_result = []
     for element in ndvi_outcome_list:
         element = pd.Series(element)  # 格式转换
         # 截取文件名称,结果为获取数据的时间,格式为"年+第几天"
-        element[0] = str(element[0])[10:17]  # 如2018123
+        element[0] = str(element[0])[9:16]  # 如2018123
         # 修改日期格式为XX月XX日
         element[0] = time.strptime(element[0], '%Y%j')
         element[0] = time.strftime("%Y-%m-%d ", element[0])

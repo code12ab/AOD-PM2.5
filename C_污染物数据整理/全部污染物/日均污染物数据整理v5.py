@@ -26,14 +26,14 @@ path_list = ["D:\\站点_20140513-20141231\\",
              "D:\\站点_20180101-20181231\\"]
 '''
 
-path_list = ["D:\\DATA_毕业论文\\监测点\\站点140513-181231\\"]
-
+path_list = ["D:\\DATA_毕业论文\\监测点\\站点160102-170101\\"]
+save_year = 2016
 
 # 文件夹循环
 for path in path_list:
     input_file_path = path
     input_file_name = os.listdir(input_file_path)  # 文件名
-    output_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\total\\"
+    output_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\%s\\" % save_year
     error_path = "D:\\毕业论文程序\\污染物浓度\\error\\"
     JCZ_data = pd.read_excel(
         "D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx",
@@ -214,9 +214,9 @@ print("================ 开始第二部分 ==================")
 
 warnings.filterwarnings('ignore')  # 代码中仅进行新列的赋值,不对数据源做修改,因此可以忽略该警告
 # 参数设置
-input_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\total\\"
+input_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\%s\\" % save_year
 input_file_name = os.listdir(input_file_path)  # 文件名
-output_file_path = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\多年合一\\"
+output_file_path = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\%s\\" % save_year
 JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
 # JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="北京2019")  # 适用于北京2019年
 # JCZ_NAME格式为df,监测站编码,监测点名称,城市,经度,纬度
