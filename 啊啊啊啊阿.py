@@ -6,15 +6,23 @@
 # 库
 
 
-def huiwen(str1):
-     str11=list(str1)
-     str2=reversed(str11)
-     if str11==list(str2):
-          print('是回文联！')
-     else:
-          print('不是回文联！')
+X = 3 == 3, 5
+# print(X)
 
 
-a = "asdd1sa"
+a = ["a1", "a2", "a3", "a4", "a5", "a6", 'a7']
+b = []
+for element in a:
+     b.append(element)
+     b.reverse()
 
-print(huiwen(a))
+
+
+a = 15
+
+b = 23
+
+if a == 15:
+     print(2)
+if a != b:
+     print(3)

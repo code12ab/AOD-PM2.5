@@ -24,4 +24,4 @@ for modis in ["Terra", "Aqua"]:
             elif len(data_raw.index) == 365 * 5 + 1:
                 print(year, modis, name)
             else:
-                print("==========", year, modis, name, "==========")
+                print("==========", year, modis, name, "==========")  # 问题文件

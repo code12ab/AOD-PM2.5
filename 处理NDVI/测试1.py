@@ -128,7 +128,6 @@ def get_ndvi_list(longitude_df, latitude_df, ndvi_df, item_df1, item_df2):  # �
 
 
 warnings.filterwarnings('ignore')  # 忽略"number/0"的情况
-start_time = datetime.datetime.now()  # 耗时计算
 # 参数设置
 dis1 = 8000  # 同心圆范围
 dis2 = 20000
@@ -148,92 +147,121 @@ exist_file_list = os.listdir(ndvi_output)
 # y = pd.read_csv("y.csv", index_col=[0])
 # print(y.head(5), y.shape)
 
-# 批量导入监测站
-JCZ_file = pd.read_excel(location_xy_input_file, sheet_name="T1")
-JCZ = []
-for i in range(len(JCZ_file)):
-    exec(
-        'JCZ%s = [JCZ_file["经度"][i],JCZ_file["纬度"][i],JCZ_file["城市"][i]+"-"+JCZ_file["监测点名称"][i]]' %
-        i)
-    exec("JCZ.append(JCZ%s)" % i)  # exec可以执行字符串指令
-for item in JCZ:
-    if item[2] + ".xlsx" in exist_file_list:  # 已输出文件不在重复计算
-        print("文件已经存在")
-        continue
-    ndvi_outcome_list = []
-    # 数据读取
-    for csv in os.listdir(data_input):
-        data = pd.read_csv(data_input+csv, index_col=[0])
-        x = pd.read_csv(x_input+csv, index_col=[0])
-        y = pd.read_csv(y_input+csv, index_col=[0])  # 忽视索引列
-        # 格式转换
-        data = np.array(data)
-        x = np.array(x)
-        y = np.array(y)
-        if np.min(x) - 0.8 <= item[0] <= np.max(x) + 0.8 and \
-                np.min(y) - 0.5 <= item[1] <= np.max(y) + 0.5:
-            ndvi_list = get_ndvi_list(
-                x,
-                y,
-                data,
-                item[0],
-                item[1])  # 内含一个文件的17个列表
-            list_value = "%s文件" % csv, "%s" % item[2], np.average(ndvi_list[0]), np.average(ndvi_list[1]), \
-                         np.average(ndvi_list[2]), np.average(ndvi_list[3]), np.average(ndvi_list[4]), \
-                         np.average(ndvi_list[5]), np.average(ndvi_list[6]), np.average(ndvi_list[7]), \
-                         np.average(ndvi_list[8]), np.average(ndvi_list[9]), np.average(ndvi_list[10]), \
-                         np.average(ndvi_list[11]), np.average(ndvi_list[12]), np.average(ndvi_list[13]), \
-                         np.average(ndvi_list[14]), np.average(ndvi_list[15]), np.average(ndvi_list[16])
-            # 添加进列表
-            ndvi_outcome_list.append(list_value)
-            # 进度提示
-            print("完成 %s文件" % csv, "%s" % item[2])
-        else:
-            print("不在 %s文件中: %s站点" % (csv, item[2]))
-    # 上一个for循环结束
-    ndvi_outcome_list_result = []
-    for element in ndvi_outcome_list:
-        element = pd.Series(element)  # 格式转换
-        # 截取文件名称,结果为获取数据的时间,格式为"年+第几天"
-        element[0] = str(element[0])[9:16]  # 如2018123
-        # 修改日期格式为XX月XX日
-        element[0] = time.strptime(element[0], '%Y%j')
-        element[0] = time.strftime("%Y-%m-%d ", element[0])
-        element = np.array(element)  # 格式转换
-        ndvi_outcome_list_result.append(element)
-    # 避免输出结果字符串省略，四行设置都需要
-    pd.set_option('display.max_rows', None)  # 行
-    pd.set_option('display.max_columns', 1000)  # 列
-    pd.set_option('display.width', 1000)
-    pd.set_option('display.max_colwidth', 1000)
-    ndvi_outcome_list_result = pd.DataFrame(ndvi_outcome_list_result)  # 格式转换
-    print(ndvi_outcome_list_result)
-    # 重设列名
-    ndvi_outcome_list_result.columns = [
-        '日期',
-        '监测站',
-        "NDVI_0",
-        "NDVI_1",
-        "NDVI_2",
-        "NDVI_3",
-        "NDVI_4",
-        "NDVI_5",
-        "NDVI_6",
-        "NDVI_7",
-        "NDVI_8",
-        "NDVI_9",
-        "NDVI_10",
-        "NDVI_11",
-        "NDVI_12",
-        "NDVI_13",
-        "NDVI_14",
-        "NDVI_15",
-        "NDVI_16"]
-    # 同日期，多文件情况下的均值处理
-    ndvi_outcome_list_result = ndvi_outcome_list_result.groupby(
-        ['日期', "监测站"]).mean()
-    ndvi_outcome_list_result.to_excel(ndvi_output + "%s.xlsx" % item[2])  # 完整结果存入excel
 
-    # 程序用时写入文件
-end_time = datetime.datetime.now()
-print(str(end_time - start_time))
+# 批量导入监测站
+def get_ndvi(sheet_names):
+    JCZ_file = pd.read_excel(location_xy_input_file, sheet_name=sheet_names)
+    JCZ = []
+    for i in range(len(JCZ_file)):
+        exec(
+            'JCZ%s = [JCZ_file["经度"][i],JCZ_file["纬度"][i],JCZ_file["城市"][i]+"-"+JCZ_file["监测点名称"][i]]' %
+            i)
+        exec("JCZ.append(JCZ%s)" % i)  # exec可以执行字符串指令
+    for item in JCZ:
+        if item[2] + ".xlsx" in exist_file_list:  # 已输出文件不在重复计算
+            print("文件已经存在")
+            continue
+        ndvi_outcome_list = []
+        # 数据读取
+        for csv in os.listdir(data_input):
+            data = pd.read_csv(data_input+csv, index_col=[0])
+            x = pd.read_csv(x_input+csv, index_col=[0])
+            y = pd.read_csv(y_input+csv, index_col=[0])  # 忽视索引列
+            # 格式转换
+            data = np.array(data)
+            x = np.array(x)
+            y = np.array(y)
+            if np.min(x) - 0.8 <= item[0] <= np.max(x) + 0.8 and \
+                    np.min(y) - 0.5 <= item[1] <= np.max(y) + 0.5:
+                ndvi_list = get_ndvi_list(
+                    x,
+                    y,
+                    data,
+                    item[0],
+                    item[1])  # 内含一个文件的17个列表
+                list_value = "%s文件" % csv, "%s" % item[2], np.average(ndvi_list[0]), np.average(ndvi_list[1]), \
+                             np.average(ndvi_list[2]), np.average(ndvi_list[3]), np.average(ndvi_list[4]), \
+                             np.average(ndvi_list[5]), np.average(ndvi_list[6]), np.average(ndvi_list[7]), \
+                             np.average(ndvi_list[8]), np.average(ndvi_list[9]), np.average(ndvi_list[10]), \
+                             np.average(ndvi_list[11]), np.average(ndvi_list[12]), np.average(ndvi_list[13]), \
+                             np.average(ndvi_list[14]), np.average(ndvi_list[15]), np.average(ndvi_list[16])
+                # 添加进列表
+                ndvi_outcome_list.append(list_value)
+                # 进度提示
+                print("完成 %s文件" % csv, "%s" % item[2])
+            else:
+                print("不在 %s文件中: %s站点" % (csv, item[2]))
+        # 上一个for循环结束
+        ndvi_outcome_list_result = []
+        for element in ndvi_outcome_list:
+            element = pd.Series(element)  # 格式转换
+            # 截取文件名称,结果为获取数据的时间,格式为"年+第几天"
+            element[0] = str(element[0])[9:16]  # 如2018123
+            # 修改日期格式为XX月XX日
+            element[0] = time.strptime(element[0], '%Y%j')
+            element[0] = time.strftime("%Y-%m-%d ", element[0])
+            element = np.array(element)  # 格式转换
+            ndvi_outcome_list_result.append(element)
+        # 避免输出结果字符串省略，四行设置都需要
+        pd.set_option('display.max_rows', None)  # 行
+        pd.set_option('display.max_columns', 1000)  # 列
+        pd.set_option('display.width', 1000)
+        pd.set_option('display.max_colwidth', 1000)
+        ndvi_outcome_list_result = pd.DataFrame(ndvi_outcome_list_result)  # 格式转换
+        print(ndvi_outcome_list_result)
+        # 重设列名
+        ndvi_outcome_list_result.columns = [
+            '日期',
+            '监测站',
+            "NDVI_0",
+            "NDVI_1",
+            "NDVI_2",
+            "NDVI_3",
+            "NDVI_4",
+            "NDVI_5",
+            "NDVI_6",
+            "NDVI_7",
+            "NDVI_8",
+            "NDVI_9",
+            "NDVI_10",
+            "NDVI_11",
+            "NDVI_12",
+            "NDVI_13",
+            "NDVI_14",
+            "NDVI_15",
+            "NDVI_16"]
+        # 同日期，多文件情况下的均值处理
+        ndvi_outcome_list_result = ndvi_outcome_list_result.groupby(
+            ['日期', "监测站"]).mean()
+        ndvi_outcome_list_result.to_excel(ndvi_output + "%s.xlsx" % item[2])  # 完整结果存入excel
+
+
+if __name__ == '__main__':
+    print('=====主进程=====')
+
+    p1 = Process(target=get_ndvi, args=('样例1',))
+    p2 = Process(target=get_ndvi, args=('样例2',))
+    p3 = Process(target=get_ndvi, args=('样例3',))
+    p4 = Process(target=get_ndvi, args=('样例4',))
+    p5 = Process(target=get_ndvi, args=('样例5',))
+    p6 = Process(target=get_ndvi, args=('样例6',))
+
+    p1.start()
+    p2.start()
+    p3.start()
+    p4.start()
+    p5.start()
+    p6.start()
+
+    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
+    p5.join()
+    p4.join()
+    p3.join()
+    p2.join()
+    p1.join()
+
+    # 自动关机
+    print("程序已完成," + str(60) + '秒后将会关机')
+    time.sleep(60)
+    print('关机')
+    # os.system('shutdown -s -f -t 1')

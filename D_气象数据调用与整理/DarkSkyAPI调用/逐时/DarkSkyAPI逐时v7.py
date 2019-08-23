@@ -16,7 +16,7 @@ pd.set_option('display.max_rows', None)  # 设置显示最大行
 pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显示所有列
 
 # 参数设置
-save_year = 2018
+save_year = 2017
 date_start = int(str(save_year) + "000")
 
 if save_year % 4 == 0:
@@ -24,7 +24,7 @@ if save_year % 4 == 0:
 else:
     year_days = 365
 
-start_count = 2922  # 刘家园超出次数，没完成
+start_count = 3660  # 刘家园超出次数，没完成
 
 API_KEY_LIST = [
     "2ab378a4b9a0daee27f74037217b2632",
@@ -108,7 +108,7 @@ for jcz in JCZ:
         MonitoringStation = coordinate[0:3]  # API_KEY、纬度、经度
         # noinspection PyBroadException
         try:
-            t = dt(time[0], time[1], time[2], 00).isoformat()
+            t = dt(time[0], time[1], time[2], 00).isoformat()   # 是否"00"或其他不影响
             get_outcome(t)
             # 进度
             print("完成:%s" % coordinate[3], t)

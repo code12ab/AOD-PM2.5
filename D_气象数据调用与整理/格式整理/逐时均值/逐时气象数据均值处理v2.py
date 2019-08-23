@@ -14,8 +14,8 @@ import os
 # 批量读取
 
 
-input_path = "D:\\毕业论文程序\\气象数据\\数据\\逐时\\2017\\"
-output_path = "D:\\毕业论文程序\\气象数据\\整理\\逐时均值\\2017\\"
+input_path = "D:\\毕业论文程序\\气象数据\\数据\\逐时\\2018\\"
+output_path = "D:\\毕业论文程序\\气象数据\\整理\\逐时均值\\2018\\"
 file_name_list = os.listdir(input_path)  # 文件名
 
 for name in file_name_list:
