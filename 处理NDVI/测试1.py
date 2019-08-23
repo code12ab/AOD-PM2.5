@@ -128,6 +128,7 @@ def get_ndvi_list(longitude_df, latitude_df, ndvi_df, item_df1, item_df2):  # �
 
 
 warnings.filterwarnings('ignore')  # 忽略"number/0"的情况
+start_time = datetime.datetime.now()  # 耗时计算
 # 参数设置
 dis1 = 8000  # 同心圆范围
 dis2 = 20000
@@ -149,8 +150,8 @@ exist_file_list = os.listdir(ndvi_output)
 
 
 # 批量导入监测站
-def get_ndvi(sheet_names):
-    JCZ_file = pd.read_excel(location_xy_input_file, sheet_name=sheet_names)
+def get_ndvi_multiprocessing(sheetname):
+    JCZ_file = pd.read_excel(location_xy_input_file, sheet_name=sheetname)
     JCZ = []
     for i in range(len(JCZ_file)):
         exec(
@@ -239,12 +240,12 @@ def get_ndvi(sheet_names):
 if __name__ == '__main__':
     print('=====主进程=====')
 
-    p1 = Process(target=get_ndvi, args=('样例1',))
-    p2 = Process(target=get_ndvi, args=('样例2',))
-    p3 = Process(target=get_ndvi, args=('样例3',))
-    p4 = Process(target=get_ndvi, args=('样例4',))
-    p5 = Process(target=get_ndvi, args=('样例5',))
-    p6 = Process(target=get_ndvi, args=('样例6',))
+    p1 = Process(target=get_ndvi_multiprocessing, args=('样例1',))
+    p2 = Process(target=get_ndvi_multiprocessing, args=('样例2',))
+    p3 = Process(target=get_ndvi_multiprocessing, args=('样例3',))
+    p4 = Process(target=get_ndvi_multiprocessing, args=('样例4',))
+    p5 = Process(target=get_ndvi_multiprocessing, args=('样例5',))
+    p6 = Process(target=get_ndvi_multiprocessing, args=('样例6',))
 
     p1.start()
     p2.start()
