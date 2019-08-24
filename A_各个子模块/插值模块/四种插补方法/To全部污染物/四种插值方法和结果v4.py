@@ -17,6 +17,8 @@ input_file_path_pollution = "D:\\毕业论文程序\\污染物浓度\\整理\\�
 merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2016\\"
 JCZ_info = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")  # 152个
 JCZ_info["监测站"] = JCZ_info["城市"] + "-" + JCZ_info["监测点名称"]
+# 已经输出
+saved_list = os.listdir(merge_output_file_path)
 
 
 def get4method(xx152):
@@ -72,6 +74,9 @@ def get4method(xx152):
     jcz_152["监测站名称_152"] = jcz_152["城市"] + "-" + jcz_152["监测点名称"]
     for input_file_name in jcz_152["监测站名称_152"]:
         input_file_name = input_file_name + ".xlsx"
+        if input_file_name in saved_list:
+            print("已经完成:", input_file_name, xx152)
+            continue
         print("========正在计算%s========" % input_file_name)
         # 读取数据源
         data_pollution = pd.read_excel(input_file_path_pollution + input_file_name)
@@ -141,6 +146,7 @@ def get4method(xx152):
         data_pollution_Iterative.replace(0, np.nan, inplace=True)
 
         # 合并相同方法的结果
+
         data_pollution_KNN = data_pollution_KNN.set_index(data_pollution.index)
         data_pollution_KNN.columns = data_pollution.columns
         data_pollution_ewm = data_pollution_ewm.set_index(data_pollution.index)
@@ -164,27 +170,27 @@ if __name__ == '__main__':
     print('=====主进程=====')
 
     p1 = Process(target=get4method, args=("样例1",))
-    p2 = Process(target=get4method, args=('样例2',))
-    p3 = Process(target=get4method, args=('样例3',))
-    p4 = Process(target=get4method, args=('样例4',))
-    p5 = Process(target=get4method, args=('样例5',))
-    p6 = Process(target=get4method, args=('样例6',))
+    #p2 = Process(target=get4method, args=('样例2',))
+    #p3 = Process(target=get4method, args=('样例3',))
+    #p4 = Process(target=get4method, args=('样例4',))
+    #p5 = Process(target=get4method, args=('样例5',))
+    #p6 = Process(target=get4method, args=('样例6',))
 
     p1.start()
-    p2.start()
-    p3.start()
-    p4.start()
-    p5.start()
-    p6.start()
+    #p2.start()
+    #p3.start()
+    #p4.start()
+    #p5.start()
+    #p6.start()
 
-    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
-    p5.join()
-    p4.join()
-    p3.join()
-    p2.join()
+    #p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
+    #p5.join()
+    #p4.join()
+    #p3.join()
+    #p2.join()
     p1.join()
 
     # 自动关机
     print("程序已完成," + str(60) + '秒后将会关机')
     print('关机')
-    #os.system('shutdown -s -f -t 60')
+    # os.system('shutdown -s -f -t 60')

@@ -24,7 +24,7 @@ for year_tag in [2018]:
         data["Index"] = data["time"]
         data = data.set_index('Index')
         # 将时间序列转换为指定的频率
-        data = data.asfreq(freq='1440min')  # 补全信息,这个方法以后可能会经常使用到
+        data = data.asfreq(freq='1440min')  # 补全信息,这个方法以后可能会经常使用到, 日期补全
         data["time"] = data.index
         data["日期"] = data["time"].dt.date  # 新建日期列
         data["日期"] = data["日期"].map(lambda x: str(x))  # 改成字符串格式 方便日后合并
@@ -32,6 +32,7 @@ for year_tag in [2018]:
         data = data.drop(["time"], axis=1)  # 日均条件下删除无关列
 
         # 日均数据,填充
+        """
         try:
             data["precipAccumulation"] = data["precipAccumulation"][data["precipType"] == "snow"].interpolate()
         except Exception as e:
@@ -40,6 +41,7 @@ for year_tag in [2018]:
             data["precipIntensity"] = data["precipIntensity"][data["precipType"] == "rain"].interpolate()
         except Exception as e:
             print("错误信息", e, "\n")
+        """
         # 保存
         data.to_excel(output_path + "%s.xlsx" % file_name)
         '''
