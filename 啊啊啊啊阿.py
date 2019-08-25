@@ -6,46 +6,20 @@
 # 库
 import pandas as pd
 import os
-"""
-output_file_path = "D:\\毕业论文程序\\气象数据\\整理\\日均\\%s\\" % 2018  # 气象数据存储路径
-saved_list = os.listdir(output_file_path)
 
-non_full_list = []
-for item in saved_list:
-     data = pd.read_excel(output_file_path+item)
-     if len(data.index) != 365:
-          print(item)
-          non_full_list.append(item)
-print(len(non_full_list))
-"""
+# 路径
+input_file_path_pollution = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\2018_日期补全\\"
+merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018\\"
+JCZ_info = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")  # 152个
+JCZ_info["监测站"] = JCZ_info["城市"] + "-" + JCZ_info["监测点名称"]
+# 已经输出
+saved_list = os.listdir(merge_output_file_path)
 
-"""
-import pandas as pd
-import datetime
-from datetime import datetime as dt
-import os
+jcz_152 = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\站点列表-2018.11.08起_152.xlsx", sheet_name="station152")
+jcz_152["监测站名称_152"] = jcz_152["城市"] + "-" + jcz_152["监测点名称"]
 
-# 批量读取
-
-input_path = 'C:\\Users\\iii\\Desktop\\保定-地表水厂.xlsx'
-data = pd.read_excel(input_path)
-# print(data.head())
-data["Index"] = data["time"]
-data = data.set_index('Index')
-# 将时间序列转换为指定的频率
-data = data.asfreq(freq='1440min')  # 补全信息,这个方法以后可能会经常使用到
-data["time"] = data.index
-data["日期"] = data["time"].dt.date  # 新建日期列
-data["日期"] = data["日期"].map(lambda x: str(x))  # 改成字符串格式 方便日后合并
-data = data.set_index('日期')
-data = data.drop(["time"], axis=1)  # 日均条件下删除无关列
-
-
-print(data.index, len(data.index))
-"""
-a = [1,1,3,4]
-b = set(a)
-a = list(b)
-print(b[1])
-
-print(b)
+null_list = []
+for item in jcz_152["监测站名称_152"]:
+    if item+".xlsx" not in saved_list:
+        null_list.append(item)
+print(null_list)
