@@ -54,7 +54,7 @@ def geo_distance(lng1, lat1, lng2, lat2):
 for row1 in range(len(coordinates)):
     # print(coordinates[row1:row1+1])  # 万寿西宫到菏泽学院 每一个
     data1 = coordinates[row1:row1+1]  # 某一行
-    data2 = coordinates.drop([row1])  # 删除一行的数据
+    data2 = coordinates.drop([row1])  # 删除行的数据
     # print(data1, data2, sep="\n")
     for row2 in range(len(data2)):
         data3 = data2[row2:row2+1]  # 某一行

@@ -53,11 +53,17 @@ def cal_weight(x):
     return w
 
 
-Merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018\\"
-res_output_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Res\\2018\\"
+Merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\多年合一\\"
+res_output_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Res\\多年合一\\"
+
+saved_list = os.listdir(res_output_path)
 
 input_file_names = os.listdir(Merge_output_file_path)  # 文件名列表
 for input_file_name in input_file_names:
+    if input_file_name in saved_list:
+        continue
+    else:
+        print('======%s======' % input_file_name)
     # 读取
     data_KNN = pd.read_excel(
         Merge_output_file_path +
@@ -77,6 +83,7 @@ for input_file_name in input_file_names:
         sheet_name="Iterative")
     # 结果列表
     res = []
+
     # for area_numb in range(0, 17):  # 这里需要修改
     for column_name in ["PM25", "PM10", "SO2", "NO2", "O3", "CO"]:
         d1 = data_KNN[["日期", column_name]]
@@ -102,6 +109,7 @@ for input_file_name in input_file_names:
         data_aod.columns = ["日期", "KNN", "ewm", "IDW", "Iterative"]
         # data_aod.columns : 日期 AOD_0_x_x AOD_0_y_x AOD_0_x_y AOD_0_y_y
         data_aod = data_aod.set_index("日期")
+
         data_aod_to_weight = data_aod.dropna()  # 用非空值计算更合理
         w = cal_weight(data_aod_to_weight)  # 调用cal_weight
         w.index = data_aod.columns
@@ -202,7 +210,6 @@ for input_file_name in input_file_names:
         connect_data = connect_data.drop(
             columns=["KNN", "ewm", "IDW", "Iterative"])
         res.append(connect_data)
-
     res_data = pd.concat(res, sort=False, axis=1)
     res_data.to_excel(res_output_path + input_file_name)
     print("已输出:" + "%s" % input_file_name)

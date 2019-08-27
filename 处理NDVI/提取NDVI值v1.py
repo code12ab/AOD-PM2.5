@@ -135,10 +135,10 @@ dis2 = 20000
 dis3 = 50000
 
 # 文件路径
-x_input = 'E:\\NDVI\\X\\MOD2018\\'
-y_input = 'E:\\NDVI\\Y\\MOD2018\\'
-ndvi_output = 'E:\\NDVI\\DATA\\MOD2018\\'
-data_input = 'E:\\NDVI\\NDVI_RAW\\MOD2018\\'
+x_input = 'D:\\NDVI\\X\\MYD2018\\'
+y_input = 'D:\\NDVI\\Y\\MYD2018\\'
+ndvi_output = 'D:\\NDVI\\DATA\\MYD2018\\'
+data_input = 'D:\\NDVI\\NDVI_RAW\\MYD2018\\'
 location_xy_input_file = "D:\\毕业论文程序\\MODIS\\坐标\\站点列表-2018.11.08起_152.xlsx"
 exist_file_list = os.listdir(ndvi_output)
 
@@ -244,18 +244,18 @@ if __name__ == '__main__':
     p2 = Process(target=get_ndvi_multiprocessing, args=('样例2',))
     p3 = Process(target=get_ndvi_multiprocessing, args=('样例3',))
     p4 = Process(target=get_ndvi_multiprocessing, args=('样例4',))
-    p5 = Process(target=get_ndvi_multiprocessing, args=('样例5',))
-    p6 = Process(target=get_ndvi_multiprocessing, args=('样例6',))
+    #p5 = Process(target=get_ndvi_multiprocessing, args=('样例5',))
+    #p6 = Process(target=get_ndvi_multiprocessing, args=('样例6',))
 
     p1.start()
     p2.start()
     p3.start()
     p4.start()
-    p5.start()
-    p6.start()
+    #p5.start()
+    #p6.start()
 
-    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
-    p5.join()
+    #p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
+    #p5.join()
     p4.join()
     p3.join()
     p2.join()
