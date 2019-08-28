@@ -233,22 +233,22 @@ if __name__ == '__main__':
 
     p1 = Process(target=get4method, args=("V4P1",))
     p2 = Process(target=get4method, args=('V4P2',))
-    p3 = Process(target=get4method, args=('样例3',))
+    #p3 = Process(target=get4method, args=('样例3',))    # 样例3ok
     p4 = Process(target=get4method, args=('样例4',))
-    p5 = Process(target=get4method, args=('样例5',))
-    p6 = Process(target=get4method, args=('样例6',))
+    #p5 = Process(target=get4method, args=('样例5',))  # 样例5ok
+    #p6 = Process(target=get4method, args=('样例6',)) # yangli6ok
 
     p1.start()
     p2.start()
-    p3.start()
+    #p3.start()
     p4.start()
-    p5.start()
-    p6.start()
+    #p5.start()
+    #p6.start()
 
-    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
-    p5.join()
+    #p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
+    #p5.join()
     p4.join()
-    p3.join()
+    #p3.join()
     p2.join()
     p1.join()
 
