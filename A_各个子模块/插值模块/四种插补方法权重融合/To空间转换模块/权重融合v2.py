@@ -186,7 +186,7 @@ for input_file_name in input_file_names:
                     pd.notnull(data_aod["Iterative"][loc]):
                 value_weight = data_aod["Iterative"][loc] * w.weight[3]
             else:
-                value_weight = -9999
+                value_weight = np.nan
             value_weight_list.append(value_weight)
             # print(value_weight)
         value_weight_list = pd.DataFrame(value_weight_list)
