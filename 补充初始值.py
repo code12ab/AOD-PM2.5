@@ -14,3 +14,4 @@ a[a.shape[1]%2][a.shape[0]%2] = float(0.00)
 
 print(a)
 
+print(11//2)
