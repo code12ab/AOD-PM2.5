@@ -9,7 +9,6 @@ import numpy as np
 
 
 a = [[np.nan,np.nan,np.nan,np.nan],[np.nan,np.nan,np.nan,np.nan],[np.nan,np.nan,np.nan,np.nan],[np.nan,np.nan,np.nan,np.nan]]
-a = np.array(a)
 a = pd.DataFrame(a)
 a[a.shape[1]%2][a.shape[0]%2] = float(0.00)
 

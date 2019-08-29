@@ -80,9 +80,9 @@ for input_file_name in input_file_names:
     data_Terra = data_Terra.set_index('日期')
     "给初始值"
     if str(np.max(np.array(data_Terra))) == 'nan':
-        data_Terra[data_Terra.shape[1] % 2][data_Terra.shape[0] % 2] = float(0.00)
+        data_Terra.iloc[data_Terra.shape[0] % 2][data_Terra.shape[1] % 2] = float(0.00)
     if str(np.max(np.array(data_Aqua))) == 'nan':
-        data_Aqua[data_Aqua.shape[1] % 2][data_Aqua.shape[0] % 2] = float(0.00)
+        data_Aqua.iloc[data_Aqua.shape[0] % 2][data_Aqua.shape[1] % 2] = float(0.00)
     # 时间局部：KNN
     # 最近邻估算，使用两行都具有观测数据的特征的均方差来对样本进行加权。然后用加权的结果进行特征值填充
     # 相当于A0D17个点为特征进行近邻,则参数K为时间,即时间上最近的16行按特征的均方差进行加权，即哪个时间点的权重大一些
