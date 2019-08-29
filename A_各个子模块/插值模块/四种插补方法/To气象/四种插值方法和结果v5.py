@@ -136,6 +136,7 @@ def get4method(xx152):
             # 空间局部: IDW,反距离插值
             data_darksky_weather_IDW = get_IDW(data_darksky_weather_to_IDW)
             # 空间全局: 迭代回归,缺失特征作为y,其他特征作为x
+            """
             merge_list = []  # 同一监测站,不同污染物
             for darksky_weather_Iterative in [
                      'apparentTemperatureHigh',
@@ -195,12 +196,12 @@ def get4method(xx152):
                     del data_darksky_weather_Iterative_to_merge[darksky_weather_Iterative + "_add%s" % numb_del]
                 merge_list.append(data_darksky_weather_Iterative_to_merge)
             data_darksky_weather_Iterative = pd.concat(merge_list, axis=1, sort=False)
-
+            """
             # 对结果的0值取np.nan
             data_darksky_weather_KNN.replace(0, np.nan, inplace=True)
             data_darksky_weather_ewm.replace(0, np.nan, inplace=True)
             data_darksky_weather_IDW.replace(0, np.nan, inplace=True)
-            data_darksky_weather_Iterative.replace(0, np.nan, inplace=True)
+            #data_darksky_weather_Iterative.replace(0, np.nan, inplace=True)
 
             # 合并相同方法的结果
             data_darksky_weather_KNN = data_darksky_weather_KNN.set_index(data_darksky_weather.index)
@@ -209,14 +210,23 @@ def get4method(xx152):
             data_darksky_weather_ewm.columns = data_darksky_weather.columns
             data_darksky_weather_IDW = data_darksky_weather_IDW.set_index(data_darksky_weather.index)
             data_darksky_weather_IDW.columns = data_darksky_weather.columns
-            data_darksky_weather_Iterative = data_darksky_weather_Iterative.set_index(data_darksky_weather.index)
-            data_darksky_weather_Iterative.columns = data_darksky_weather.columns
+            #data_darksky_weather_Iterative = data_darksky_weather_Iterative.set_index(data_darksky_weather.index)
+            #data_darksky_weather_Iterative.columns = data_darksky_weather.columns
 
             # 合并不同方法为一个文件
+            """
             sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
             sheet_name_count = 0
             writer = pd.ExcelWriter(merge_output_file_path + '%s.xlsx' % (input_file_name.replace(".xlsx", "")))
             for methods_output in [data_darksky_weather_KNN, data_darksky_weather_ewm, data_darksky_weather_IDW, data_darksky_weather_Iterative]:
+                methods_output.to_excel(writer, sheet_name=sheet_name[sheet_name_count])
+                sheet_name_count = 1 + sheet_name_count
+            writer.save()
+            """
+            sheet_name = ["KNN", "ewm", "IDW"]
+            sheet_name_count = 0
+            writer = pd.ExcelWriter(merge_output_file_path + '%s.xlsx' % (input_file_name.replace(".xlsx", "")))
+            for methods_output in [data_darksky_weather_KNN, data_darksky_weather_ewm, data_darksky_weather_IDW]:
                 methods_output.to_excel(writer, sheet_name=sheet_name[sheet_name_count])
                 sheet_name_count = 1 + sheet_name_count
             writer.save()
@@ -233,22 +243,22 @@ if __name__ == '__main__':
 
     p1 = Process(target=get4method, args=("V4P1",))
     p2 = Process(target=get4method, args=('V4P2',))
-    #p3 = Process(target=get4method, args=('样例3',))    # 样例3ok
-    p4 = Process(target=get4method, args=('样例4',))
-    #p5 = Process(target=get4method, args=('样例5',))  # 样例5ok
-    #p6 = Process(target=get4method, args=('样例6',)) # yangli6ok
+    p3 = Process(target=get4method, args=('V4P3',))    # 样例3ok
+    p4 = Process(target=get4method, args=('V4P4',))
+    p5 = Process(target=get4method, args=('V4P5',))  # 样例5ok
+    p6 = Process(target=get4method, args=('V4P6',)) # yangli6ok
 
     p1.start()
     p2.start()
-    #p3.start()
+    p3.start()
     p4.start()
-    #p5.start()
-    #p6.start()
+    p5.start()
+    p6.start()
 
-    #p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
-    #p5.join()
+    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
+    p5.join()
     p4.join()
-    #p3.join()
+    p3.join()
     p2.join()
     p1.join()
 
