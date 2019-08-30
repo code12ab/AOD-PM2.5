@@ -8,7 +8,7 @@ import pandas as pd
 import os
 
 # 路径
-merge_output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\逐时\\2017\\"
+merge_output_file_path = "D:\\毕业论文程序\\气象数据\\插值模块\\Merge\\2018\\"
 JCZ_info = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")  # 152个
 JCZ_info["监测站"] = JCZ_info["城市"] + "-" + JCZ_info["监测点名称"]
 # 已经输出

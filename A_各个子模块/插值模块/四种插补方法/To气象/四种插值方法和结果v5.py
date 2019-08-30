@@ -4,6 +4,7 @@
 
 """
 更新 try,except
+迭代法存在bug
 """
 
 # 库
@@ -104,9 +105,9 @@ def get4method(xx152):
     error_list = []
     for input_file_name in jcz_152["监测站名称_152"]:
         input_file_name = input_file_name + ".xlsx"
-        if input_file_name in saved_list:
+        #if input_file_name in saved_list:
             # print("已经完成:", input_file_name, xx152)
-            continue
+            #continue
         print("========正在计算%s========" % input_file_name)
         try:
             # 读取数据源
@@ -136,7 +137,6 @@ def get4method(xx152):
             # 空间局部: IDW,反距离插值
             data_darksky_weather_IDW = get_IDW(data_darksky_weather_to_IDW)
             # 空间全局: 迭代回归,缺失特征作为y,其他特征作为x
-            """
             merge_list = []  # 同一监测站,不同污染物
             for darksky_weather_Iterative in [
                      'apparentTemperatureHigh',
@@ -188,7 +188,16 @@ def get4method(xx152):
                     data_to_Iterative = data_darksky_weather[darksky_weather_Iterative].copy()
                     data_to_Iterative = pd.DataFrame(data_to_Iterative)
                     data_to_Iterative.columns = [darksky_weather_Iterative]  # 本身
-                data_darksky_weather_Iterative_to_merge = IterativeImputer(max_iter=10).fit_transform(data_to_Iterative)
+                # print(data_to_Iterative.sum())
+                count_1 = 0
+                for value_1 in data_to_Iterative.sum():  # 避免所有列均'nan'列
+                    if value_1 != 0:
+                        count_1 += 1
+                if count_1 > 1:
+                    data_darksky_weather_Iterative_to_merge = IterativeImputer(max_iter=10).fit_transform(
+                        data_to_Iterative)
+                else:
+                    data_darksky_weather_Iterative_to_merge = copy.deepcopy(data_to_Iterative)
                 data_darksky_weather_Iterative_to_merge = pd.DataFrame(data_darksky_weather_Iterative_to_merge)
                 data_darksky_weather_Iterative_to_merge = data_darksky_weather_Iterative_to_merge.set_index(data_to_Iterative.index)
                 data_darksky_weather_Iterative_to_merge.columns = data_to_Iterative.columns
@@ -196,12 +205,12 @@ def get4method(xx152):
                     del data_darksky_weather_Iterative_to_merge[darksky_weather_Iterative + "_add%s" % numb_del]
                 merge_list.append(data_darksky_weather_Iterative_to_merge)
             data_darksky_weather_Iterative = pd.concat(merge_list, axis=1, sort=False)
-            """
+
             # 对结果的0值取np.nan
             data_darksky_weather_KNN.replace(0, np.nan, inplace=True)
             data_darksky_weather_ewm.replace(0, np.nan, inplace=True)
             data_darksky_weather_IDW.replace(0, np.nan, inplace=True)
-            #data_darksky_weather_Iterative.replace(0, np.nan, inplace=True)
+            data_darksky_weather_Iterative.replace(0, np.nan, inplace=True)
 
             # 合并相同方法的结果
             data_darksky_weather_KNN = data_darksky_weather_KNN.set_index(data_darksky_weather.index)
@@ -210,11 +219,11 @@ def get4method(xx152):
             data_darksky_weather_ewm.columns = data_darksky_weather.columns
             data_darksky_weather_IDW = data_darksky_weather_IDW.set_index(data_darksky_weather.index)
             data_darksky_weather_IDW.columns = data_darksky_weather.columns
-            #data_darksky_weather_Iterative = data_darksky_weather_Iterative.set_index(data_darksky_weather.index)
-            #data_darksky_weather_Iterative.columns = data_darksky_weather.columns
+            data_darksky_weather_Iterative = data_darksky_weather_Iterative.set_index(data_darksky_weather.index)
+            data_darksky_weather_Iterative.columns = data_darksky_weather.columns
 
             # 合并不同方法为一个文件
-            """
+
             sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
             sheet_name_count = 0
             writer = pd.ExcelWriter(merge_output_file_path + '%s.xlsx' % (input_file_name.replace(".xlsx", "")))
@@ -230,12 +239,9 @@ def get4method(xx152):
                 methods_output.to_excel(writer, sheet_name=sheet_name[sheet_name_count])
                 sheet_name_count = 1 + sheet_name_count
             writer.save()
+            """
         except Exception as e:
             print(input_file_name, "发生错误:", e)
-            error_list.append(input_file_name)
-        if len(error_list) != 0:
-            error_list = pd.DataFrame(error_list)
-            error_list.to_excel(xx152+".xlsx")
 
 
 if __name__ == '__main__':
