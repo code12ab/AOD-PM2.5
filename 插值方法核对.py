@@ -21,8 +21,7 @@ for item in saved_list:
     except Exception as e:
         null_list.append(item)
 
-for key in null_list:
-    print(key)
+
 
 
 print(len(null_list))

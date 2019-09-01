@@ -244,18 +244,18 @@ if __name__ == '__main__':
     p2 = Process(target=get_ndvi_multiprocessing, args=('样例2',))
     p3 = Process(target=get_ndvi_multiprocessing, args=('样例3',))
     p4 = Process(target=get_ndvi_multiprocessing, args=('样例4',))
-    #p5 = Process(target=get_ndvi_multiprocessing, args=('样例5',))
-    #p6 = Process(target=get_ndvi_multiprocessing, args=('样例6',))
+    p5 = Process(target=get_ndvi_multiprocessing, args=('样例5',))
+    p6 = Process(target=get_ndvi_multiprocessing, args=('样例6',))
 
     p1.start()
     p2.start()
     p3.start()
     p4.start()
-    #p5.start()
-    #p6.start()
+    p5.start()
+    p6.start()
 
-    #p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
-    #p5.join()
+    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
+    p5.join()
     p4.join()
     p3.join()
     p2.join()
