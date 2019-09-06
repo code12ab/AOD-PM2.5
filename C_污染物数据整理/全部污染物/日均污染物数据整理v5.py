@@ -26,14 +26,14 @@ path_list = ["D:\\站点_20140513-20141231\\",
              "D:\\站点_20180101-20181231\\"]
 '''
 
-path_list = ["D:\\DATA_毕业论文\\监测点\\站点140513-150101\\"]
-save_year = 2014
+path_list = ["D:\\DATA_毕业论文\\监测点\\站点180101-181231\\"]
+save_year = 2018
 
 # 文件夹循环
 for path in path_list:
     input_file_path = path
     input_file_name = os.listdir(input_file_path)  # 文件名
-    output_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\%s\\" % save_year
+    output_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\%s_new\\" % save_year
     error_path = "D:\\毕业论文程序\\污染物浓度\\error\\"
     JCZ_data = pd.read_excel(
         "D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx",
@@ -68,7 +68,8 @@ for path in path_list:
                 data = pd.read_csv(input_file_path + file, encoding='utf8')
                 data = data[data["type"].isin(
                     ['PM10_24h', 'SO2_24h', "NO2_24h", "O3_24h", "CO_24h", "PM2.5_24h"])]
-                data = data[data["hour"] == 0]
+                # data = data[data["hour"] == 0]
+                data = data[data["hour"] == 23]
                 # 为合并做准备
 
                 # 筛选行: 返回 同类型污染物的多个监测站数据
@@ -214,9 +215,9 @@ print("================ 开始第二部分 ==================")
 
 warnings.filterwarnings('ignore')  # 代码中仅进行新列的赋值,不对数据源做修改,因此可以忽略该警告
 # 参数设置
-input_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\%s\\" % save_year
+input_file_path = "D:\\毕业论文程序\\污染物浓度\\污染物数据\\日均\\%s_new\\" % save_year
 input_file_name = os.listdir(input_file_path)  # 文件名
-output_file_path = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\%s\\" % save_year
+output_file_path = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\%s_new\\" % save_year
 JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")
 # JCZ_NAME = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="北京2019")  # 适用于北京2019年
 # JCZ_NAME格式为df,监测站编码,监测点名称,城市,经度,纬度

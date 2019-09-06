@@ -16,6 +16,7 @@ print(t.__class__)
 import datetime
 import time
 weekday = time.strptime('2018014', '%Y%j')
+print(weekday)
 weekday = time.strftime("%Y-%m-%d", weekday)
 weekday = datetime.datetime.strptime(weekday, '%Y-%m-%d').date()
 print(weekday.__class__)

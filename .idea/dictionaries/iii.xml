@@ -1,16 +1,25 @@
 <component name="ProjectDictionaryState">
   <dictionary name="iii">
     <words>
+      <w>amsgrad</w>
+      <w>aods</w>
+      <w>auqa</w>
       <w>brng</w>
+      <w>cccol</w>
+      <w>cccola</w>
       <w>columname</w>
       <w>creat</w>
       <w>crossentropy</w>
+      <w>dataout</w>
       <w>dataset</w>
       <w>dayinyear</w>
       <w>edvi</w>
       <w>imputer</w>
       <w>indx</w>
+      <w>isocalendar</w>
+      <w>keras</w>
       <w>lnfij</w>
+      <w>mday</w>
       <w>morethan</w>
       <w>ndvi</w>
       <w>noin</w>
@@ -23,7 +32,9 @@
       <w>slopey</w>
       <w>softmax</w>
       <w>timestation</w>
+      <w>wday</w>
       <w>xytodis</w>
+      <w>yday</w>
     </words>
   </dictionary>
 </component>

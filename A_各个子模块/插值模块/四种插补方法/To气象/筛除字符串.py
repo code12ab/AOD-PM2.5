@@ -9,8 +9,8 @@ import numpy as np
 import os
 
 # 路径
-input_file_path = "D:\\毕业论文程序\\气象数据\\变量筛选模块\\2018\\"
-output_file_path = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018\\"
+input_file_path = "D:\\毕业论文程序\\气象数据\\变量筛选模块\\2018_不补全\\"
+output_file_path = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018_不补全\\"
 file_name_list = os.listdir(input_file_path)
 saved_list = os.listdir(output_file_path)
 for file in file_name_list:

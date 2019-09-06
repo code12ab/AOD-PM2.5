@@ -52,8 +52,8 @@ def cal_weight(x):
     return w
 
 
-mean_output_file_path = "E:\\NDVI\\插值模块\\Mean\\2018\\"
-res_output_path = "E:\\NDVI\\插值模块\\Res\\2018\\"
+mean_output_file_path = "D:\\毕业论文程序\\NDVI\\插值模块\\Mean\\2018\\"
+res_output_path = "d:\\毕业论文程序\\NDVI\\插值模块\\Res\\2018\\"
 input_file_names = os.listdir(mean_output_file_path)  # 文件名列表
 saved_list = os.listdir(res_output_path)
 for input_file_name in input_file_names:
@@ -87,7 +87,7 @@ for input_file_name in input_file_names:
         continue
     # 结果列表
     res = []
-    for area_numb in range(0, 17):
+    for area_numb in range(0, 1):
         d1 = data_KNN[["日期", 'NDVI_%s' % area_numb]]
         d2 = data_ewm[["日期", 'NDVI_%s' % area_numb]]
 
@@ -266,24 +266,7 @@ for input_file_name in input_file_names:
 
     if len(res) > 0:
         res_data = pd.concat(res, sort=False, axis=1)
-        for cname in ['NDVI_0',
-                     'NDVI_1',
-                     'NDVI_2',
-                     'NDVI_3',
-                     'NDVI_4',
-                     'NDVI_5',
-                     'NDVI_6',
-                     'NDVI_7',
-                     'NDVI_8',
-                     'NDVI_9',
-                     'NDVI_10',
-                     'NDVI_11',
-                     'NDVI_12',
-                     'NDVI_13',
-                     'NDVI_14',
-                     'NDVI_15',
-                     'NDVI_16',
-                     ]:
+        for cname in ['NDVI_0']:
             if cname not in res_data.columns:
                 res_data[cname] = np.nan
         res_data = res_data.fillna(0.00)

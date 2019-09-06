@@ -1,0 +1,306 @@
+# -*- coding: utf-8 -*-
+# 作者: xcl
+# 时间: 2019/8/7 11:10
+
+"""
+改 俩个at的日期不同
+"""
+# 库
+import pandas as pd
+import numpy as np
+from fancyimpute import KNN, IterativeImputer
+import os
+import copy
+# 路径
+input_file_path_Aqua = "d:\\毕业论文程序\\NDVI\\DATA\\MOD2018\\"
+input_file_path_Terra = "d:\\毕业论文程序\\NDVI\\DATA\\MYD2018\\"
+merge_output_file_path = "d:\\毕业论文程序\\NDVI\\插值模块\\Merge\\2018\\"
+mean_output_file_path = "d:\\毕业论文程序\\NDVI\\插值模块\\Mean\\2018\\"
+
+xytodis = pd.read_excel("d:\\毕业论文程序\\NDVI\\插值模块\\xytodis.xlsx")  # 17个区域的投影坐标
+input_file_names = os.listdir(input_file_path_Aqua)  # 文件名列表
+saved_list = os.listdir(mean_output_file_path)
+
+
+# 空间局部公式: 不存在插值为1*nan=nan的插值结果;只存在nan*nan=nan -> 因为使用的插值数据已经筛选为'>0'的部分.
+def get_IDW(input_data):
+    list_to_concat = []
+    for count in range(len(input_data.index)):
+        data_to_add = pd.DataFrame(list(input_data.iloc[count]))  # 把某一行 转换成 列表 从而把行转化成 df中的列,不会修改原数据
+        data_to_dis = pd.concat([data_to_add, xytodis], axis=1)  # 坐标和某一行合并
+        # 这里使用简单合并的原因: 每行格式都是一致的,AOD0-16完美对应xytodis
+        # print(data_to_dis, input_data.iloc[count], "================================", sep="\n")
+        data_to_dis.columns = ["value", "index", "longitude", "latitude"]
+        # 对这一行进行操作 对每一行输出一下
+        for count_2 in range(len(data_to_dis["value"])):
+            res_list = []
+            weight_list = []
+            if pd.isnull(data_to_dis.iloc[count_2]['value']):
+                data_to_weight = data_to_dis[data_to_dis["value"] > 0]
+                if len(data_to_weight["value"]) > 0:
+                    # 先求权重
+                    for item in range(len(data_to_weight["value"])):
+                        dx = 1 * (data_to_weight.iloc[item]["longitude"] -
+                                  data_to_dis.iloc[count_2]['longitude'])
+                        dy = 1 * (data_to_weight.iloc[item]["latitude"] -
+                                  data_to_dis.iloc[count_2]['latitude'])
+                        weight_dis = 1 / ((dx * dx + dy * dy) ** 0.5)
+                        # weight = inf ?
+                        weight_list.append(weight_dis)
+                    weight_sum = np.sum(np.array(weight_list))
+                    # 计算结果
+                    for item in range(len(data_to_weight["value"])):
+                        dx = 1 * (data_to_weight.iloc[item]["longitude"] -
+                                  data_to_dis.iloc[count_2]['longitude'])
+                        dy = 1 * (data_to_weight.iloc[item]["latitude"] -
+                                  data_to_dis.iloc[count_2]['latitude'])
+                        weight_dis = 1 / ((dx * dx + dy * dy) ** 0.5)
+                        res = (weight_dis/weight_sum) * data_to_weight.iloc[item]["value"]
+                        res_list.append(res)
+                    res_output = np.sum(np.array(res_list))  # 插补的数值
+                    try:
+                        data_to_dis.loc[count_2, 'value'] = res_output  # 进行插补
+                    except Exception as e:
+                        print("缺失严重, 插值未定义:", e)
+        data_to_dis = data_to_dis.drop(["latitude", "longitude"], axis=1)   # 删除无用列
+        data_to_dis = data_to_dis.drop(["index"], axis=1)
+        list_to_concat.append(data_to_dis.T)  # 添加,行转化为列,合并中最终数据.
+    data_last = pd.concat(list_to_concat)
+    return data_last
+
+
+for input_file_name in input_file_names:
+    if input_file_name in saved_list:
+        print("已经完成%s" % input_file_name)
+        # continue
+    print("========正在计算%s========" % input_file_name)
+    # 读取
+    data_Aqua = pd.read_excel(input_file_path_Aqua + input_file_name)
+    data_Terra = pd.read_excel(input_file_path_Terra + input_file_name)
+    # 删除字符串,便于计算
+    del data_Terra["监测站"]
+    del data_Aqua["监测站"]
+
+    # 索引
+    data_Aqua = data_Aqua.set_index('日期')
+    data_Terra = data_Terra.set_index('日期')
+
+    for cola in data_Aqua.columns:
+        if cola != '日期':
+            data_Aqua[cola] = data_Aqua[cola].map(lambda x :float(x))
+    for colt in data_Terra.columns:
+        if colt != '日期':
+            data_Terra[colt] = data_Terra[colt].map(lambda x :float(x))
+
+    if data_Terra['NDVI_0'].isnull().sum() ==0 and data_Aqua['NDVI_0'].isnull().sum() ==0:
+        data_out = pd.concat([data_Aqua[['NDVI_0']],
+                            data_Terra[['NDVI_0']]],
+                            axis = 1, sort=True)
+        data_out =data_out.reset_index()
+
+        data_out.columns = ['日期',"NDVI_0_x", 'NDVI_0_y']
+        data_out = data_out.set_index('日期')
+        data_out["NDVI_0"] = data_out.mean(1)
+        data_out.drop(['NDVI_0_x', "NDVI_0_y"], inplace=True, axis=1)
+        writer = pd.ExcelWriter(mean_output_file_path + '%s.xlsx' % (input_file_name.replace(".xlsx", "")))
+        data_out.to_excel(writer, sheet_name='KNN')
+        data_out.to_excel(writer, sheet_name='ewm')
+        data_out.to_excel(writer, sheet_name='IDW')
+        data_out.to_excel(writer, sheet_name='Iterative')
+        writer.save()
+        continue
+
+    # 时间局部：KNN
+    # 最近邻估算，使用两行都具有观测数据的特征的均方差来对样本进行加权。然后用加权的结果进行特征值填充
+    # 相当于A0D17个点为特征进行近邻,则参数K为时间,即时间上最近的16行按特征的均方差进行加权，即哪个时间点的权重大一些
+    try:
+        data_Aqua_KNN = KNN(k=7).fit_transform(data_Aqua)
+        data_Aqua_KNN = pd.DataFrame(data_Aqua_KNN)  # 结果中有许多零值,应为空值
+
+        data_Terra_KNN = KNN(k=7).fit_transform(data_Terra)
+        data_Terra_KNN = pd.DataFrame(data_Terra_KNN)  # 结果中有许多零值,应为空值
+
+    except Exception as e:
+        data_Terra_KNN = copy.deepcopy(data_Terra)
+        data_Aqua_KNN = copy.deepcopy(data_Aqua)
+    data_Aqua_KNN = data_Aqua_KNN.set_index(data_Aqua.index)
+    data_Aqua_KNN.columns = data_Aqua.columns
+    # data_Aqua_KNN["日期合并用"] = data_Aqua_KNN.index
+    data_Terra_KNN = data_Terra_KNN.set_index(data_Terra.index)
+    data_Terra_KNN.columns = data_Terra.columns
+    # data_Terra_KNN["日期合并用"] = data_Terra_KNN.index
+
+    data_Aqua_KNN = data_Aqua_KNN[['NDVI_0']]
+    data_Terra_KNN = data_Terra_KNN[['NDVI_0']]
+    # 时间全局: 平滑,常用于股市
+    data_Aqua_ewm = pd.DataFrame.ewm(
+        self=data_Aqua,
+        com=0.5,
+        ignore_na=True,
+        adjust=True).mean()
+    data_Aqua_ewm = data_Aqua_ewm.set_index(data_Aqua.index)
+    data_Aqua_ewm.columns = data_Aqua.columns
+    # data_Aqua_ewm["日期合并用"] = data_Aqua_ewm.index
+
+    data_Terra_ewm = pd.DataFrame.ewm(
+        self=data_Terra,
+        com=0.5,
+        ignore_na=True,
+        adjust=True).mean()
+    data_Terra_ewm = data_Terra_ewm.set_index(data_Terra.index)
+    data_Terra_ewm.columns = data_Terra.columns
+    # data_Terra_ewm["日期合并用"] = data_Terra_ewm.index
+
+    data_Aqua_ewm = data_Aqua_ewm[['NDVI_0']]
+    data_Terra_ewm = data_Terra_ewm[['NDVI_0']]
+
+    # 空间局部: IDW
+    data_Aqua_IDW = get_IDW(data_Aqua)
+    data_Aqua_IDW = data_Aqua_IDW.set_index(data_Aqua.index)
+    data_Aqua_IDW.columns = data_Aqua.columns
+    # data_Aqua_IDW["日期合并用"] = data_Aqua_IDW.index
+
+    data_Terra_IDW = get_IDW(data_Terra)
+    data_Terra_IDW = data_Terra_IDW.set_index(data_Terra.index)
+    data_Terra_IDW.columns = data_Terra.columns
+    # data_Terra_IDW["日期合并用"] = data_Terra_IDW.index
+
+    data_Aqua_IDW = data_Aqua_IDW[['NDVI_0']]
+    data_Terra_IDW = data_Terra_IDW[['NDVI_0']]
+
+    # 空间全局: 迭代函数法,缺失特征作为y，其他特征作为x
+    data_Aqua_N0 = data_Aqua[['NDVI_0']].reset_index()
+    data_Terra_N0 = data_Terra[['NDVI_0']].reset_index()
+    numb = 0
+    for add_file in input_file_names:
+        if add_file != input_file_name:
+            add_A = pd.read_excel(input_file_path_Aqua+add_file)[['NDVI_0','日期']]
+            add_A.columns = ["add_%s" % numb, '日期']
+            add_T = pd.read_excel(input_file_path_Terra+add_file)[['NDVI_0','日期']]
+            add_T.columns = ["add_%s" % numb, '日期']
+            data_Aqua_N0 = pd.merge(data_Aqua_N0, add_A, how='left', on='日期')
+            data_Terra_N0 = pd.merge(data_Terra_N0, add_T, how='left', on='日期')
+        numb += 1
+    # 补列
+    # Aqua
+    data_Aqua_N0 = data_Aqua_N0.set_index('日期')
+    count_A = 0
+    for value_A in data_Aqua_N0.sum():
+        if value_A != 0:
+            count_A += 1
+    if count_A > 1:  # 至少两个非空列才可以计算
+        data_Aqua_Iterative = IterativeImputer(
+            max_iter=100).fit_transform(data_Aqua_N0)
+    else:
+        data_Aqua_Iterative = copy.deepcopy(data_Aqua_N0)
+
+    data_Aqua_Iterative = pd.DataFrame(data_Aqua_Iterative)  # 格式转换
+    data_Aqua_Iterative = data_Aqua_Iterative.set_index(data_Aqua_N0.index)  # ok
+
+    if len(data_Aqua_Iterative.columns) < len(data_Aqua_N0.columns):
+        reset_col_name_listA = []  # 对非nan列先命名
+        for col_nameA1 in data_Aqua_N0.columns:
+            if np.max(data_Aqua_N0[col_nameA1]) > 0:
+                reset_col_name_listA.append(col_nameA1)
+        data_Aqua_Iterative.columns = reset_col_name_listA
+
+        for col_nameA2 in data_Aqua_N0.columns:  # 对缺失的nan列补充
+            if col_nameA2 not in data_Aqua_Iterative.columns:
+                # 补全缺失nan列
+                data_Aqua_Iterative[col_nameA2] = np.nan
+    else:
+        data_Aqua_Iterative.columns = data_Aqua_N0.columns  # 重设列名
+    for CCCOLA in data_Aqua_Iterative.columns:
+        if 'add' in CCCOLA:
+            del data_Aqua_Iterative[CCCOLA]
+
+    data_Aqua_Iterative = pd.DataFrame(data_Aqua_Iterative)
+    data_Aqua_Iterative = data_Aqua_Iterative.set_index(data_Aqua.index)
+    data_Aqua_Iterative.columns = ['NDVI_0']
+    # data_Aqua_Iterative["日期合并用"] = data_Aqua_Iterative.index
+
+    # Terra
+    data_Terra_N0 = data_Terra_N0.set_index('日期')
+    count_T = 0
+    for value_T in data_Terra_N0.sum():
+        if value_T != 0:
+            count_T += 1
+    if count_T > 1:  # 至少两个非空列才可以计算
+        data_Terra_Iterative = IterativeImputer(
+            max_iter=100).fit_transform(data_Terra_N0)
+    else:
+        data_Terra_Iterative = copy.deepcopy(data_Terra_N0)
+
+    data_Terra_Iterative = pd.DataFrame(data_Terra_Iterative)  # 格式转换
+    data_Terra_Iterative = data_Terra_Iterative.set_index(data_Terra_N0.index)  # ok
+
+    if len(data_Terra_Iterative.columns) < len(data_Terra_N0.columns):
+        reset_col_name_listT = []  # 对非nan列先命名
+        for col_nameT1 in data_Terra_N0.columns:
+            if np.max(data_Terra_N0[col_nameT1]) > 0:
+                reset_col_name_listT.append(col_nameT1)
+        data_Terra_Iterative.columns = reset_col_name_listT
+
+        for col_nameT2 in data_Terra_N0.columns:  # 对缺失的nan列补充
+            if col_nameT2 not in data_Terra_Iterative.columns:
+                # 补全缺失nan列
+                data_Terra_Iterative[col_nameT2] = np.nan
+    else:
+        data_Terra_Iterative.columns = data_Terra_N0.columns  # 重设列名
+    for CCCOLT in data_Terra_Iterative.columns:
+        if 'add' in CCCOLT:
+            del data_Terra_Iterative[CCCOLT]
+
+    data_Terra_Iterative = pd.DataFrame(data_Terra_Iterative)
+    data_Terra_Iterative = data_Terra_Iterative.set_index(data_Terra.index)
+    data_Terra_Iterative.columns = ['NDVI_0']
+    # data_Terra_Iterative["日期合并用"] = data_Terra_Iterative.index
+    
+    # 对结果的0值取np.nan
+    data_Aqua_KNN.replace(0, np.nan, inplace=True)
+    data_Terra_KNN.replace(0, np.nan, inplace=True)
+    data_Aqua_ewm.replace(0, np.nan, inplace=True)
+    data_Terra_ewm.replace(0, np.nan, inplace=True)
+    data_Aqua_IDW.replace(0, np.nan, inplace=True)
+    data_Terra_IDW.replace(0, np.nan, inplace=True)
+    data_Aqua_Iterative.replace(0, np.nan, inplace=True)
+    data_Terra_Iterative.replace(0, np.nan, inplace=True)
+
+    """
+    data_KNN = pd.merge(data_Terra_KNN,data_Aqua_KNN,how='right',on='日期合并用')
+    data_ewm = pd.merge(data_Terra_ewm,data_Aqua_ewm,how='right',on='日期合并用')
+    data_IDW = pd.merge(data_Terra_IDW,data_Aqua_IDW,how='right',on='日期合并用')
+    data_Iterative = pd.merge(data_Terra_Iterative,data_Aqua_Iterative,how='right',on='日期合并用')
+    """
+    data_KNN = pd.concat([data_Terra_KNN,data_Aqua_KNN],axis=1, sort=True)
+    data_ewm = pd.concat([data_Terra_ewm,data_Aqua_ewm],axis=1, sort=True)
+    data_IDW = pd.concat([data_Terra_IDW,data_Aqua_IDW],axis=1, sort=True)
+    data_Iterative = pd.concat([data_Terra_Iterative, data_Aqua_Iterative],axis=1, sort=True)
+
+    # 合并不同方法下的A/T为一个文件
+    sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
+    sheet_name_count = 0  # 为什么显示without usage ?  因为下面如果if为false则..
+    writer = pd.ExcelWriter(merge_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")))
+    for methods_output in [data_KNN, data_ewm, data_IDW, data_Iterative]:
+        methods_output.to_excel(
+            writer, sheet_name=sheet_name[sheet_name_count])
+        sheet_name_count = 1 + sheet_name_count
+    writer.save()
+
+    # AQ.mean(1) 对两颗卫星去均值, 列的横向均值
+    writer = pd.ExcelWriter(mean_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")))
+    for methods_output in sheet_name:
+        data_to_mean = pd.read_excel(merge_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")), sheet_name=methods_output)
+        data_to_mean.rename(columns={"Unnamed: 0": '日期'}, inplace=True)
+        data_to_mean = data_to_mean.set_index("日期")
+        data_to_mean.columns = ["NDVI_0_x", 'NDVI_0_y']
+        for area_numb in range(0,1):
+            d1 = data_to_mean[['NDVI_%s_x' % area_numb, "NDVI_%s_y" % area_numb]]
+            d2 = d1.mean(1)
+            data_to_mean["NDVI_%s" % area_numb] = d2
+            data_to_mean.drop(['NDVI_%s_x' %
+                               area_numb, "NDVI_%s_y" %
+                               area_numb], inplace=True, axis=1)
+
+        data_to_mean.to_excel(writer, sheet_name=methods_output)
+    writer.save()

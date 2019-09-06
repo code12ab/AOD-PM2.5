@@ -1,23 +1,136 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
 # 时间: 2019/8/1 21:51
-
+import pandas as pd
 import keras
 from keras.layers import Input, Embedding, LSTM, Dense, concatenate, core, add
 from keras.models import Model
+import os
+
+# 读取
+input_path = 'D:\\毕业论文程序\\建模数据_合并\\全2018.xlsx'
+data_all = pd.read_excel(input_path, index_col='日期')
+
+data_aod = data_all[['AOD_0',
+                     'AOD_1',
+                     'AOD_2',
+                     'AOD_3',
+                     'AOD_4',
+                     'AOD_5',
+                     'AOD_6',
+                     'AOD_7',
+                     'AOD_8',
+                     'AOD_9',
+                     'AOD_10',
+                     'AOD_11',
+                     'AOD_12',
+                     'AOD_13',
+                     'AOD_14',
+                     'AOD_15',
+                     'AOD_16']]
+data_sky = data_all[['apparentTemperatureHigh',
+                     'apparentTemperatureLow',
+                     'apparentTemperatureMax',
+                     'apparentTemperatureMin',
+                     'cloudCover',
+                     'dewPoint',
+                     'humidity',
+                     'moonPhase',
+                     'ozone',
+                     'precipAccumulation',
+                     'precipIntensity',
+                     'precipIntensityMax',
+                     'pressure',
+                     'sunriseTime',
+                     'sunsetTime',
+                     'temperatureHigh',
+                     'temperatureLow',
+                     'temperatureMax',
+                     'temperatureMin',
+                     'uvIndex',
+                     'visibility',
+                     'windBearing',
+                     'windGust',
+                     'windSpeed',
+                     'apparentTemperature',
+                     'temperature']]
+data_ts = data_all[['tm_mon', 'tm_mday',
+                    'tm_wday', 'tm_yday', 'tm_week', 'id']]
+data_ts['id'] = data_ts['id'].map(lambda x: x.replace("A", ""))
+data_t1 = data_all[['AOD_0_T1',
+                    'AOD_1_T1',
+                    'AOD_2_T1',
+                    'AOD_3_T1',
+                    'AOD_4_T1',
+                    'AOD_5_T1',
+                    'AOD_6_T1',
+                    'AOD_7_T1',
+                    'AOD_8_T1',
+                    'AOD_9_T1',
+                    'AOD_10_T1',
+                    'AOD_11_T1',
+                    'AOD_12_T1',
+                    'AOD_13_T1',
+                    'AOD_14_T1',
+                    'AOD_15_T1',
+                    'AOD_16_T1',
+                    'apparentTemperatureHigh_T1',
+                    'apparentTemperatureLow_T1',
+                    'apparentTemperatureMax_T1',
+                    'apparentTemperatureMin_T1',
+                    'cloudCover_T1',
+                    'dewPoint_T1',
+                    'humidity_T1',
+                    'moonPhase_T1',
+                    'ozone_T1',
+                    'precipAccumulation_T1',
+                    'precipIntensity_T1',
+                    'precipIntensityMax_T1',
+                    'pressure_T1',
+                    'sunriseTime_T1',
+                    'sunsetTime_T1',
+                    'temperatureHigh_T1',
+                    'temperatureLow_T1',
+                    'temperatureMax_T1',
+                    'temperatureMin_T1',
+                    'uvIndex_T1',
+                    'visibility_T1',
+                    'windBearing_T1',
+                    'windGust_T1',
+                    'windSpeed_T1',
+                    'apparentTemperature_T1',
+                    'temperature_T1']]
+data_ndvi = data_all[['NDVI_0',
+                      'NDVI_1',
+                      'NDVI_2',
+                      'NDVI_3',
+                      'NDVI_4',
+                      'NDVI_5',
+                      'NDVI_6',
+                      'NDVI_7',
+                      'NDVI_8',
+                      'NDVI_9',
+                      'NDVI_10',
+                      'NDVI_11',
+                      'NDVI_12',
+                      'NDVI_13',
+                      'NDVI_14',
+                      'NDVI_15',
+                      'NDVI_16']]
+data_pm = data_all[['PM25']]
+
+
 # 模块
 # 当日天气模块
 # 时滞天气模块
 # 其他空气污染物模块
 # 时空元属性模块
 # 整体影响模块
-
-
 # 第一个模块 当日天气模块
 #
 # 输入层
-Meteorology_input = Input(shape=(12,), name="Meteorology_input")
-AODs_input = Input(shape=(17,), name="AODs_input")
+Meteorology_input = Input(shape=(len(data_sky.columns),), name="Meteorology_input")
+AODs_input = Input(shape=(len(data_aod.columns),), name="AODs_input")
 # 因素融合层
 meteorology_concat = concatenate([Meteorology_input, AODs_input])
 # 全连接层
@@ -63,7 +176,7 @@ model_meteorology = Model(
 ##########################################################################
 # 第二个模块 时滞天气模块
 
-Weather_input = Input(shape=(12,), name="Weather_input")  # 只添加新的因素即可
+Weather_input = Input(shape=(len(data_t1.columns),), name="Weather_input")  # 只添加新的因素即可
 # AODs_input = Input(shape=(17,), name="AODs_input")
 # 因素融合层
 weather_concat = concatenate([Weather_input, AODs_input])
@@ -105,9 +218,9 @@ model_weather = Model(inputs=[Weather_input, AODs_input], outputs=weather_y)
 
 
 ##########################################################################
-# 第三个模块 其他空气污染物模块
+# 第三个模块 其他空气污染物模块 更改为ndvi
 # 输入层
-OtherPollution_input = Input(shape=(15,))
+OtherPollution_input = Input(shape=(len(data_ndvi.columns),))
 # 因素融合层
 otherpollution_concat = concatenate([OtherPollution_input, AODs_input])
 # 全连接层
@@ -150,13 +263,13 @@ model_otherpollution = Model(
     outputs=otherpollution_y)
 
 
-##########################################################################
+""""##########################################################################======================================================"""
 # 第四个模块 时空元属性模块
 # 输入层
-TimeStation_input = Input(shape=(12,), name="TimeStation_input")
-# 编码层, 该层之前需要自己对数据提前独特编码
-embedded_timestation = Embedding(input_dim=12,
-                                 output_dim=64)(TimeStation_input)  # 参数设置 ?
+TimeStation_input = Input(shape=(len(data_ts.columns),), name="TimeStation_input")
+# 编码层, 该层之前需要自己对数据提前独特编码, 后记不用，可以直接嵌入字符串。
+embedded_timestation = Embedding(input_dim=6666,
+                                 output_dim=64)(TimeStation_input)  # 参数设置 ? 12太小了 12345
 encoded_text = LSTM(32)(embedded_timestation)
 # 因素融合层
 timestation_concat = concatenate([encoded_text, AODs_input])
@@ -301,5 +414,5 @@ model_last = Model(
 model_last.compile(loss="mse", optimizer="adam", metrics=["accuracy"])
 
 # print(model_last.summary())
-
+model_last.fit([data_sky,data_t1,data_ndvi,data_ts,data_aod],data_pm,epochs = 10000, batch_size = 256)
 #########################################

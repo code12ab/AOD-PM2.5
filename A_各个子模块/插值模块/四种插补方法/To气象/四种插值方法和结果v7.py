@@ -17,7 +17,7 @@ from fancyimpute import KNN, IterativeImputer  # 方法创建新的数据框,不
 import os
 
 # 路径
-input_file_path_darksky_weather = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018_日期补全\\"
+input_file_path_darksky_weather = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018_不补全\\"
 merge_output_file_path = "D:\\毕业论文程序\\气象数据\\插值模块\\Merge\\2018\\"
 JCZ_info = pd.read_excel(
     "D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx",
