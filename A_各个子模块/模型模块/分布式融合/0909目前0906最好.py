@@ -103,20 +103,17 @@ data_sky_test = data_test[['apparentTemperatureHigh',
                            'cloudCover',
                            'dewPoint',
                            'humidity',
-
                            'sunTime',
                            'temperatureHigh',
                            'temperatureLow',
                            'temperatureMax',
                            'temperatureMin',
-
                            'visibility',
                            'windBearing',
                            'windGust',
                            'windSpeed',
                            'apparentTemperature',
                            'temperature',
-
                            'pressure',
                            'precipIntensity',
                            'precipIntensityMax',
@@ -212,13 +209,11 @@ data_t1_train = data_train[['AOD_0_T1',
                             'cloudCover_T1',
                             'dewPoint_T1',
                             'humidity_T1',
-
                             'sunTime_T1',
                             'temperatureHigh_T1',
                             'temperatureLow_T1',
                             'temperatureMax_T1',
                             'temperatureMin_T1',
-
                             'visibility_T1',
                             'windBearing_T1',
                             'windGust_T1',
@@ -354,95 +349,114 @@ allin_concat = concatenate([Meteorology_input,
 # 全连接层 1
 
 # AOD + AODs
-aods_x1 = Dense(24,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FC1_aods")(aods_concat)
+aods_x1 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FC1_aods")(aods_concat)
 # AOD + 气象
-meteorology_x1 = Dense(24, activation=keras.layers.LeakyReLU(
+meteorology_x1 = Dense(12, activation=keras.layers.LeakyReLU(
     alpha=0.2), name="FC1_meteorology")(meteorology_concat)
 # AOD + 时滞
-weather_x1 = Dense(24,
-                   activation=keras.layers.LeakyReLU(alpha=0.2),
-                   name="FC1_T1")(weather_concat)
+weather_x1 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FC1_T1")(weather_concat)
 # AOD + NDVI
-ndvi_x1 = Dense(24,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FC1_NDVI")(ndvi_concat)
+ndvi_x1 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FC1_NDVI")(ndvi_concat)
 # AOD + 时间
-time_x1 = Dense(24,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FC1_Time")(time_concat)
+time_x1 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FC1_Time")(time_concat)
 # AOD + 空间
-station_x1 = Dense(24,
-                   activation=keras.layers.LeakyReLU(alpha=0.2),
-                   name="FC1_Station")(station_concat)
+station_x1 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FC1_Station")(station_concat)
 # 全部特征
-allin_x1 = Dense(24,
-                 activation=keras.layers.LeakyReLU(alpha=0.2),
-                 name="FC11_AIA")(allin_concat)
+allin_x1 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FC11_AIA")(allin_concat)
 
 # 残差层
 # AOD + AODs
-aods_residual_connection1 = Dense(24,
-                                  activation=keras.layers.LeakyReLU(alpha=0.2),
-                                  name="ResidualConnectionAODs")(aods_x1)
+aods_residual_connection1 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="ResidualConnectionAODs")(aods_x1)
 aods_residual_connection2 = Dense(
-    24, activation=keras.layers.advanced_activations.ELU(
+    12, activation=keras.layers.advanced_activations.ELU(
         alpha=1.0), name="FullConnectionAOD_RC")(aods_residual_connection1)
-# aods_residual_connection = add([aods_x, aods_residual_connection],
-# name="ResidualConnectionAODs_Add")  # 原先版本
 aods_residual_output = add([aods_x1,
                             aods_residual_connection2],
                            name="ResidualConnectionAODs_Add")
 # AOD + 气象
 meteorology_residual_connection1 = Dense(
-    24, activation=keras.layers.LeakyReLU(
+    12, activation=keras.layers.LeakyReLU(
         alpha=0.2), name="ResidualConnectionMA")(meteorology_x1)
-meteorology_residual_connection2 = Dense(24, activation=keras.layers.LeakyReLU(
+meteorology_residual_connection2 = Dense(12, activation=keras.layers.LeakyReLU(
     alpha=0.2), name="FullConnectionMA_RC")(meteorology_residual_connection1)
 meteorology_residual_output = add(
     [meteorology_x1, meteorology_residual_connection2], name="ResidualConnectionMA_Add")
 # AOD + 时滞
 weather_residual_connection1 = Dense(
-    24, activation=keras.layers.LeakyReLU(
+    12, activation=keras.layers.LeakyReLU(
         alpha=0.2), name="ResidualConnectionWA")(weather_x1)
-weather_residual_connection2 = Dense(24, activation=keras.layers.LeakyReLU(
+weather_residual_connection2 = Dense(12, activation=keras.layers.LeakyReLU(
     alpha=0.2), name="FullConnectionWAForRC")(weather_residual_connection1)
 weather_residual_output = add([weather_x1,
                                weather_residual_connection2],
                               name="ResidualConnectionWA_Add")
 # AOD + NDVI
 ndvi_residual_connection1 = Dense(
-    24, activation=keras.layers.LeakyReLU(
+    12, activation=keras.layers.LeakyReLU(
         alpha=0.2), name="ResidualConnectionNDVI")(ndvi_x1)
-ndvi_residual_connection2 = Dense(24, activation=keras.layers.LeakyReLU(
+ndvi_residual_connection2 = Dense(12, activation=keras.layers.LeakyReLU(
     alpha=0.2), name="FullConnectionNDVI_RC")(ndvi_residual_connection1)
 ndvi_residual_output = add([ndvi_x1,
                             ndvi_residual_connection2],
                            name="ResidualConnectionNDVI_Add")
 # AOD + 时间
 time_residual_connection1 = Dense(
-    24, activation=keras.layers.LeakyReLU(
+    12, activation=keras.layers.LeakyReLU(
         alpha=0.2), name="ResidualConnectionTime")(time_x1)
-time_residual_connection2 = Dense(24, activation=keras.layers.LeakyReLU(
+time_residual_connection2 = Dense(12, activation=keras.layers.LeakyReLU(
     alpha=0.2), name="FullConnectionTime_RC")(time_residual_connection1)
 time_residual_output = add([time_x1,
                             time_residual_connection2],
                            name="ResidualConnectionTime_Add")
 # AOD + 空间
 station_residual_connection1 = Dense(
-    24, activation=keras.layers.LeakyReLU(
+    12, activation=keras.layers.LeakyReLU(
         alpha=0.2), name="ResidualConnectionStation")(station_x1)
-station_residual_connection2 = Dense(24, activation=keras.layers.LeakyReLU(
+station_residual_connection2 = Dense(12, activation=keras.layers.LeakyReLU(
     alpha=0.2), name="FullConnectionStation_RC")(station_residual_connection1)
 station_residual_output = add([station_x1,
                                station_residual_connection2],
                               name="ResidualConnectionStation_Add")
 # 全部特征
 allin_residual_connection1 = Dense(
-    24, activation=keras.layers.LeakyReLU(
+    12, activation=keras.layers.LeakyReLU(
         alpha=0.2), name="ResidualConnectionAIA")(allin_x1)
-allin_residual_connection2 = Dense(24, activation=keras.layers.LeakyReLU(
+allin_residual_connection2 = Dense(12, activation=keras.layers.LeakyReLU(
     alpha=0.2), name="FullConnectionAIA_RC")(allin_residual_connection1)
 allin_residual_output = add([allin_x1,
                              allin_residual_connection2],
@@ -450,150 +464,214 @@ allin_residual_output = add([allin_x1,
 
 # 全连接层 2
 # AOD + AODs
-aods_x2 = Dense(7,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FullConnectionAODs_2")(aods_residual_output)
+aods_x2 = Dense(
+    7,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionAODs_2")(aods_residual_output)
 # AOD + 气象
-meteorology_x2 = Dense(12,
-                       activation=keras.layers.LeakyReLU(alpha=0.2),
-                       name="FullConnectionMA_2")(meteorology_residual_output)
+meteorology_x2 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionMA_2")(meteorology_residual_output)
 # AOD + 时滞
-weather_x2 = Dense(6,
-                   activation=keras.layers.LeakyReLU(alpha=0.2),
-                   name="FullConnectionWA_2")(weather_residual_output)
+weather_x2 = Dense(
+    6,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionWA_2")(weather_residual_output)
 # AOD + NDVI
-ndvi_x2 = Dense(4,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FullConnectionNDVI_2")(ndvi_residual_output)
+ndvi_x2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionNDVI_2")(ndvi_residual_output)
 # AOD + 时间
-time_x2 = Dense(6,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FullConnectionTime_2")(time_residual_output)
+time_x2 = Dense(
+    6,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionTime_2")(time_residual_output)
 # AOD + 空间
-station_x2 = Dense(3,
-                   activation=keras.layers.LeakyReLU(alpha=0.2),
-                   name="FullConnectionStation_2")(station_residual_output)
+station_x2 = Dense(
+    3,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionStation_2")(station_residual_output)
 # 全部特征
-allin_x2 = Dense(12,
-                 activation=keras.layers.LeakyReLU(alpha=0.2),
-                 name="FullConnectionAIA_2")(allin_residual_output)
+allin_x2 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionAIA_2")(allin_residual_output)
 
 # Dropout
 
 
 # AOD + AODs
-aods_y = core.Dropout(rate=0.5, name="Aods_Module")(aods_x2)
+aods_y = core.Dropout(rate=0.1, name="Aods_Module")(aods_x2)
 
 
 # AOD + 气象
-meteorology_y = core.Dropout(rate=0.5, name="Meteorology_Module")(meteorology_x2)
+meteorology_y = core.Dropout(
+    rate=0.1,
+    name="Meteorology_Module")(meteorology_x2)
 
 
 # AOD + 时滞
-weather_y = core.Dropout(rate=0.5, name="Weather_Module")(weather_x2)
+weather_y = core.Dropout(rate=0.1, name="Weather_Module")(weather_x2)
 
 
 # AOD + NDVI
-ndvi_y = core.Dropout(rate=0.5, name="NDVI_Module")(ndvi_x2)
+ndvi_y = core.Dropout(rate=0.1, name="NDVI_Module")(ndvi_x2)
 
 
 # AOD + 时间
-time_y = core.Dropout(rate=0.5, name="Time_Module")(time_x2)
+time_y = core.Dropout(rate=0.1, name="Time_Module")(time_x2)
 
 # AOD + 空间
-station_y = core.Dropout(rate=0.5, name="Station_Module")(station_x2)
+station_y = core.Dropout(rate=0.1, name="Station_Module")(station_x2)
 
 
 # 全部特征
-allin_y = core.Dropout(rate=0.5, name="AllIn_Module")(allin_x2)
-
+allin_y = core.Dropout(rate=0.1, name="AllIn_Module")(allin_x2)
 
 
 # 全连接层 3
 
 # AOD + AODs
-aods_y2 = Dense(4,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FullConnectionAODs_3x")(aods_y)
+aods_y2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionAODs_3x")(aods_y)
 
 
 # AOD + 气象
-meteorology_y2 = Dense(6,
-                       activation=keras.layers.LeakyReLU(alpha=0.2),
-                       name="FullConnectionMA_3x")(meteorology_y)
+meteorology_y2 = Dense(
+    6,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionMA_3x")(meteorology_y)
 
 
 # AOD + 时滞
-weather_y2 = Dense(4,
-                   activation=keras.layers.LeakyReLU(alpha=0.2),
-                   name="FullConnectionWA_3x")(weather_y)
+weather_y2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionWA_3x")(weather_y)
 
 
 # AOD + NDVI
-ndvi_y2 = Dense(2,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FullConnectionNDVI_3x")(ndvi_y)
+ndvi_y2 = Dense(
+    2,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionNDVI_3x")(ndvi_y)
 
 
 # AOD + 时间
-time_y2 = Dense(4,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FullConnectionTime_3x")(time_y)
+time_y2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionTime_3x")(time_y)
 
 
 # AOD + 空间
-station_y2 = Dense(6,
-                   activation=keras.layers.LeakyReLU(alpha=0.2),
-                   name="FullConnectionStation_3x")(station_y)
+station_y2 = Dense(
+    6,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionStation_3x")(station_y)
 
 
 # 全部特征
-allin_y2 = Dense(8,
-                 activation=keras.layers.LeakyReLU(alpha=0.2),
-                 name="FullConnectionAIA_3x")(allin_y)
+allin_y2 = Dense(
+    8,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionAIA_3x")(allin_y)
 
 # 全连接层 3
 
 # AOD + AODs
-aods_y2 = Dense(12,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FullConnectionAODs_3")(aods_y2)
+aods_y2 = Dense(
+    12,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionAODs_3")(aods_y2)
 
 
 # AOD + 气象
-meteorology_y2 = Dense(4,
-                       activation=keras.layers.LeakyReLU(alpha=0.2),
-                       name="FullConnectionMA_3")(meteorology_y2)
+meteorology_y2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionMA_3")(meteorology_y2)
 
 
 # AOD + 时滞
-weather_y2 = Dense(4,
-                   activation=keras.layers.LeakyReLU(alpha=0.2),
-                   name="FullConnectionWA_3")(weather_y2)
+weather_y2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionWA_3")(weather_y2)
 
 
 # AOD + NDVI
-ndvi_y2 = Dense(2,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FullConnectionNDVI_3")(ndvi_y2)
+ndvi_y2 = Dense(
+    2,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionNDVI_3")(ndvi_y2)
 
 
 # AOD + 时间
-time_y2 = Dense(4,
-                activation=keras.layers.LeakyReLU(alpha=0.2),
-                name="FullConnectionTime_3")(time_y2)
+time_y2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionTime_3")(time_y2)
 
 
 # AOD + 空间
-station_y2 = Dense(6,
-                   activation=keras.layers.LeakyReLU(alpha=0.2),
-                   name="FullConnectionStation_3")(station_y2)
+station_y2 = Dense(
+    6,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionStation_3")(station_y2)
 
 
 # 全部特征
-allin_y2 = Dense(8,
-                 activation=keras.layers.LeakyReLU(alpha=0.2),
-                 name="FullConnectionAIA_3")(allin_y2)
+allin_y2 = Dense(
+    8,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionAIA_3")(allin_y2)
 # 模型层
 # 输入顺序： 气象 时滞 NDVI 时间 空间 AODs AOD
 # AOD + AODs
@@ -672,27 +750,45 @@ res_residual_output = add(
 
 
 # 全连接层 2
-res_x2 = Dense(4,
-               activation=keras.layers.LeakyReLU(alpha=0.2),
-               name="FullConnectionLast_2")(res_residual_output)
-res_x3 = Dense(7,
-               activation=keras.layers.LeakyReLU(alpha=0.2),
-               name="FullConnectionLast_2x")(res_x2)
+res_x2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionLast_2")(res_residual_output)
+res_x3 = Dense(
+    8,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionLast_2x")(res_x2)
 # Dropout
 res_y = core.Dropout(rate=0.1, name="Res_Module")(res_x3)
-res_y2 = Dense(4,
-               activation=keras.layers.LeakyReLU(alpha=0.2),
-               name="FullConnectionLast_y")(res_y)
+res_y2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionLast_y")(res_y)
 
-res_y2 = Dense(3,
-               activation=keras.layers.LeakyReLU(alpha=0.2),
-               name="FullConnectionLast_y2")(res_y2)
+res_y2 = Dense(
+    2,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    kernel_regularizer=keras.regularizers.l2(0.001),
+    name="FullConnectionLast_y2")(res_y2)
 
-
+res_y2 = Dense(
+    4,
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
+    name="FullConnectionLast_y2")(res_y2)
 # 最终融合结果
+
 res_outcome = Dense(
     1,
-    activation=keras.layers.LeakyReLU(alpha=0.2),
+    activation=keras.layers.LeakyReLU(
+        alpha=0.2),
     kernel_regularizer=keras.regularizers.l2(0.001),
     name="sigmoid_FC")(res_y2)
 # 正则化
@@ -716,10 +812,11 @@ model_last = Model(
 model_last.compile(
     loss=['mean_absolute_error'],
     #optimizer=keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=None, decay=0.00001),
-    #optimizer=keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=None, decay=0.0),
+    optimizer=keras.optimizers.RMSprop(
+        lr=0.001, rho=0.9, epsilon=None, decay=0.0),
     #optimizer=keras.optimizers.Adagrad(lr=0.01, epsilon=None, decay=0.00001),
     #optimizer=keras.optimizers.SGD(lr=0.01, momentum=0.0, decay=0.0, nesterov=False),
-    optimizer=keras.optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999),
+    #optimizer=keras.optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999),
     # epsilon=None, decay=0.0, amsgrad=False),
     metrics=["accuracy"])
 

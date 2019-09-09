@@ -64,7 +64,8 @@ def get4method(xx152):
                                 res_list.append(res)
                     res_output = np.sum(np.array(res_list))  # 上下公式结果若为nan,并不会报错.会让最后的插值为nan.
                     try:
-                        input_data[pollution][indx] = res_output
+                        input_data.loc[indx, pollution] = res_output
+                        #input_data[pollution][indx] = res_output
                     except Exception as e:
                         print("缺失严重, 插值未定义:", e)
         print("[IDW]Finished.")
