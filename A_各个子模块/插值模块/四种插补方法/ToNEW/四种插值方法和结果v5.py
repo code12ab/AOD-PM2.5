@@ -17,7 +17,7 @@ import os
 
 # 路径
 input_file_path_pollution = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018_不补全\\"
-merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018_new\\"
+merge_output_file_path = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018\\"
 # 监测点坐标
 JCZ_info = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")  # 152个
 JCZ_info["监测站"] = JCZ_info["城市"] + "-" + JCZ_info["监测点名称"]
@@ -76,9 +76,8 @@ def get4method(xx152):
     for input_file_name in jcz_152["监测站名称_152"]:
         input_file_name = input_file_name + ".xlsx"
         if input_file_name in saved_list:
-            #ASD = 1
             print("已经完成:", input_file_name, xx152)
-            continue
+            #continue
         print("========正在计算%s========" % input_file_name)
         # 读取数据源
         data_pollution = pd.read_excel(input_file_path_pollution + input_file_name)
@@ -95,7 +94,7 @@ def get4method(xx152):
             if data_pollution[columname].count() != len(data_pollution):
                 loc = data_pollution[columname][data_pollution[columname].isnull().values == True].index.tolist()
                 for nub in loc:
-                    data_pollution_ewm.loc[columname][nub] = data_pollution_ewm_mid.loc[columname][nub]
+                    data_pollution_ewm.loc[nub, columname] = data_pollution_ewm_mid.loc[nub, columname]
 
         print('[ewm]Finished')
 
@@ -237,20 +236,3 @@ if __name__ == '__main__':
     p6 = Process(target=get4method, args=('样例6',))
 
     p1.start()
-    p2.start()
-    p3.start()
-    p4.start()
-    p5.start()
-    p6.start()
-
-    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
-    p5.join()
-    p4.join()
-    p3.join()
-    p2.join()
-    p1.join()
-
-    # 自动关机
-    print("程序已完成," + str(60) + '秒后将会关机')
-    print('关机')
-    os.system('shutdown -s -f -t 60')
