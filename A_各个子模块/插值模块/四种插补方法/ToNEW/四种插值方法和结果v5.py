@@ -16,7 +16,7 @@ from fancyimpute import KNN, IterativeImputer  # 方法创建新的数据框,不
 import os
 
 # 路径
-input_file_path_pollution = "D:\\毕业论文程序\\污染物浓度\\整理\\PM\\2018\\"
+input_file_path_pollution = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018_不补全\\"
 merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018_new\\"
 # 监测点坐标
 JCZ_info = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")  # 152个
@@ -95,7 +95,8 @@ def get4method(xx152):
             if data_pollution[columname].count() != len(data_pollution):
                 loc = data_pollution[columname][data_pollution[columname].isnull().values == True].index.tolist()
                 for nub in loc:
-                    data_pollution_ewm[columname][nub] = data_pollution_ewm_mid[columname][nub]
+                    data_pollution_ewm.loc[columname][nub] = data_pollution_ewm_mid.loc[columname][nub]
+
         print('[ewm]Finished')
 
         # 空间
