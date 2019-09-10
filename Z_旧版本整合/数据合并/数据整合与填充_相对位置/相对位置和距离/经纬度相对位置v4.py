@@ -54,7 +54,7 @@ def geo_distance(lng1, lat1, lng2, lat2):
 
 
 # 尝试计算
-
+list1 = []
 # 方案1
 for row1 in range(len(coordinates)):
     # print(coordinates[row1:row1+1])  # 万寿西宫到菏泽学院 每一个
@@ -64,8 +64,11 @@ for row1 in range(len(coordinates)):
     for row2 in range(len(data2)):
         data3 = data2[row2:row2+1]  # 某一行
         data4 = geo_distance(data1["xs"], data1["ys"], data3["xs"], data3["ys"])
+        list1.append(data4)
         print(data4)
     print("\n")  # 断行
+print(np.median(np.array(list1)))
+# os.remove("data6.xlsx", "data8-2.xlsx" )
 
 
 # 方案2
@@ -201,4 +204,3 @@ table3['name'] = coordinates["names"]
 table3 = table3.set_index('name')
 table3.to_excel("table3.xlsx")
 
-#os.remove("data6.xlsx", "data8-2.xlsx" )

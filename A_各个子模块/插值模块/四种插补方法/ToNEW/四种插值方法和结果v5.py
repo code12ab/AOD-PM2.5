@@ -16,8 +16,8 @@ from fancyimpute import KNN, IterativeImputer  # 方法创建新的数据框,不
 import os
 
 # 路径
-input_file_path_pollution = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018_不补全\\"
-merge_output_file_path = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018\\"
+input_file_path_pollution = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\2018_日期补全\\"
+merge_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Merge\\Aqua\\2018\\"
 # 监测点坐标
 JCZ_info = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")  # 152个
 JCZ_info["监测站"] = JCZ_info["城市"] + "-" + JCZ_info["监测点名称"]
@@ -37,40 +37,53 @@ def get4method(xx152):
 
     # 空间局部: 难以插值是因为大部分地区及其临近地区同一污染物值可能会一同缺失.
     def get_IDW(input_data):
-        for pollution in input_data.columns:  # 确定污染物列
+        for darksky_weather in input_data.columns:  # 确定污染物列
             for indx in input_data.index:  # 获取索引
                 res_list = []
                 weight_list = []
-                if pd.isnull(input_data[pollution][indx]):  # 开始循环
+                if pd.isnull(input_data[darksky_weather][indx]):  # 开始循环
                     for item_idw in JCZ_info["监测站"]:  # 获取距离,定义权重
                         if item_idw != name:
                             lng2 = JCZ_info[JCZ_info["监测站"] == item_idw]["经度"]
                             lat2 = JCZ_info[JCZ_info["监测站"] == item_idw]["纬度"]
-                            dis_1 = geo_distance(lng1, lat1, lng2, lat2)  # 两站地理距离
-                            data_to_add_in_1 = pd.read_excel(input_file_path_pollution + item_idw + ".xlsx")
-                            data_to_add_in_1 = data_to_add_in_1.set_index("日期")  # 需要日期为索引,方便下面添加
-                            if indx in data_to_add_in_1.index and pd.notnull(data_to_add_in_1[pollution][indx]):
-                                weight_list.append((1/dis_1))
+                            dis_1 = geo_distance(
+                                lng1, lat1, lng2, lat2)  # 两站地理距离
+                            if dis_1 <= 200000:  # 152 中位数345933 平均数333118
+                                data_to_add_in_1 = pd.read_excel(
+                                    input_file_path_pollution + item_idw + ".xlsx")
+                                data_to_add_in_1 = data_to_add_in_1.set_index(
+                                    "日期")  # 需要日期为索引,方便下面添加
+                                if indx in data_to_add_in_1.index and pd.notnull(
+                                        data_to_add_in_1[darksky_weather][indx]):
+                                    weight_list.append(dis_1)
                     weight_sum = np.sum(np.array(weight_list))  # 总距离,权重分母
                     for item_idw_2 in JCZ_info["监测站"]:  # 分配权重
                         if item_idw_2 != name:
-                            lng2 = JCZ_info[JCZ_info["监测站"] == item_idw_2]["经度"]
-                            lat2 = JCZ_info[JCZ_info["监测站"] == item_idw_2]["纬度"]
-                            dis_1 = geo_distance(lng1, lat1, lng2, lat2)  # 两站地理距离
-                            data_to_add_in = pd.read_excel(input_file_path_pollution + item_idw_2 + ".xlsx")
-                            data_to_add_in = data_to_add_in.set_index("日期")  # 需要日期为索引,方便下面添加
-                            if indx in data_to_add_in.index and pd.notnull(data_to_add_in[pollution][indx]):
-                                res = ((1/dis_1)/weight_sum) * data_to_add_in[pollution][indx]
-                                res_list.append(res)
-                    res_output = np.sum(np.array(res_list))  # 上下公式结果若为nan,并不会报错.会让最后的插值为nan.
+                            lng2 = JCZ_info[JCZ_info["监测站"]
+                                            == item_idw_2]["经度"]
+                            lat2 = JCZ_info[JCZ_info["监测站"]
+                                            == item_idw_2]["纬度"]
+                            dis_1 = geo_distance(
+                                lng1, lat1, lng2, lat2)  # 两站地理距离
+                            if dis_1 <= 200000:
+                                data_to_add_in = pd.read_excel(
+                                    input_file_path_pollution + item_idw_2 + ".xlsx")
+                                data_to_add_in = data_to_add_in.set_index(
+                                    "日期")  # 需要日期为索引,方便下面添加
+                                if indx in data_to_add_in.index and pd.notnull(
+                                        data_to_add_in[darksky_weather][indx]):
+                                    res = (dis_1 / weight_sum) * \
+                                        data_to_add_in[darksky_weather][indx]
+                                    res_list.append(res)
+                                    # print("已添加单元格插值:", res)
+                    # 上下公式结果若为nan,并不会报错.会让最后的插值为nan.
+                    res_output = np.sum(np.array(res_list))
                     try:
-                        input_data.loc[indx, pollution] = res_output
-                        #input_data[pollution][indx] = res_output
+                        input_data.loc[indx, darksky_weather] = res_output
                     except Exception as e:
                         print("缺失严重, 插值未定义:", e)
         print("[IDW]Finished.")
         return input_data
-
     # 监测站
     jcz_152 = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\站点列表-2018.11.08起_152.xlsx", sheet_name=xx152)
     jcz_152["监测站名称_152"] = jcz_152["城市"] + "-" + jcz_152["监测点名称"]
@@ -189,6 +202,7 @@ def get4method(xx152):
                 numb1 += 1
             data_knn_raw = data_knn_raw.set_index('日期')
             if pol+'add_0' in data_knn_raw.columns:
+                print('============================================')
                 data_pollution_KNN = KNN(k=7).fit_transform(data_knn_raw)
                 data_pollution_KNN = pd.DataFrame(data_pollution_KNN)
                 data_pollution_KNN.columns = data_knn_raw.columns
@@ -198,7 +212,7 @@ def get4method(xx152):
                 if 'add' in numb_del2:
                     del data_pollution_KNN[numb_del2]
             merge_list2.append(data_pollution_KNN)
-        data_darksky_weather_KNN_1 = pd.concat(merge_list2, axis=1, sort=False)
+        data_darksky_weather_KNN_1 = pd.concat(merge_list2, axis=1, sort=True)
 
         # 对结果的0值取np.nan
         data_darksky_weather_KNN_1.replace(0, np.nan, inplace=True)
@@ -237,3 +251,20 @@ if __name__ == '__main__':
     p6 = Process(target=get4method, args=('样例6',))
 
     p1.start()
+    p2.start()
+    p3.start()
+    p4.start()
+    p5.start()
+    p6.start()
+
+    p6.join()  # 依次检测是否完成, 完成才会执行join下面的代码
+    p5.join()
+    p4.join()
+    p3.join()
+    p2.join()
+    p1.join()
+
+    # 自动关机
+    print("程序已完成," + str(60) + '秒后将会关机')
+    print('关机')
+    # os.system('shutdown -s -f -t 60')
