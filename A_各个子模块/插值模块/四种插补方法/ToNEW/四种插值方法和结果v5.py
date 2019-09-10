@@ -203,7 +203,7 @@ def get4method(xx152):
             data_knn_raw = data_knn_raw.set_index('日期')
             if pol+'add_0' in data_knn_raw.columns:
                 print('============================================')
-                data_pollution_KNN = KNN(k=7).fit_transform(data_knn_raw)
+                data_pollution_KNN = KNN(k=30).fit_transform(data_knn_raw)
                 data_pollution_KNN = pd.DataFrame(data_pollution_KNN)
                 data_pollution_KNN.columns = data_knn_raw.columns
             else:
