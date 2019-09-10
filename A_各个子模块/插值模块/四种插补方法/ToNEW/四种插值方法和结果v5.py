@@ -14,7 +14,7 @@ import pandas as pd
 import numpy as np
 from fancyimpute import KNN, IterativeImputer  # 方法创建新的数据框,不覆盖原始数据
 import os
-
+import numba
 # 路径
 input_file_path_pollution = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\2018_日期补全\\"
 merge_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Merge\\Aqua\\2018\\"
@@ -36,9 +36,51 @@ def get4method(xx152):
         return dis  # 输出结果的单位为“米”
 
     # 空间局部: 难以插值是因为大部分地区及其临近地区同一污染物值可能会一同缺失.
+    def get_IDW(input_data_pd, lng1_def, lat1_def, name_def):
+        col_list = input_data_pd.columns
+        idx_list = input_data_pd.index
+        input_data = np.array(input_data_pd)
+        for darksky_weather in range(input_data.shape[1]):  # lie
+            for indx in range(input_data.shape[0]):  # hang
+                print(col_list[darksky_weather], idx_list[indx])
+                res_list = []
+                weight_list = []
+                if pd.isnull(input_data[indx][darksky_weather]):  # 开始循环
+                    for item_idw in JCZ_info["监测站"]:  # 获取距离,定义权重
+                        if item_idw != name_def:
+                            lng2 = JCZ_info[JCZ_info["监测站"] == item_idw]["经度"]
+                            lat2 = JCZ_info[JCZ_info["监测站"] == item_idw]["纬度"]
+                            dis_1 = geo_distance(
+                                lng1_def, lat1_def, lng2, lat2)  # 两站地理距离
+                            if dis_1 <= 200000:  # 152 中位数345933 平均数333118
+                                data_to_add_in_1 = pd.read_excel(
+                                    input_file_path_pollution + item_idw + ".xlsx")
+                                data_to_add_in_1 = data_to_add_in_1.set_index(
+                                    "日期")  # 需要日期为索引,方便下面添加
+                                if idx_list[indx] in data_to_add_in_1.index and pd.notnull(
+                                        data_to_add_in_1[col_list[darksky_weather]][idx_list[indx]]):
+                                    data_to_add_in = np.array(data_to_add_in_1)
+                                    res = (1/dis_1) * data_to_add_in[indx][darksky_weather]
+                                    res_list.append(res)
+                                    weight_list.append((1/dis_1))
+                    weight_sum = np.sum(np.array(weight_list))  # 总距离,权重分
+                    res_list = [j/weight_sum for j in res_list]
+                    # 上下公式结果若为nan,并不会报错.会让最后的插值为nan.
+                    res_output = np.sum(np.array(res_list))
+                    try:
+                        input_data_pd.loc[idx_list[indx], col_list[darksky_weather]] = res_output
+                    except Exception as e:
+                        print("缺失严重, 插值未定义:", e)
+        print("[IDW]Finished.")
+        return input_data_pd
+
+
+    """
     def get_IDW(input_data):
+        col_list = input_data.columns
         for darksky_weather in input_data.columns:  # 确定污染物列
             for indx in input_data.index:  # 获取索引
+                print(darksky_weather, indx)
                 res_list = []
                 weight_list = []
                 if pd.isnull(input_data[darksky_weather][indx]):  # 开始循环
@@ -55,7 +97,7 @@ def get4method(xx152):
                                     "日期")  # 需要日期为索引,方便下面添加
                                 if indx in data_to_add_in_1.index and pd.notnull(
                                         data_to_add_in_1[darksky_weather][indx]):
-                                    weight_list.append(dis_1)
+                                    weight_list.append((1/dis_1))
                     weight_sum = np.sum(np.array(weight_list))  # 总距离,权重分母
                     for item_idw_2 in JCZ_info["监测站"]:  # 分配权重
                         if item_idw_2 != name:
@@ -72,7 +114,7 @@ def get4method(xx152):
                                     "日期")  # 需要日期为索引,方便下面添加
                                 if indx in data_to_add_in.index and pd.notnull(
                                         data_to_add_in[darksky_weather][indx]):
-                                    res = (dis_1 / weight_sum) * \
+                                    res = ((1/dis_1) / weight_sum) * \
                                         data_to_add_in[darksky_weather][indx]
                                     res_list.append(res)
                                     # print("已添加单元格插值:", res)
@@ -84,6 +126,7 @@ def get4method(xx152):
                         print("缺失严重, 插值未定义:", e)
         print("[IDW]Finished.")
         return input_data
+    """
     # 监测站
     jcz_152 = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\站点列表-2018.11.08起_152.xlsx", sheet_name=xx152)
     jcz_152["监测站名称_152"] = jcz_152["城市"] + "-" + jcz_152["监测点名称"]
@@ -118,7 +161,7 @@ def get4method(xx152):
         lng1 = JCZ_info[JCZ_info["监测站"] == name]["经度"]
         lat1 = JCZ_info[JCZ_info["监测站"] == name]["纬度"]
         # 空间局部: IDW,反距离插值
-        data_pollution_IDW = get_IDW(data_pollution_to_IDW)
+        data_pollution_IDW = get_IDW(data_pollution_to_IDW, lng1, lat1,name)
         # 空间全局: 迭代回归,缺失特征作为y,其他特征作为x
         merge_list = []  # 同一监测站,不同污染物
         for darksky_weather_Iterative in data_pollution.columns:
@@ -148,7 +191,7 @@ def get4method(xx152):
                     count_1 += 1
             if count_1 > 1:  # 至少两个非空列才可以计算
                 data_darksky_weather_Iterative_to_merge = IterativeImputer(
-                    max_iter=100).fit_transform(data_darksky_weather_to_Iterative)
+                    max_iter=30).fit_transform(data_darksky_weather_to_Iterative)
             else:
                 data_darksky_weather_Iterative_to_merge = copy.deepcopy(
                     data_darksky_weather_to_Iterative)
@@ -179,7 +222,7 @@ def get4method(xx152):
         data_darksky_weather_Iterative_1 = pd.concat(
             merge_list, axis=1, sort=False)
         print('[Iterative]Finished')
-        # 时间局部：最近邻KNN,是使用K行都具有全部特征的样本,使用其他特征的均方差进行加权,判断最接近的时间点.
+        # 局部：最近邻KNN,是使用K行都具有全部特征的样本,使用其他特征的均方差进行加权,判断最接近的时间点.
         merge_list2 = []  # 同一监测站,不同污染物
 
         for pol in data_pollution.columns:
@@ -191,7 +234,7 @@ def get4method(xx152):
                     lng2 = JCZ_info[JCZ_info["监测站"] == item_idw]["经度"]
                     lat2 = JCZ_info[JCZ_info["监测站"] == item_idw]["纬度"]
                     dis_knn = geo_distance(lng1, lat1, lng2, lat2)  # 两站地理距离
-                    if dis_knn <= 600000:
+                    if dis_knn <= 200000:
                         data_knnadd = pd.read_excel(input_file_path_pollution+item_idw+'.xlsx')
                         data_knnadd = data_knnadd[[pol, '日期']]
                         data_knnadd.columns = [pol + "add_%s" % numb1, '日期']

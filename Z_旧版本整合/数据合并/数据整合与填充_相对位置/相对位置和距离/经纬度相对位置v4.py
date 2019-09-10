@@ -31,7 +31,7 @@ distance2 = 100000
 
 # 读取文件
 coordinate_file_path = "d:\\毕业论文程序\\MODIS\\坐标\\"
-JCZ_file = pd.read_excel(coordinate_file_path + "监测站坐标toDarkSkyAPI.xlsx", sheet_name="测试")  # 监测站坐标toDarkSkyAPI
+JCZ_file = pd.read_excel("D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx", sheet_name="汇总")  # 监测站坐标toDarkSkyAPI
 
 # 输出位置
 out_path = "d:\\毕业论文程序\\整合数据\\整合1\\"
@@ -54,9 +54,10 @@ def geo_distance(lng1, lat1, lng2, lat2):
 
 
 # 尝试计算
-list1 = []
+
 # 方案1
 for row1 in range(len(coordinates)):
+    list1 = []
     # print(coordinates[row1:row1+1])  # 万寿西宫到菏泽学院 每一个
     data1 = coordinates[row1:row1+1]  # 某一行
     data2 = coordinates.drop([row1])  # 删除一行的数据
@@ -64,13 +65,15 @@ for row1 in range(len(coordinates)):
     for row2 in range(len(data2)):
         data3 = data2[row2:row2+1]  # 某一行
         data4 = geo_distance(data1["xs"], data1["ys"], data3["xs"], data3["ys"])
-        list1.append(data4)
-        print(data4)
+        if data4 <= 100000/2:
+            list1.append(data4)
+        # print(data4)
     print("\n")  # 断行
-print(np.median(np.array(list1)))
+    print(np.median(np.array(list1)))
+    print(len(list1))
 # os.remove("data6.xlsx", "data8-2.xlsx" )
 
-
+""""
 # 方案2
 data5 = []
 for row1 in range(len(coordinates)):
@@ -203,4 +206,4 @@ for namess in table2.columns:
 table3['name'] = coordinates["names"]
 table3 = table3.set_index('name')
 table3.to_excel("table3.xlsx")
-
+"""
