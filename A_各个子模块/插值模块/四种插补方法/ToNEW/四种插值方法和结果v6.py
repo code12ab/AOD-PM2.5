@@ -43,7 +43,7 @@ def get4method(xx152):
         input_file_name = input_file_name + ".xlsx"
         if input_file_name in saved_list:
             print("已经完成:", input_file_name, xx152)
-            # continue
+            continue
         #  print("========正在计算%s========" % input_file_name)
         # 读取数据源
         data_pollution = pd.read_excel(input_file_path_pollution + input_file_name)
@@ -119,7 +119,7 @@ def get4method(xx152):
         data_darksky_weather_Iterative_1 = pd.concat(merge_list, axis=1, sort=False)
         print('[Iterative]Finished')
 
-        # 局部
+        # 局部 + 空间
         # 最近邻KNN,是使用K行都具有全部特征的样本,使用其他特征的均方差进行加权,判断最接近的时间点.
         print('======%s:开始进行空间特性和局部相关性捕捉======' % input_file_name.replace('.xlsx', ''))
         merge_list2 = []  # 同一监测站,不同污染物
@@ -176,6 +176,7 @@ def get4method(xx152):
             merge_list2.append(data_pollution_KNN)
         data_darksky_weather_KNN_1 = pd.concat(merge_list2, axis=1, sort=True)
         print('[IDW]Finished')
+
         # 对结果的0值取np.nan
         data_darksky_weather_KNN_1.replace(0, np.nan, inplace=True)
         data_pollution_ewm.replace(0, np.nan, inplace=True)
@@ -215,7 +216,7 @@ if __name__ == '__main__':
     p1.start()
     p2.start()
     p3.start()
-    p4.start()
+    #p4.start()
     #p5.start()
     #p6.start()
 
