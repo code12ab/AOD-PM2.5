@@ -10,7 +10,7 @@ import os
 
 
 for year in [2018]:
-    input_path = "D:\\毕业论文程序\\NDVI\\%s\\" % year
+    input_path = "D:\\毕业论文程序\\NDVI\\插值模块\\Mean\\%s\\" % year
     output_path = "D:\\毕业论文程序\\NDVI\\%s_日期补全\\" % year
     fillna_path = "D:\\毕业论文程序\\NDVI\\%s_线性填充\\" % year
 

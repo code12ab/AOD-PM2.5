@@ -9,9 +9,9 @@ import numpy as np
 import os
 
 
-for year in [2014, 2015, 2016, 2017, 2018, "多年合一"]:
-    input_path = "D:\\毕业论文程序\\污染物浓度\整理\\全部污染物\\%s\\" % year
-    output_path = "D:\\毕业论文程序\\污染物浓度\\整理\\全部污染物\\%s_日期补全\\" % year
+for year in [2018]:
+    input_path = "D:\\毕业论文程序\\污染物浓度\整理\\PM\\%s_new\\" % year
+    output_path = "D:\\毕业论文程序\\污染物浓度\\整理\\PM\\%s_日期补全\\" % year
     file_name = os.listdir(input_path)
     # 创建完全的日期列
     if year == 2014:
