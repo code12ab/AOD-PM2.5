@@ -141,8 +141,10 @@ def get4method(xx152):
                                                                  data_to_Iterative_concat,
                                                                  how='left',
                                                                  on='日期')
-                    data_darksky_weather_to_Iterative = data_darksky_weather_to_Iterative.set_index('日期')
-                numb += 1
+                    numb += 1
+                    # data_darksky_weather_to_Iterative = data_darksky_weather_to_Iterative.set_index('日期')
+                    # 上下哪个合适?
+            data_darksky_weather_to_Iterative = data_darksky_weather_to_Iterative.set_index('日期')
             # 迭代部分
             count_1 = 0
             for value_1 in data_darksky_weather_to_Iterative.sum():
