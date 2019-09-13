@@ -12,7 +12,7 @@ import os
 
 # 定义熵值法函数
 def cal_weight(x):
-    # 标准化
+    # 标准化 每列各自标准化 目前错误
     x = x.apply(lambda x: ((x - np.min(x)) / (np.max(x) - np.min(x))))
 
     # 求k

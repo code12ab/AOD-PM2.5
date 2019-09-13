@@ -1,6 +1,7 @@
 <component name="ProjectDictionaryState">
   <dictionary name="iii">
     <words>
+      <w>adagrad</w>
       <w>amsgrad</w>
       <w>aods</w>
       <w>arrar</w>
@@ -25,6 +26,7 @@
       <w>mday</w>
       <w>morethan</w>
       <w>ndvi</w>
+      <w>nesterov</w>
       <w>noin</w>
       <w>otherpollution</w>
       <w>regressor</w>
@@ -34,6 +36,7 @@
       <w>slopex</w>
       <w>slopey</w>
       <w>softmax</w>
+      <w>sprop</w>
       <w>timestation</w>
       <w>wday</w>
       <w>xytodis</w>
