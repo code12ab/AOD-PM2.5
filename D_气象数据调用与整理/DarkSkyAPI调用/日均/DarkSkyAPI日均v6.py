@@ -16,7 +16,7 @@ pd.set_option('display.max_rows', None)  # 设置显示最大行
 pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显示所有列
 
 # 参数设置
-save_year = 2018
+save_year = 2017
 dayinyear_start = "000"
 date_start = int(str(save_year) + dayinyear_start)
 if save_year % 4 == 0:
@@ -24,7 +24,7 @@ if save_year % 4 == 0:
     year_days = 366 - int(dayinyear_start)
 else:
     year_days = 365 - int(dayinyear_start)
-start_count = 5500
+start_count = -1
 
 # API KEY
 API_KEY_LIST = [
@@ -44,6 +44,7 @@ coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
 output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % save_year  # 气象数据存储路径
 error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
 time_out = 30  # 超时设置,10秒太短
+saved_list = os.listdir(output_file_path)
 
 # 批量导入监测站坐标
 # JCZ_file = pd.read_excel("监测站坐标toDarkSkyAPI.xlsx")
@@ -91,14 +92,15 @@ def get_outcome(date_time):
 i = start_count  # 设置计数
 # 监测站循环
 for jcz in JCZ:
+    if jcz[2]+'.xlsx' in saved_list:
+        print('已完成', jcz[2])
+        continue
     outcome = []
     error = []
     # 一年循环
     for time in time_list:
         i += 1
         # 终止条件
-        if i > 10086:
-            break
         API_KEY = API_KEY_LIST[math.floor(i / 1000)]
         print(i, API_KEY)
         # API_KEY,纬度,经度,监测站,注意格式是先"纬度"后"经度"
@@ -117,6 +119,8 @@ for jcz in JCZ:
                 error.append(t)  # 保存报错日期
             else:
                 print("报错:%s" % coordinate[3], t, "内容为:", e)
+    if i > 10086:
+        break
     # print("old", error)
     # 报错日期循环
     print("接下来执行报错日期数据重新获取")
