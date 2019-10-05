@@ -21,8 +21,6 @@ data_rainsonw = data[(data['precipIntensity_T1'] > 0) | (data['precipIntensity']
                      (data['precipAccumulation'] > 0) | (data['precipAccumulation_T1'] > 0)]
 data_rainsonw.to_excel('d:\\全2018_雨雪.xlsx')  # 只有发生雨雪天时候的数据
 
-
-
 data['precipIntensity'] = data['precipIntensity'].fillna(0.00)
 data['precipIntensity_T1'] = data['precipIntensity_T1'].fillna(0.00)
 data['precipIntensityMax'] = data['precipIntensityMax'].fillna(0.00)

@@ -6,6 +6,7 @@
       <w>aods</w>
       <w>arrar</w>
       <w>arrayw</w>
+      <w>atemp</w>
       <w>auqa</w>
       <w>brng</w>
       <w>cccol</w>
@@ -14,6 +15,7 @@
       <w>creat</w>
       <w>crossentropy</w>
       <w>dataout</w>
+      <w>datares</w>
       <w>dataset</w>
       <w>dayinyear</w>
       <w>edvi</w>
@@ -25,11 +27,13 @@
       <w>knnadd</w>
       <w>lnfij</w>
       <w>mday</w>
+      <w>modall</w>
       <w>morethan</w>
       <w>ndvi</w>
       <w>nesterov</w>
       <w>noin</w>
       <w>otherpollution</w>
+      <w>predt</w>
       <w>regressor</w>
       <w>reprojection</w>
       <w>rmsprop</w>

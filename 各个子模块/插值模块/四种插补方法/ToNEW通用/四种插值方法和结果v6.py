@@ -142,7 +142,7 @@ def get4method(xx152):
                     lng2 = JCZ_info[JCZ_info["监测站"] == item_idw]["经度"]
                     lat2 = JCZ_info[JCZ_info["监测站"] == item_idw]["纬度"]
                     dis_1 = geo_distance(lng1, lat1, lng2, lat2)  # 两站地理距离
-                    if dis_1 <= 200000:
+                    if dis_1 <= 200000:  # 或 > 0
                         data_knnadd = pd.read_excel(input_file_path_pollution + item_idw + '.xlsx')
                         data_knnadd = data_knnadd[[pol, '日期']]
                         data_knnadd.columns = [pol + "add_%s" % numb1, '日期']
