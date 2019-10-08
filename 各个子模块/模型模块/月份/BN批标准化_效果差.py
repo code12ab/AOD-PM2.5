@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
+# 时间: 2019/10/3 16:57
+
+
+# -*- coding: utf-8 -*-
+# 作者: xcl
 # 时间: 2019/9/21 23:54
 
 
@@ -12,8 +17,9 @@ from keras import layers, Input
 import keras
 from keras.utils import to_categorical
 from sklearn.utils import shuffle
-from sklearn.model_selection import KFold,StratifiedKFold
+from sklearn.model_selection import KFold, StratifiedKFold
 import datetime  # 程序耗时
+import tensorflow as tf
 
 import pandas as pd
 import keras
@@ -25,9 +31,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import shuffle
 
-
 input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate.xlsx'
-
 data_all = pd.read_excel(input_path, index_col='日期')
 
 """
@@ -41,6 +45,7 @@ data_ts_df = data_all[['tm_mon', 'tm_mday',
 for ccc in data_ts_df.columns:
     data_ts_df[ccc] = data_ts_df[ccc].map(lambda x: str(x))
 data_get_dummies1 = pd.get_dummies(data_ts_df[['tm_mon']], drop_first=True)
+# print(data_get_dummies1.columns)
 data_get_dummies2 = pd.get_dummies(data_ts_df[['tm_mday']], drop_first=True)
 data_get_dummies3 = pd.get_dummies(data_ts_df[['id']], drop_first=True)
 data_dummies = pd.concat([data_get_dummies1,
@@ -66,11 +71,11 @@ data_all = shuffle(data_all, random_state=1027)
 MAE_list = []
 RE_list = []
 MSE_list = []
-for t_numb in range(0,20):
+for t_numb in range(0, 25):
 
     # 划分
-    idlist = list(range(1,153))
-    slice1 = random.sample(idlist, 38)  #从list中随机获取5个元素，作为一个片断返回
+    idlist = list(range(1, 13))
+    slice1 = random.sample(idlist, 3)  # 从list中随机获取5个元素，作为一个片断返回
     slice2 = []
     for idx in idlist:
         if idx not in slice1:
@@ -78,51 +83,49 @@ for t_numb in range(0,20):
             slice2.append(idx)
     slice1 = [str(j) for j in slice1]
 
-    data_test = data_out[data_out["id"].isin(slice1)]
-    data_train = data_out[data_out["id"].isin(slice2)]
+    data_test = data_out[data_out["tm_mon"].isin(slice1)]
+    data_train = data_out[data_out["tm_mon"].isin(slice2)]
     # AOD
     data_aod_test = data_test[['AOD_0']]
     data_aod_train = data_train[['AOD_0']]
 
-
     # 气象
     data_sky_test = data_test[[
-                               'cloudCover',
-                               'dewPoint',
-                               'humidity',
+        'cloudCover',
+        'dewPoint',
+        'humidity',
 
-                               'sunTime',
-    'tempMM','tempHL','atempMM','atempHL',
+        'sunTime',
+        'tempMM', 'tempHL', 'atempMM', 'atempHL',
 
-                               'visibility',
-                               'windGust',
-                               'windSpeed',
-                               'apparentTemperature',
-                               'temperature',
+        'visibility',
+        'windGust',
+        'windSpeed',
+        'apparentTemperature',
+        'temperature',
 
-                               'pressure',
-                               'precipIntensity',
-                               'precipAccumulation']]
+        'pressure',
+        'precipIntensity',
+        'precipAccumulation']]
 
     data_sky_train = data_train[[
-                                 'cloudCover',
-                                 'dewPoint',
-                                 'humidity',
+        'cloudCover',
+        'dewPoint',
+        'humidity',
 
-                                 'sunTime',
-    'tempMM','tempHL','atempMM','atempHL',
+        'sunTime',
+        'tempMM', 'tempHL', 'atempMM', 'atempHL',
 
+        'visibility',
+        'windGust',
+        'windSpeed',
+        'apparentTemperature',
+        'temperature',
 
-                                 'visibility',
-                                 'windGust',
-                                 'windSpeed',
-                                 'apparentTemperature',
-                                 'temperature',
-
-                                 'pressure',
-                                 'precipIntensity',
-                                 'precipAccumulation',
-                                 ]]
+        'pressure',
+        'precipIntensity',
+        'precipAccumulation',
+    ]]
 
     # 时间特征
     data_time_test = data_test[['tm_mon_10',
@@ -176,13 +179,13 @@ for t_numb in range(0,20):
                                 'cloudCover_T1',
                                 'dewPoint_T1',
                                 'humidity_T1',
-    
+
                                 'sunTime_T1',
                                 'temperatureHigh_T1',
                                 'temperatureLow_T1',
                                 'temperatureMax_T1',
                                 'temperatureMin_T1',
-    
+
                                 'visibility_T1',
                                 'windBearing_T1',
                                 'windGust_T1',
@@ -208,38 +211,7 @@ for t_numb in range(0,20):
     # NDVI
     data_ndvi_test = data_test[['NDVI_0']]
     data_ndvi_train = data_train[['NDVI_0']]
-    """
-    data_ndvi_train = data_train[['tm_mday_10',
-                                  'tm_mday_11',
-                                  'tm_mday_12',
-                                  'tm_mday_13',
-                                  'tm_mday_14',
-                                  'tm_mday_15',
-                                  'tm_mday_16',
-                                  'tm_mday_17',
-                                  'tm_mday_18',
-                                  'tm_mday_19',
-                                  'tm_mday_2',
-                                  'tm_mday_20',
-                                  'tm_mday_21',
-                                  'tm_mday_22',
-                                  'tm_mday_23',
-                                  'tm_mday_24',
-                                  'tm_mday_25',
-                                  'tm_mday_26',
-                                  'tm_mday_27',
-                                  'tm_mday_28',
-                                  'tm_mday_29',
-                                  'tm_mday_3',
-                                  'tm_mday_30',
-                                  'tm_mday_31',
-                                  'tm_mday_4',
-                                  'tm_mday_5',
-                                  'tm_mday_6',
-                                  'tm_mday_7',
-                                  'tm_mday_8',
-                                  'tm_mday_9']]
-    """
+
     # AODS
     data_aods_test = data_test[['AOD_1',
                                 'AOD_2',
@@ -278,7 +250,8 @@ for t_numb in range(0,20):
     data_pm_train = data_train[['PM25']]
     # 输入层 全部
 
-    AOD_input = Input(shape=(len(data_aod_test.columns),), name="AOD_input")  # AOD
+    AOD_input = Input(shape=(len(data_aod_test.columns),),
+                      name="AOD_input")  # AOD
     AODs_input = Input(shape=(len(data_aods_test.columns),),
                        name="AODs_input")  # AODs
 
@@ -299,7 +272,8 @@ for t_numb in range(0,20):
     # 融合层
     aods_concat = concatenate([AOD_input, AODs_input])  # AOD + AODs
 
-    meteorology_concat = concatenate([Meteorology_input, AOD_input])  # AOD + 气象
+    meteorology_concat = concatenate(
+        [Meteorology_input, AOD_input])  # AOD + 气象
 
     weather_concat = concatenate([Weather_input, AOD_input])  # AOD + 时滞
 
@@ -347,9 +321,9 @@ for t_numb in range(0,20):
 
     # 残差层
     # AOD + AODs
-    aods_residual_connection1 = Dense(24,
-                                      activation=keras.layers.LeakyReLU(alpha=0.2),
-                                      name="ResidualConnectionAODs")(aods_x1)
+    aods_residual_connection1 = Dense(
+        24, activation=keras.layers.LeakyReLU(
+            alpha=0.2), name="ResidualConnectionAODs")(aods_x1)
     aods_residual_connection2 = Dense(
         24, activation=keras.layers.advanced_activations.ELU(
             alpha=1.0), name="FullConnectionAOD_RC")(aods_residual_connection1)
@@ -411,16 +385,43 @@ for t_numb in range(0,20):
     allin_residual_output = add([allin_x1,
                                  allin_residual_connection2],
                                 name="ResidualConnectionAIA_Add")
-
+    """
+    # BN
+    # AOD + AODs
+    aods_residual_output = Dense(24,
+                    activation=keras.layers.BatchNormalization(axis=-1, momentum=0.98, epsilon=0.0012, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None),
+                    name="BN1_aods")(aods_residual_output)
+    # AOD + 气象
+    meteorology_residual_output = Dense(24, activation=keras.layers.BatchNormalization(axis=-1, momentum=0.98, epsilon=0.0012, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None), name="BN1_meteorology")(meteorology_residual_output)
+    # AOD + 时滞
+    weather_residual_output = Dense(24,
+                       activation=keras.layers.BatchNormalization(axis=-1, momentum=0.98, epsilon=0.0012, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None),
+                       name="BN1_T1")(weather_residual_output)
+    # AOD + NDVI
+    ndvi_residual_output = Dense(24,
+                    activation=keras.layers.BatchNormalization(axis=-1, momentum=0.98, epsilon=0.0012, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None),
+                    name="BN1_NDVI")(ndvi_residual_output)
+    # AOD + 时间
+    time_residual_output = Dense(24,
+                    activation=keras.layers.BatchNormalization(axis=-1, momentum=0.98, epsilon=0.0012, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None),
+                    name="BN1_Time")(time_residual_output)
+    # AOD + 空间
+    station_residual_output = Dense(24,
+                       activation=keras.layers.BatchNormalization(axis=-1, momentum=0.98, epsilon=0.001, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None),
+                       name="BN1_Station")(station_residual_output)
+    # 全部特征
+    allin_residual_output = Dense(24,
+                     activation=keras.layers.BatchNormalization(axis=-1, momentum=0.98, epsilon=0.0012, center=True, scale=True, beta_initializer='zeros', gamma_initializer='ones', moving_mean_initializer='zeros', moving_variance_initializer='ones', beta_regularizer=None, gamma_regularizer=None, beta_constraint=None, gamma_constraint=None),
+                     name="BN11_AIA")(allin_residual_output)
+    """
     # 全连接层 2
     # AOD + AODs
     aods_x2 = Dense(12,
                     activation=keras.layers.LeakyReLU(alpha=0.2),
                     name="FullConnectionAODs_2")(aods_residual_output)
     # AOD + 气象
-    meteorology_x2 = Dense(12,
-                           activation=keras.layers.LeakyReLU(alpha=0.2),
-                           name="FullConnectionMA_2")(meteorology_residual_output)
+    meteorology_x2 = Dense(12, activation=keras.layers.LeakyReLU(
+        alpha=0.2), name="FullConnectionMA_2")(meteorology_residual_output)
     # AOD + 时滞
     weather_x2 = Dense(12,
                        activation=keras.layers.LeakyReLU(alpha=0.2),
@@ -448,7 +449,8 @@ for t_numb in range(0,20):
     aods_y = core.Dropout(rate=0.01, name="Aods_Module")(aods_x2)
 
     # AOD + 气象
-    meteorology_y = core.Dropout(rate=0.01, name="Meteorology_Module")(meteorology_x2)
+    meteorology_y = core.Dropout(
+        rate=0.01, name="Meteorology_Module")(meteorology_x2)
 
     # AOD + 时滞
     weather_y = core.Dropout(rate=0.01, name="Weather_Module")(weather_x2)
@@ -492,7 +494,6 @@ for t_numb in range(0,20):
                     activation=keras.layers.LeakyReLU(alpha=0.2),
                     name="FullConnectionTime_3x")(time_y)
 
-
     # AOD + 空间
     station_y2 = Dense(8,
                        activation=keras.layers.LeakyReLU(alpha=0.2),
@@ -529,7 +530,6 @@ for t_numb in range(0,20):
     time_y2 = Dense(4,
                     activation=keras.layers.LeakyReLU(alpha=0.2),
                     name="FullConnectionTime_3")(time_y2)
-
 
     # AOD + 空间
     station_y2 = Dense(4,
@@ -600,19 +600,34 @@ for t_numb in range(0,20):
         model_allin.output])
 
     # 全连接层 1
-    res_x1 = Dense(8,activation=keras.layers.LeakyReLU(alpha=0.2),
+    res_x1 = Dense(8, activation=keras.layers.LeakyReLU(alpha=0.2),
                    name="ResFullConnectionResModelForLast")(res_concat)
 
     # 残差连接层
-    res_residual_connection1 = Dense(8,activation=keras.layers.LeakyReLU(alpha=0.2),
-                                     name="ResidualConnectionLast")(res_x1)
+    res_residual_connection1 = Dense(
+        8, activation=keras.layers.LeakyReLU(
+            alpha=0.2), name="ResidualConnectionLast")(res_x1)
 
-    res_residual_connection2 = Dense(
-        8, activation=keras.layers.LeakyReLU(alpha=0.2),name="FullConnectionLast_RC")(res_residual_connection1)
+    res_residual_connection2 = Dense(8, activation=keras.layers.LeakyReLU(
+        alpha=0.2), name="FullConnectionLast_RC")(res_residual_connection1)
 
     res_residual_output = add(
         [res_x1, res_residual_connection2], name="ResidualConnectionLast_Add")
-
+    #
+    res_residual_output = Dense(
+        1,
+        activation=keras.layers.BatchNormalization(
+            axis=-1,
+            momentum=0.99,
+            epsilon=0.001,
+            center=True,
+            scale=True,
+            beta_initializer='zeros',
+            gamma_initializer='ones',
+            moving_mean_initializer='zeros',
+            moving_variance_initializer='ones',
+),
+        name="Residual213123ConnectionLast")(res_residual_output)
     # 全连接层 2
     res_x2 = Dense(8,
                    activation=keras.layers.LeakyReLU(alpha=0.2),
@@ -652,7 +667,7 @@ for t_numb in range(0,20):
         # optimizer=keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=None, decay=0.0),
         # optimizer=keras.optimizers.Adagrad(lr=0.01, epsilon=None, decay=0.00001),
         # optimizer=keras.optimizers.SGD(lr=0.01, momentum=0.0, decay=0.0, nesterov=False),
-        optimizer=keras.optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999),
+        optimizer=keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999),
         # epsilon=None, decay=0.0, amsgrad=False),
         metrics=["accuracy"])
 
@@ -685,8 +700,9 @@ for t_numb in range(0,20):
         data_aod_train
     ],
         data_pm_train,
-        epochs=200,
-        batch_size=5120)
+        epochs=100,
+        batch_size=5120,
+        verbose=2)  # ,validation_split=0.1,shuffle=True) #
 
     res = model_last.predict([data_sky_test,
                               data_t1_test,
@@ -708,15 +724,14 @@ for t_numb in range(0,20):
     RE = np.average(data_predt['百分误'])
     MSE = np.average(data_predt['差值2'])
     # os.system('shutdown -s -f -t 60')
-    # print(np.average(data_predt['差值']))
-    # print(np.average(data_predt['百分误']))
-    # print(np.average(data_predt['差值2']))
+    print('第%s次实验, mae:' % t_numb, np.average(data_predt['差值']))
+    print('第%s次实验, re:' % t_numb, np.average(data_predt['百分误']))
+    print('第%s次实验, mse:' % t_numb, np.average(data_predt['差值2']))
 
     MSE_list.append(MSE)
     RE_list.append(RE)
     MAE_list.append(MAE)
-
-
+    print('=========================== %s ===========================' % t_numb)
 
 print('mae', np.average(MAE_list))
 print('re', np.average(RE_list))
@@ -728,5 +743,5 @@ a.append(RE_list)
 a.append(MSE_list)
 
 a = pd.DataFrame(a)
-a.to_excel('test100_sta.xlsx')
-# os.system('shutdown -s -f -t 60')
+a.to_excel('test100_mon.xlsx')
+os.system('shutdown -s -f -t 60')

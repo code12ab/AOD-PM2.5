@@ -19,27 +19,26 @@ import datetime  # 程序耗时
 start_time = datetime.datetime.now()
 # 读取
 #data = pd.read_excel("相邻位置仅留PM和T-1.xlsx")
-data = pd.read_excel("自身与相邻站点PM_AOD_T-1_全样本.xlsx")
+input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate.xlsx'
+
+data = pd.read_excel(input_path)
 #data = pd.read_excel("测试用数据.xlsx")
 # 设置变量
+"""
 data = data[data["AOD值"] > 0]
 data["AOD值"] = data["AOD值"] / 1000
 data = data[data["日均PM2.5"] > 0]
 data = data[data["AOD值"] < 2001]
+"""
 
-
-independent = ["AOD值", 'cloudCover', 'dewPoint', 'humidity', 'precipAccumulation', 'precipIntensity', 'pressure',
+independent = ["AOD_0", 'cloudCover', 'dewPoint', 'humidity', 'precipAccumulation', 'precipIntensity', 'pressure',
                'temperature', 'uvIndex', 'visibility', 'windSpeed', 'windBearing']
-T_1 = ["AOD值-t-1", 'cloudCover-t-1', 'dewPoint-t-1', 'humidity-t-1', 'precipAccumulation-t-1', 'precipIntensity-t-1',
-       'pressure-t-1', 'temperature-t-1', 'uvIndex-t-1', 'visibility-t-1', 'windSpeed-t-1', 'windBearing-t-1']
-PM_list = ["A1-日均PM2.5-MEAN-t-1", "A2-日均PM2.5-MEAN-t-1", "A3-日均PM2.5-MEAN-t-1", "A4-日均PM2.5-MEAN-t-1",
-           "A5-日均PM2.5-MEAN-t-1", "A6-日均PM2.5-MEAN-t-1", "A7-日均PM2.5-MEAN-t-1", "A8-日均PM2.5-MEAN-t-1",
-           "B1-日均PM2.5-MEAN-t-1", "B2-日均PM2.5-MEAN-t-1", "B3-日均PM2.5-MEAN-t-1", "B4-日均PM2.5-MEAN-t-1",
-           "B5-日均PM2.5-MEAN-t-1", "B6-日均PM2.5-MEAN-t-1", "B7-日均PM2.5-MEAN-t-1", "B8-日均PM2.5-MEAN-t-1",
-           "日均PM2.5-t-1"]
-dependent = ["日均PM2.5"]
-jcz = ["监测站"]
-xni = pd.get_dummies(data[jcz])
+T_1 = ['AOD_0', 'pressure_T1']
+PM_list = ['AOD_0']
+dependent = ["PM25"]
+# jcz = ["监测站"]
+''''''
+xni = pd.get_dummies(data['id'])
 
 
 # independent = list(set(independent) | set(T_1))  # 合集
@@ -65,8 +64,8 @@ data_y = to_categorical(data_y)
 
 # 输入1和2的变量数,维度 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!是否可以不同维度
 inputA = Input(shape=(12,))
-inputB = Input(shape=(17,))
-inputC = Input(shape=(12,))
+inputB = Input(shape=(1,))
+inputC = Input(shape=(2,))
 inputD = Input(shape=(xni.shape[1],))
 # 输入1
 x = layers.Dense(24, activation="relu")(inputA)

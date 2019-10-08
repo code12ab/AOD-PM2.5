@@ -4,17 +4,12 @@
 
 
 # 库
-import pandas as pd
-import numpy as np
-import os
+
 from random import choice
 import random
 from sklearn.ensemble import AdaBoostRegressor
 from keras.models import Sequential, Model
 from keras import layers, Input
-import keras
-import numpy as np
-import pandas as pd
 from keras.utils import to_categorical
 from sklearn.utils import shuffle
 from sklearn.model_selection import KFold,StratifiedKFold
@@ -31,8 +26,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import shuffle
 
 
+input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate.xlsx'
 
-input_path = 'D:\\雨雪+2018_new_pm_aod.xlsx'
 data_all = pd.read_excel(input_path, index_col='日期')
 
 """
@@ -350,14 +345,13 @@ model.fit([
     batch_size=512)
 
 
-
 res = model.predict([data_aod_test,
-                          data_sky_test,
-                          data_time_test,
-                          data_station_test,
-                          data_t1_test,
-                          data_ndvi_test,
-                          data_aods_test])
+                     data_sky_test,
+                     data_time_test,
+                     data_station_test,
+                     data_t1_test,
+                     data_ndvi_test,
+                     data_aods_test])
 datares = res - data_pm_test
 datares.PM25 = datares.PM25.map(lambda x: abs(x))
 data_predt = pd.concat([datares, data_pm_test], axis=1)

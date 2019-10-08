@@ -14,7 +14,8 @@ import pandas as pd
 from sklearn.model_selection import KFold
 import random
 # 读取
-input_path = 'D:\\雨雪+2018_new_pm_aod.xlsx'
+input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate.xlsx'
+
 data_all = pd.read_excel(input_path, index_col='日期')
 """
 del data_all['pressure_T1']

@@ -1,20 +1,15 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
+# 时间: 2019/10/3 16:57
+
+
+# -*- coding: utf-8 -*-
+# 作者: xcl
 # 时间: 2019/9/21 23:54
 
 
 # 库
-from random import choice
 import random
-from sklearn.ensemble import AdaBoostRegressor
-from keras.models import Sequential, Model
-from keras import layers, Input
-import keras
-from keras.utils import to_categorical
-from sklearn.utils import shuffle
-from sklearn.model_selection import KFold,StratifiedKFold
-import datetime  # 程序耗时
-
 import pandas as pd
 import keras
 from keras.layers import Input, Embedding, LSTM, Dense, concatenate, core, add
@@ -22,12 +17,9 @@ from keras.models import Model
 import os
 import copy
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import shuffle
 
-
 input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate.xlsx'
-
 data_all = pd.read_excel(input_path, index_col='日期')
 
 """
@@ -41,36 +33,43 @@ data_ts_df = data_all[['tm_mon', 'tm_mday',
 for ccc in data_ts_df.columns:
     data_ts_df[ccc] = data_ts_df[ccc].map(lambda x: str(x))
 data_get_dummies1 = pd.get_dummies(data_ts_df[['tm_mon']], drop_first=True)
-data_get_dummies2 = pd.get_dummies(data_ts_df[['tm_mday']], drop_first=True)
 data_get_dummies3 = pd.get_dummies(data_ts_df[['id']], drop_first=True)
 data_dummies = pd.concat([data_get_dummies1,
-                          data_get_dummies2,
                           data_get_dummies3,
                           data_ts_df[['tm_mon']]],
                          axis=1)
-list1 = []
-for ccc in data_dummies.columns:
-    # print(ccc)
-    if ccc != 'tm_mon':
-        list1.append(ccc)
 
-# 去掉无用列
+# 去掉不标准化列; data_all本身不含id
 data_to_std = data_all.drop(
     ['tm_mon', 'tm_mday', 'tm_wday', 'tm_yday', 'tm_week', ], axis=1)
 
-# 不标准化
-data_out = pd.concat([data_dummies, data_to_std], join='outer', axis=1)
+
+# 标准化
+data_std = copy.deepcopy(data_to_std)
+mean_pm = data_std['PM25'].mean()
+std_pm = data_std['PM25'].std()
+
+for col in data_std:
+    mean = data_std[col].mean()
+    std = data_std[col].std()
+    data_std[col] = data_std[col].map(lambda x:(x-mean)/std)
+# 标准化后的数据矩阵
+data_out = pd.concat([data_dummies, data_std], join='outer', axis=1)
+# 标准化前的数据矩阵
+data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标准化前的真实值
+
+
 # 打乱
 data_all = shuffle(data_all, random_state=1027)
 
 MAE_list = []
 RE_list = []
 MSE_list = []
-for t_numb in range(0,20):
+for t_numb in range(0, 10):
 
     # 划分
     idlist = list(range(1,153))
-    slice1 = random.sample(idlist, 38)  #从list中随机获取5个元素，作为一个片断返回
+    slice1 = random.sample(idlist, 38)  # 从list中随机获取38个元素，作为一个片断返回
     slice2 = []
     for idx in idlist:
         if idx not in slice1:
@@ -78,51 +77,54 @@ for t_numb in range(0,20):
             slice2.append(idx)
     slice1 = [str(j) for j in slice1]
 
+    # 划分不标准化下的训练集测试集, 用于检验
+    data_test2 = data_out2[data_out2["id"].isin(slice1)]
+    # print(data_test2.PM25)  # 这才是真实值
+
+    # 划分标准化后的训练集测试集, 用于训练
     data_test = data_out[data_out["id"].isin(slice1)]
     data_train = data_out[data_out["id"].isin(slice2)]
     # AOD
     data_aod_test = data_test[['AOD_0']]
     data_aod_train = data_train[['AOD_0']]
 
-
     # 气象
     data_sky_test = data_test[[
-                               'cloudCover',
-                               'dewPoint',
-                               'humidity',
+        'cloudCover',
+        'dewPoint',
+        'humidity',
 
-                               'sunTime',
-    'tempMM','tempHL','atempMM','atempHL',
+        'sunTime',
+        'tempMM', 'tempHL', 'atempMM', 'atempHL',
 
-                               'visibility',
-                               'windGust',
-                               'windSpeed',
-                               'apparentTemperature',
-                               'temperature',
+        'visibility',
+        'windGust',
+        'windSpeed',
+        'apparentTemperature',
+        'temperature',
 
-                               'pressure',
-                               'precipIntensity',
-                               'precipAccumulation']]
+        'pressure',
+        'precipIntensity',
+        'precipAccumulation']]
 
     data_sky_train = data_train[[
-                                 'cloudCover',
-                                 'dewPoint',
-                                 'humidity',
+        'cloudCover',
+        'dewPoint',
+        'humidity',
 
-                                 'sunTime',
-    'tempMM','tempHL','atempMM','atempHL',
+        'sunTime',
+        'tempMM', 'tempHL', 'atempMM', 'atempHL',
 
+        'visibility',
+        'windGust',
+        'windSpeed',
+        'apparentTemperature',
+        'temperature',
 
-                                 'visibility',
-                                 'windGust',
-                                 'windSpeed',
-                                 'apparentTemperature',
-                                 'temperature',
-
-                                 'pressure',
-                                 'precipIntensity',
-                                 'precipAccumulation',
-                                 ]]
+        'pressure',
+        'precipIntensity',
+        'precipAccumulation',
+    ]]
 
     # 时间特征
     data_time_test = data_test[['tm_mon_10',
@@ -176,13 +178,13 @@ for t_numb in range(0,20):
                                 'cloudCover_T1',
                                 'dewPoint_T1',
                                 'humidity_T1',
-    
+
                                 'sunTime_T1',
                                 'temperatureHigh_T1',
                                 'temperatureLow_T1',
                                 'temperatureMax_T1',
                                 'temperatureMin_T1',
-    
+
                                 'visibility_T1',
                                 'windBearing_T1',
                                 'windGust_T1',
@@ -492,7 +494,6 @@ for t_numb in range(0,20):
                     activation=keras.layers.LeakyReLU(alpha=0.2),
                     name="FullConnectionTime_3x")(time_y)
 
-
     # AOD + 空间
     station_y2 = Dense(8,
                        activation=keras.layers.LeakyReLU(alpha=0.2),
@@ -529,7 +530,6 @@ for t_numb in range(0,20):
     time_y2 = Dense(4,
                     activation=keras.layers.LeakyReLU(alpha=0.2),
                     name="FullConnectionTime_3")(time_y2)
-
 
     # AOD + 空间
     station_y2 = Dense(4,
@@ -604,7 +604,7 @@ for t_numb in range(0,20):
                    name="ResFullConnectionResModelForLast")(res_concat)
 
     # 残差连接层
-    res_residual_connection1 = Dense(8,activation=keras.layers.LeakyReLU(alpha=0.2),
+    res_residual_connection1 = Dense(8,                   activation=keras.layers.LeakyReLU(alpha=0.2),
                                      name="ResidualConnectionLast")(res_x1)
 
     res_residual_connection2 = Dense(
@@ -685,8 +685,9 @@ for t_numb in range(0,20):
         data_aod_train
     ],
         data_pm_train,
-        epochs=200,
-        batch_size=5120)
+        epochs=2000,
+        batch_size=5120,
+        verbose=2) #validation_split=0.2,shuffle=True
 
     res = model_last.predict([data_sky_test,
                               data_t1_test,
@@ -695,9 +696,14 @@ for t_numb in range(0,20):
                               data_station_test,
                               data_aods_test,
                               data_aod_test])
-    datares = res - data_pm_test
+    # 还原，反标准化
+    res2 = [float((j * std_pm) + mean_pm) for j in res]
+    res2 = pd.DataFrame(res2, index=data_pm_test.index, columns=['PM25'])
+
+    datares = res2 - data_test2[['PM25']]  # 预测还原-真实
+    # print(datares)
     datares.PM25 = datares.PM25.map(lambda x: abs(x))
-    data_predt = pd.concat([datares, data_pm_test], axis=1)
+    data_predt = pd.concat([datares, data_test2.PM25], axis=1)  # 标准化后真值变化了 需要修改
 
     data_predt.columns = ["差值", '真']
     data_predt['差值'] = data_predt['差值'].map(lambda x: abs(x))
@@ -708,16 +714,14 @@ for t_numb in range(0,20):
     RE = np.average(data_predt['百分误'])
     MSE = np.average(data_predt['差值2'])
     # os.system('shutdown -s -f -t 60')
-    # print(np.average(data_predt['差值']))
-    # print(np.average(data_predt['百分误']))
-    # print(np.average(data_predt['差值2']))
+    print('第%s次实验, mae:' % t_numb, np.average(data_predt['差值']))
+    print('第%s次实验, re:' % t_numb, np.average(data_predt['百分误']))
+    print('第%s次实验, mse:' % t_numb, np.average(data_predt['差值2']))
 
     MSE_list.append(MSE)
     RE_list.append(RE)
     MAE_list.append(MAE)
-
-
-
+    print('=========================== %s ===========================' % t_numb)
 print('mae', np.average(MAE_list))
 print('re', np.average(RE_list))
 print('mse', np.average(MSE_list))
@@ -728,5 +732,5 @@ a.append(RE_list)
 a.append(MSE_list)
 
 a = pd.DataFrame(a)
-a.to_excel('test100_sta.xlsx')
-# os.system('shutdown -s -f -t 60')
+a.to_excel('test100_stdstation.xlsx')
+#os.system('shutdown -s -f -t 60')

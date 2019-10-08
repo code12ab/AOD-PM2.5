@@ -9,17 +9,7 @@
 
 
 # 库
-from random import choice
 import random
-from sklearn.ensemble import AdaBoostRegressor
-from keras.models import Sequential, Model
-from keras import layers, Input
-import keras
-from keras.utils import to_categorical
-from sklearn.utils import shuffle
-from sklearn.model_selection import KFold, StratifiedKFold
-import datetime  # 程序耗时
-
 import pandas as pd
 import keras
 from keras.layers import Input, Embedding, LSTM, Dense, concatenate, core, add
@@ -27,7 +17,6 @@ from keras.models import Model
 import os
 import copy
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import shuffle
 
 input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate.xlsx'
@@ -38,42 +27,45 @@ del data_all['pressure_T1']
 del data_all['pressure']
 """
 data_all = data_all.dropna()
+data_ts_df = data_all[['tm_mon', 'tm_mday',
+                       'tm_wday', 'tm_yday', 'tm_week', 'id']]
+# 虚拟变量
+for ccc in data_ts_df.columns:
+    data_ts_df[ccc] = data_ts_df[ccc].map(lambda x: str(x))
+data_get_dummies1 = pd.get_dummies(data_ts_df[['tm_mon']], drop_first=True)
+# print(data_get_dummies1.columns)
+data_get_dummies2 = pd.get_dummies(data_ts_df[['tm_mday']], drop_first=True)
+data_get_dummies3 = pd.get_dummies(data_ts_df[['id']], drop_first=True)
+data_dummies = pd.concat([data_get_dummies1,
+                          data_get_dummies2,
+                          data_get_dummies3,
+                          data_ts_df[['tm_mon']]],
+                         axis=1)
+"""
+list1 = []
+for ccc in data_dummies.columns:
+    # print(ccc)
+    if ccc != 'tm_mon':
+        list1.append(ccc)
+"""
+
+# 去掉无用列
+data_to_std = data_all.drop(
+    ['tm_mon', 'tm_mday', 'tm_wday', 'tm_yday', 'tm_week', ], axis=1)
+
+# 不标准化
+data_out = pd.concat([data_dummies, data_to_std], join='outer', axis=1)
 # 打乱
 data_all = shuffle(data_all, random_state=1027)
 
 MAE_list = []
 RE_list = []
 MSE_list = []
-for t_numb in range(0, 10):
-    data_ts_df = data_all[['tm_mon', 'tm_mday',
-                           'tm_wday', 'tm_yday', 'tm_week', 'id']]
-    # 虚拟变量
-    for ccc in data_ts_df.columns:
-        data_ts_df[ccc] = data_ts_df[ccc].map(lambda x: str(x))
-    data_get_dummies1 = pd.get_dummies(data_ts_df[['tm_mon']], drop_first=True)
-    # print(data_get_dummies1.columns)
-    data_get_dummies2 = pd.get_dummies(data_ts_df[['tm_mday']], drop_first=True)
-    data_get_dummies3 = pd.get_dummies(data_ts_df[['id']], drop_first=True)
-    data_dummies = pd.concat([data_get_dummies1,
-                              data_get_dummies2,
-                              data_get_dummies3,
-                              data_ts_df[['tm_mon']]],
-                             axis=1)
-    list1 = []
-    for ccc in data_dummies.columns:
-        # print(ccc)
-        if ccc != 'tm_mon':
-            list1.append(ccc)
+for t_numb in range(0, 20):
 
-    # 去掉无用列
-    data_to_std = data_all.drop(
-        ['tm_mon', 'tm_mday', 'tm_wday', 'tm_yday', 'tm_week', ], axis=1)
-
-    # 不标准化
-    data_out = pd.concat([data_dummies, data_to_std], join='outer', axis=1)
     # 划分
     idlist = list(range(1, 13))
-    slice1 = random.sample(idlist, 4)  # 从list中随机获取5个元素，作为一个片断返回
+    slice1 = random.sample(idlist, 3)  # 从list中随机获取5个元素，作为一个片断返回
     slice2 = []
     for idx in idlist:
         if idx not in slice1:
@@ -599,15 +591,15 @@ for t_numb in range(0, 10):
         model_allin.output])
 
     # 全连接层 1
-    res_x1 = Dense(8,
+    res_x1 = Dense(8,activation=keras.layers.LeakyReLU(alpha=0.2),
                    name="ResFullConnectionResModelForLast")(res_concat)
 
     # 残差连接层
-    res_residual_connection1 = Dense(8,
+    res_residual_connection1 = Dense(8,                   activation=keras.layers.LeakyReLU(alpha=0.2),
                                      name="ResidualConnectionLast")(res_x1)
 
     res_residual_connection2 = Dense(
-        8, name="FullConnectionLast_RC")(res_residual_connection1)
+        8, activation=keras.layers.LeakyReLU(alpha=0.2),name="FullConnectionLast_RC")(res_residual_connection1)
 
     res_residual_output = add(
         [res_x1, res_residual_connection2], name="ResidualConnectionLast_Add")
@@ -684,9 +676,9 @@ for t_numb in range(0, 10):
         data_aod_train
     ],
         data_pm_train,
-        epochs=2222,
-        batch_size=512*2,
-        verbose=0)
+        epochs=2000,
+        batch_size=5120,
+        verbose=2) #validation_split=0.2,shuffle=True
 
     res = model_last.predict([data_sky_test,
                               data_t1_test,
@@ -721,10 +713,10 @@ print('re', np.average(RE_list))
 print('mse', np.average(MSE_list))
 
 a = []
-a.append(np.average(MAE_list))
-a.append(np.average(RE_list))
-a.append(np.average(MSE_list))
+a.append(MAE_list)
+a.append(RE_list)
+a.append(MSE_list)
 
 a = pd.DataFrame(a)
 a.to_excel('test100_mon.xlsx')
-os.system('shutdown -s -f -t 60')
+# os.system('shutdown -s -f -t 60')
