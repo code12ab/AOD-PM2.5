@@ -101,6 +101,7 @@ for t_numb in range(0, 10):
         'visibility',
         'windGust',
         'windSpeed',
+        'windBearing',
         'apparentTemperature',
         'temperature',
 
@@ -119,6 +120,7 @@ for t_numb in range(0, 10):
         'visibility',
         'windGust',
         'windSpeed',
+        'windBearing',
         'apparentTemperature',
         'temperature',
 

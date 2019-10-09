@@ -24,6 +24,7 @@ import copy
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import shuffle
+starttime = datetime.datetime.now()
 
 input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate.xlsx'
 
@@ -40,6 +41,7 @@ data_ts_df = data_all[['tm_mon', 'tm_mday',
 for ccc in data_ts_df.columns:
     data_ts_df[ccc] = data_ts_df[ccc].map(lambda x: str(x))
 data_get_dummies1 = pd.get_dummies(data_ts_df[['tm_mon']], drop_first=True)
+print(data_get_dummies1.columns)
 # data_get_dummies2 = pd.get_dummies(data_ts_df[['tm_mday']], drop_first=True)
 data_get_dummies3 = pd.get_dummies(data_ts_df[['id']], drop_first=True)
 data_dummies = pd.concat([data_get_dummies1,
@@ -115,6 +117,7 @@ for t_numb in range(0, 20):
         'visibility',
         'windGust',
         'windSpeed',
+        'windBearing',
         'apparentTemperature',
         'temperature',
 
@@ -133,6 +136,7 @@ for t_numb in range(0, 20):
         'visibility',
         'windGust',
         'windSpeed',
+        'windBearing',
         'apparentTemperature',
         'temperature',
 
@@ -700,7 +704,7 @@ for t_numb in range(0, 20):
         data_aod_train
     ],
         data_pm_train,
-        epochs=2000,
+        epochs=20,
         batch_size=5120)
 
     res = model_last.predict([data_sky_test,
@@ -749,3 +753,6 @@ a.append(MSE_list)
 a = pd.DataFrame(a)
 a.to_excel('test100_sta.xlsx')
 # os.system('shutdown -s -f -t 60')
+# 计算所用时间
+endtime = datetime.datetime.now()
+print(endtime - starttime)

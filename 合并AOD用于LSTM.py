@@ -16,20 +16,25 @@ import os
 # input_path ='D:\\毕业论文程序\\污染物浓度\\整理\\PM\\2018_日期补全\\'
 # output_path ='D:\\毕业论文程序\\污染物浓度\\整理\\PM\\2018_all\\'
 
-input_path = 'D:\\毕业论文程序\\污染物浓度\\整理\\PM\\2018_日期补全\\'
+input_path = 'D:\\毕业论文程序\\污染物浓度\\插值模块\\Res\\2018_new\\'
+input_path2 = 'D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Res\\2018\\'
 output_path = 'D:\\'
 
 file_name = os.listdir(input_path)  # 获取文件名
 
+
 data_list = []
 nub = 1
 for name in file_name:
-    data = pd.read_excel(input_path+name, index_col ='日期')
-    data['id'] = str(nub)
-    data_list.append(data)
+    data = pd.read_excel(input_path+name)
+    data['id'] = int(nub)
+    data2 = pd.read_excel(input_path2+name)
+    data3 = pd.merge(data,data2, how ='left', on='日期')
+    data3 = data3.set_index('日期')
+    data_list.append(data3)
     print(name, "完成")
     nub += 1
-data_all = pd.concat(data_list,axis =0)
+data_all = pd.concat(data_list, axis=0)
 print(data_all.isnull().sum())
-data_all.PM25 =data_all.PM25.interpolate()
-# data_all.to_excel(output_path+"PM2018_all.xlsx")
+data_all.PM25 = data_all.PM25.interpolate()
+data_all.to_excel(output_path+"PM2018_all+AODS.xlsx")
