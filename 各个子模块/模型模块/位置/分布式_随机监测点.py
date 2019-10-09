@@ -54,9 +54,9 @@ for ccc in data_dummies.columns:
     if ccc != 'tm_mon':
         list1.append(ccc)
 
-# 去掉无用列
+# 去掉无用列; 去掉不需要标准化的列
 data_to_std = data_all.drop(
-    ['tm_mon', 'tm_mday', 'tm_wday', 'tm_yday', 'tm_week', ], axis=1)
+    ['tm_mon', 'tm_mday', 'tm_wday', 'tm_yday', 'tm_week', 'id'], axis=1)
 
 # 不标准化
 data_out = pd.concat([data_dummies, data_to_std], join='outer', axis=1)

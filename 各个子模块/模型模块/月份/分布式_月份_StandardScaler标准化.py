@@ -36,12 +36,13 @@ data_get_dummies1 = pd.get_dummies(data_ts_df[['tm_mon']], drop_first=True)
 data_get_dummies3 = pd.get_dummies(data_ts_df[['id']], drop_first=True)
 data_dummies = pd.concat([data_get_dummies1,
                           data_get_dummies3,
-                          data_ts_df[['tm_mon']]],
+                          data_ts_df[['tm_mon']],
+                          data_ts_df[['id']]],
                          axis=1)
 
-# 去掉不标准化列; data_all本身不含id
+# 去掉不标准化列
 data_to_std = data_all.drop(
-    ['tm_mon', 'tm_mday', 'tm_wday', 'tm_yday', 'tm_week', ], axis=1)
+    ['tm_mon', 'tm_mday', 'tm_wday', 'tm_yday', 'tm_week','id' ], axis=1)
 
 
 # 标准化
@@ -685,7 +686,7 @@ for t_numb in range(0, 10):
         data_aod_train
     ],
         data_pm_train,
-        epochs=2000,
+        epochs=200,
         batch_size=5120,
         verbose=2) #validation_split=0.2,shuffle=True
 
@@ -713,7 +714,7 @@ for t_numb in range(0, 10):
     MAE = np.average(data_predt['差值'])
     RE = np.average(data_predt['百分误'])
     MSE = np.average(data_predt['差值2'])
-    # os.system('shutdown -s -f -t 60')
+
     print('第%s次实验, mae:' % t_numb, np.average(data_predt['差值']))
     print('第%s次实验, re:' % t_numb, np.average(data_predt['百分误']))
     print('第%s次实验, mse:' % t_numb, np.average(data_predt['差值2']))
@@ -732,5 +733,5 @@ a.append(RE_list)
 a.append(MSE_list)
 
 a = pd.DataFrame(a)
-a.to_excel('test100_stdmon.xlsx')
+a.to_excel('分布式_随即月份_标准化.xlsx')
 # os.system('shutdown -s -f -t 60')
