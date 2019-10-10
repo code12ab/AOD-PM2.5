@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
+# 时间: 2019/10/10 9:28
+# -*- coding: utf-8 -*-
+# 作者: xcl
 # 时间: 2019/10/10 0:07
 
 import numpy as np
@@ -41,22 +44,22 @@ data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标�
 MAE_list = []
 RE_list = []
 MSE_list = []
-for t_numb in range(0, 15):
+for t_numb in range(0, 5):
     # 划分
-    idlist = list(range(1, 153))
-    slice1 = random.sample(idlist, 38)  # 从list中随机获取5个元素，作为一个片断返回
+    idlist = list(range(1, 13))
+    slice1 = random.sample(idlist, 3)  # 从list中随机获取5个元素，作为一个片断返回
     slice2 = []
     for idx in idlist:
         if idx not in slice1:
             idx = str(idx)
             slice2.append(idx)
     slice1 = [str(j) for j in slice1]
-    data_test2 = data_out2[data_out2['id'].isin(slice1)]
+    data_test2 = data_out2[data_out2['tm_mon'].isin(slice1)]
     # print(data_test2.PM25)  # 这才是真实值
 
     # 划分标准化后的训练集测试集, 用于训练
-    data_test = data_out[data_out['id'].isin(slice1)]
-    data_train = data_out[data_out['id'].isin(slice2)]
+    data_test = data_out[data_out['tm_mon'].isin(slice1)]
+    data_train = data_out[data_out['tm_mon'].isin(slice2)]
 
     input_list = ['AOD_0','AOD_1', 'AOD_2', 'AOD_3', 'AOD_4', 'AOD_5', 'AOD_6', 'AOD_7', 'AOD_8', 'AOD_9',
                      'AOD_10', 'AOD_11', 'AOD_12', 'AOD_13', 'AOD_14', 'AOD_15', 'AOD_16']
@@ -139,5 +142,5 @@ a.append(RE_list)
 a.append(MSE_list)
 
 a = pd.DataFrame(a)
-a.to_excel('lstm100_sta.xlsx')
+a.to_excel('lstm100_mon.xlsx')
 # os.system('shutdown -s -f -t 60')
