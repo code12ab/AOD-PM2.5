@@ -19,6 +19,7 @@
       <w>dataset</w>
       <w>dayinyear</w>
       <w>edvi</w>
+      <w>endtime</w>
       <w>idlist</w>
       <w>imputer</w>
       <w>indx</w>
@@ -44,6 +45,7 @@
       <w>softmax</w>
       <w>sprop</w>
       <w>staion</w>
+      <w>starttime</w>
       <w>stdmon</w>
       <w>timestation</w>
       <w>wday</w>

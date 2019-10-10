@@ -15,7 +15,7 @@ from sklearn.linear_model import ElasticNet
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import Lasso
-
+import datetime
 
 # 读取
 input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate线性2.xlsx'
@@ -59,10 +59,11 @@ data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标�
 # 打乱
 data_all = shuffle(data_all, random_state=1027)
 # 误差
-
 MAE_list = []
 RE_list = []
 MSE_list = []
+# 耗时
+time_list = []
 for t_numb in range(0, 100):
     # 划分
     idlist = list(range(1, 13))
@@ -170,9 +171,15 @@ for t_numb in range(0, 100):
     x_test = data_test[independent].values
     y_train = data_train[dependent].values.ravel()
     y_test = data_test[dependent].values.ravel()
+    # 计算耗时
+    starttime = datetime.datetime.now().second
+    # 程序
     enet = ElasticNet(alpha=alpha, l1_ratio=0.7)
     res = enet.fit(x_train, y_train).predict(x_test)
-
+    endtime = datetime.datetime.now().second
+    t_gap = endtime - starttime
+    print(t_gap)
+    time_list.append(t_gap)
     # 比较
     datares = res - y_test
     datares = pd.DataFrame(datares,index=data_test.index, columns = ['PM25'])
@@ -221,5 +228,7 @@ a.append(RE_list)
 a.append(MSE_list)
 
 a = pd.DataFrame(a)
-a.to_excel('弹性网络_随机月_标准化.xlsx')
+# a.to_excel('弹性网络_随机月_标准化.xlsx')
 # os.system('shutdown -s -f -t 60')
+print('平均耗时',np.average(time_list))
+print('总耗时',np.sum(time_list))

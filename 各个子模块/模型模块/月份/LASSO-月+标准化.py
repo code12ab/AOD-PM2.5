@@ -7,41 +7,40 @@
 由于过多的虚拟变量导致结果爆炸。
 这里引入了【id2】按四个省份设置了四个虚拟变量。
 误差稳定在19+ 20-
-
-调整 变量data_get_dummies3 行中的id2变为id即可还原
 """
 import random,copy
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import shuffle
-
+import datetime
 import numpy as np
 from sklearn.utils import check_random_state
 from sklearn.ensemble import AdaBoostRegressor
 import pandas as pd
-import datetime
+from sklearn.linear_model import Lasso
+
+
 # 读取
-input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate线性ID2+季度.xlsx'
+input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate线性2.xlsx'
 data_all = pd.read_excel(input_path, index_col='日期')
 # 去空
 data_all = data_all.dropna()
-data_ts_df = data_all[['tm_mon', 'tm_mon2','tm_mday',
+data_ts_df = data_all[['tm_mon', 'tm_mday',
                        'tm_wday', 'tm_yday', 'tm_week', 'id','id2']]
 # 虚拟变量
 for ccc in data_ts_df.columns:
     data_ts_df[ccc] = data_ts_df[ccc].map(lambda x: str(x))
-data_get_dummies1 = pd.get_dummies(data_ts_df[['tm_mon2']], drop_first=True)
-data_get_dummies3 = pd.get_dummies(data_ts_df[['id2']], drop_first=True)
+data_get_dummies1 = pd.get_dummies(data_ts_df[['tm_mon']], drop_first=True)
+data_get_dummies3 = pd.get_dummies(data_ts_df[['id']], drop_first=True)
 data_dummies = pd.concat([data_get_dummies1,
                           data_get_dummies3,
                           data_ts_df[['tm_mon']],
-                          data_ts_df[["tm_mon2"]],
                           data_ts_df[['id']],
                           data_ts_df[['id2']]],
                          axis=1)
 
 # 去掉不标准化列
 data_to_std = data_all.drop(
-    ['tm_mon', 'tm_mon2','tm_mday', 'tm_wday', 'tm_yday', 'tm_week','id','id2' ], axis=1)
+    ['tm_mon', 'tm_mday', 'tm_wday', 'tm_yday', 'tm_week','id','id2' ], axis=1)
 
 
 # 标准化
@@ -101,6 +100,17 @@ for t_numb in range(0, 50):
     '''
     independent = [
                    'AOD_0',
+        'tm_mon_10',
+        'tm_mon_11',
+        'tm_mon_12',
+        'tm_mon_2',
+        'tm_mon_3',
+        'tm_mon_4',
+        'tm_mon_5',
+        'tm_mon_6',
+        'tm_mon_7',
+        'tm_mon_8',
+        'tm_mon_9',
                    'AOD_0_T1',
                    'cloudCover_T1',
                    'dewPoint_T1',
@@ -148,8 +158,6 @@ for t_numb in range(0, 50):
                    'AOD_16', ]
     for clo in data_get_dummies3.columns:
         independent.append(clo)
-    for clo2 in data_get_dummies1.columns:
-        independent.append(clo2)
     # 因变量
     dependent = ["PM25"]
 
@@ -157,25 +165,23 @@ for t_numb in range(0, 50):
     data = shuffle(data_out)
 
     # 参数设置
-    mlp = LinearRegression(fit_intercept=True)
-    rng = check_random_state(1027)
+    alpha = 0.1
+    lasso = Lasso(alpha=alpha)
     # 划分
+
     x_train = data_train[independent].values
     x_test = data_test[independent].values
     y_train = data_train[dependent].values.ravel()
     y_test = data_test[dependent].values.ravel()
-
     # 计算耗时
     starttime = datetime.datetime.now().second
     # 程序
-    ensemble = AdaBoostRegressor(base_estimator=mlp, learning_rate=0.01,
-                                 loss='linear').fit(x_train, y_train)
+    res = lasso.fit(x_train, y_train).predict(x_test)
     # 耗时
     endtime = datetime.datetime.now().second
     t_gap = endtime - starttime
     time_list.append(t_gap)
-    # 预测
-    res = ensemble.predict(x_test)
+
 
     datares = res - y_test
     datares = pd.DataFrame(datares,index=data_test.index, columns = ['PM25'])
@@ -217,6 +223,8 @@ for t_numb in range(0, 50):
 print('mae', np.average(MAE_list))
 print('re', np.average(RE_list))
 print('mse', np.average(MSE_list))
+print('平均耗时',np.average(time_list))
+print('总耗时',np.sum(time_list))
 
 a = []
 a.append(MAE_list)
@@ -224,7 +232,5 @@ a.append(RE_list)
 a.append(MSE_list)
 
 a = pd.DataFrame(a)
-# a.to_excel('线性_随机月_标准化.xlsx')
+# a.to_excel('LASSO_随机月_标准化.xlsx')
 # os.system('shutdown -s -f -t 60')
-print('平均耗时',np.average(time_list))
-print('总耗时',np.sum(time_list))

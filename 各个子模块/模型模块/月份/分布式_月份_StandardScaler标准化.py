@@ -14,7 +14,7 @@ import pandas as pd
 import keras
 from keras.layers import Input, Embedding, LSTM, Dense, concatenate, core, add
 from keras.models import Model
-import os
+import os, datetime
 import copy
 import numpy as np
 from sklearn.utils import shuffle
@@ -62,7 +62,9 @@ data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标�
 
 # 打乱
 data_all = shuffle(data_all, random_state=1027)
-
+# 耗时
+time_list = []
+# 误差
 MAE_list = []
 RE_list = []
 MSE_list = []
@@ -675,7 +677,8 @@ for t_numb in range(0, 10):
     data_station_test = np.array(data_station_test)
     data_aods_test = np.array(data_aods_test)
     data_aod_test = np.array(data_aod_test)
-
+    # 计算耗时
+    starttime = datetime.datetime.now().second
     # 运行
     # 输入顺序： 气象 时滞 NDVI 时间 空间 AODs AOD
     model_last.fit([
@@ -688,10 +691,15 @@ for t_numb in range(0, 10):
         data_aod_train
     ],
         data_pm_train,
-        epochs=200,
+        epochs=20,
         batch_size=5120,
-        verbose=2) #validation_split=0.2,shuffle=True
+        verbose=0)  # validation_split=0.2,shuffle=True  verbose=2 输出一行
 
+    # 耗时
+    endtime = datetime.datetime.now().second
+    t_gap = endtime - starttime
+    time_list.append(t_gap)
+    # 预测
     res = model_last.predict([data_sky_test,
                               data_t1_test,
                               data_ndvi_test,
@@ -735,5 +743,7 @@ a.append(RE_list)
 a.append(MSE_list)
 
 a = pd.DataFrame(a)
-a.to_excel('分布式_随即月份_标准化.xlsx')
+# a.to_excel('分布式_随即月份_标准化.xlsx')
 # os.system('shutdown -s -f -t 60')
+print('平均耗时', np.average(time_list))
+print('总耗时', np.sum(time_list))

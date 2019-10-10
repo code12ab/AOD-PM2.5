@@ -59,8 +59,9 @@ data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标�
 
 # 打乱
 data_all = shuffle(data_all, random_state=1027)
+# 耗时
+time_list = []
 # 误差
-
 MAE_list = []
 RE_list = []
 MSE_list = []
@@ -369,6 +370,9 @@ for t_numb in range(0, 20):
         optimizer=keras.optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999),
         # epsilon=None, decay=0.0, amsgrad=False),
         metrics=["accuracy"])
+    # 计算耗时
+    starttime = datetime.datetime.now().second
+    # 运行
     model.fit([
         data_aod_train,
         data_sky_train,
@@ -379,8 +383,12 @@ for t_numb in range(0, 20):
         data_aods_train
     ],
         data_pm_train,
-        epochs=200,
+        epochs=20,
         batch_size=5120)
+    # 耗时
+    endtime = datetime.datetime.now().second
+    t_gap = endtime - starttime
+    time_list.append(t_gap)
 
     res = model.predict([data_aod_test,
                          data_sky_test,
@@ -438,3 +446,5 @@ a = pd.DataFrame(a)
 a.to_excel('多输入_随机月份_标准化.xlsx')
 # os.system('shutdown -s -f -t 60')
 
+print('平均耗时', np.average(time_list))
+print('总耗时', np.sum(time_list))

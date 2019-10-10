@@ -41,7 +41,7 @@ data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标�
 MAE_list = []
 RE_list = []
 MSE_list = []
-for t_numb in range(0, 15):
+for t_numb in range(0, 10):
     # 划分
     idlist = list(range(1, 153))
     slice1 = random.sample(idlist, 38)  # 从list中随机获取5个元素，作为一个片断返回
