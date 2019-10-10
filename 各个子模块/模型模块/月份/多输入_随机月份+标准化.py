@@ -65,7 +65,7 @@ time_list = []
 MAE_list = []
 RE_list = []
 MSE_list = []
-for t_numb in range(0, 20):
+for t_numb in range(0, 10):
     # 划分
     idlist = list(range(1, 13))
     slice1 = random.sample(idlist, 3)  # 从list中随机获取5个元素，作为一个片断返回

@@ -41,7 +41,7 @@ data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标�
 MAE_list = []
 RE_list = []
 MSE_list = []
-for t_numb in range(0, 10):
+for t_numb in range(0, 5):
     # 划分
     idlist = list(range(1, 153))
     slice1 = random.sample(idlist, 38)  # 从list中随机获取5个元素，作为一个片断返回
@@ -78,7 +78,7 @@ for t_numb in range(0, 10):
     y_test2 = data_test2[['PM25']].values.reshape(38,365) # pm+id ==2 # 不要（，，1）
 
 
-    batch_size =152
+
     timesteps = 365
     data_dim = len(input_list)
 
@@ -98,10 +98,8 @@ for t_numb in range(0, 10):
                   optimizer=keras.optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999),
                   metrics=['accuracy'])
 
-
-
     model.fit(x_train, y_train,
-              batch_size=152, epochs=20,verbose=2)
+              batch_size=114, epochs=20,verbose=2) # 114 114个实验站
     res=model.predict(x_test)
 
 

@@ -693,7 +693,7 @@ for t_numb in range(0, 10):
         data_pm_train,
         epochs=20,
         batch_size=5120,
-        verbose=0)  # validation_split=0.2,shuffle=True  verbose=2 输出一行
+        verbose=2)  # validation_split=0.2,shuffle=True  verbose=2 输出一行
 
     # 耗时
     endtime = datetime.datetime.now().second

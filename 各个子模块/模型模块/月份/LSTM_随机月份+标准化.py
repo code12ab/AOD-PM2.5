@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
-# 时间: 2019/10/10 9:28
-# -*- coding: utf-8 -*-
-# 作者: xcl
 # 时间: 2019/10/10 0:07
 
 import numpy as np
@@ -12,7 +9,7 @@ import keras
 from keras.layers import Dense, core
 from keras.layers import LSTM
 import pandas as pd
-import os, copy, random
+import os, copy, random, datetime
 from keras.models import Sequential, load_model
 # 读取
 df1 = pd.read_excel('d:\\PM2018_all+AODS.xlsx',index_col='日期')
@@ -40,11 +37,13 @@ for col in data_std:
 data_out = pd.concat([data_dummies, data_std], join='outer', axis=1)
 # 标准化前的数据矩阵
 data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标准化前的真实值
-
+# 误差
 MAE_list = []
 RE_list = []
 MSE_list = []
-for t_numb in range(0, 5):
+# 耗时
+time_list = []
+for t_numb in range(0, 10):
     # 划分
     idlist = list(range(1, 13))
     slice1 = random.sample(idlist, 3)  # 从list中随机获取5个元素，作为一个片断返回
@@ -58,31 +57,28 @@ for t_numb in range(0, 5):
     # print(data_test2.PM25)  # 这才是真实值
 
     # 划分标准化后的训练集测试集, 用于训练
-    data_test = data_out[data_out['tm_mon'].isin(slice1)]
-    data_train = data_out[data_out['tm_mon'].isin(slice2)]
+    data_test = data_out[data_out['tm_mon'].isin(slice1)]  # 3
+    data_train = data_out[data_out['tm_mon'].isin(slice2)]  # 9
 
-    input_list = ['AOD_0','AOD_1', 'AOD_2', 'AOD_3', 'AOD_4', 'AOD_5', 'AOD_6', 'AOD_7', 'AOD_8', 'AOD_9',
-                     'AOD_10', 'AOD_11', 'AOD_12', 'AOD_13', 'AOD_14', 'AOD_15', 'AOD_16']
+    input_list = ['AOD_0', 'AOD_1', 'AOD_2', 'AOD_3', 'AOD_4', 'AOD_5', 'AOD_6', 'AOD_7', 'AOD_8', 'AOD_9',
+                  'AOD_10', 'AOD_11', 'AOD_12', 'AOD_13', 'AOD_14', 'AOD_15', 'AOD_16']
     for c1 in data_get_dummies1.columns:
         input_list.append(c1)
     for c3 in data_get_dummies3.columns:
         input_list.append(c3)
 
     # 生成虚拟训练数据
-    x_test = data_test[input_list].values.reshape(38,365,len(input_list)) # pm+id ==2
-    x_train = data_train[input_list].values.reshape(114,365,len(input_list)) # pm+id ==2
-
+    x_test = data_test[input_list].values.reshape(int(len(data_test.index) / 152), 152, len(input_list))  # pm+id ==2
+    x_train = data_train[input_list].values.reshape(int(len(data_train.index) / 152), 152, len(input_list))  # pm+id ==2
 
     # 生成虚拟验证数据
-    y_test = data_test[['PM25']].values.reshape(38,365) # pm+id ==2 # 不要（，，1）
-    y_train = data_train[['PM25']].values.reshape(114,365) # pm+id ==2
+    y_test = data_test[['PM25']].values.reshape(int(len(data_test.index) / 152), 152)  # pm+id ==2 # 不要（，，1）
+    y_train = data_train[['PM25']].values.reshape(int(len(data_train.index) / 152), 152)  # pm+id ==2
 
     # 真实数据
-    y_test2 = data_test2[['PM25']].values.reshape(38,365) # pm+id ==2 # 不要（，，1）
+    y_test2 = data_test2[['PM25']].values.reshape(int(len(data_test.index) / 152), 152)  # pm+id ==2 # 不要（，，1）
 
-
-    batch_size =152
-    timesteps = 365
+    timesteps = 152  # 这里换成监测站
     data_dim = len(input_list)
 
     # 期望输入数据尺寸: (batch_size, timesteps, data_dim)
@@ -94,33 +90,40 @@ for t_numb in range(0, 5):
 
     model.add(LSTM(32, return_sequences=True))  # 返回维度为 32 的向量序列
     model.add(core.Dropout(rate=0.01))
-    model.add(LSTM(32,))  # 返回维度为 32 的单个向量
-    model.add(Dense(365, activation=keras.layers.LeakyReLU(alpha=0.2),kernel_regularizer=keras.regularizers.l2(0.01)))
+    model.add(LSTM(32, ))  # 返回维度为 32 的单个向量
+    model.add(Dense(152, activation=keras.layers.LeakyReLU(alpha=0.2), kernel_regularizer=keras.regularizers.l2(0.01)))
 
     model.compile(loss=['mean_absolute_error'],
                   optimizer=keras.optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999),
                   metrics=['accuracy'])
-
-
+    # 计算耗时
+    starttime = datetime.datetime.now().second
+    # 程序
 
     model.fit(x_train, y_train,
-              batch_size=152, epochs=20,verbose=2)
-    res=model.predict(x_test)
+              batch_size=int(len(data_train.index) / 152), epochs=20, verbose=2)  # 114 114个实验站
 
+    # 耗时
+    endtime = datetime.datetime.now().second
+    t_gap = endtime - starttime
+    time_list.append(t_gap)
+    res = model.predict(x_test)
+
+    print(t_gap)
 
     list1 = []
-    list2 =[]
-    list3 =[]
+    list2 = []
+    list3 = []
 
-    for j in range(0,38):
-        for i in range(0,365):
+    for j in range(0, int(len(data_test.index) / 152)):
+        for i in range(0, 152):
             # print(i)
-            a = res[j][i]*std_pm+mean_pm-y_test2[j][i]
+            a = res[j][i] * std_pm + mean_pm - y_test2[j][i]
             a = abs(a)
             list1.append(a)
-            b = a/abs(y_test2[j][i])
+            b = a / abs(y_test2[j][i])
             list2.append(b)
-            c = a**2
+            c = a ** 2
             list3.append(c)
 
     MAE = np.average(list1)
@@ -144,3 +147,5 @@ a.append(MSE_list)
 a = pd.DataFrame(a)
 a.to_excel('lstm100_mon.xlsx')
 # os.system('shutdown -s -f -t 60')
+print('平均耗时',np.average(time_list))
+print('总耗时',np.sum(time_list))
