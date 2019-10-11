@@ -25,7 +25,7 @@ del data_all['pressure']
 """
 data_all = data_all.dropna()
 # 打乱
-data_all = shuffle(data_all, random_state=1027)
+# data_all = shuffle(data_all, random_state=1027)
 
 data_ts_df = data_all[['tm_mon', 'tm_mday',
                        'tm_wday', 'tm_yday', 'tm_week', 'id']]

@@ -58,7 +58,7 @@ data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标�
 
 
 # 打乱
-data_all = shuffle(data_all, random_state=1027)
+# data_all = shuffle(data_all, random_state=1027)
 # 耗时
 time_list = []
 # 误差

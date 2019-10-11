@@ -59,7 +59,7 @@ data_out2 = pd.concat([data_dummies, data_to_std],
 
 
 # 打乱
-data_all = shuffle(data_all, random_state=1027)
+# data_all = shuffle(data_all, random_state=1027)
 # 误差
 
 MAE_list = []

@@ -14,12 +14,12 @@ list2 = []
 list3 = []
 
 for i in range(0,100):
-    a = random.uniform(22, 30)
-    b = random.uniform(0.6, 0.99)
-    c = random.uniform(32, 37)
+    a = random.uniform(25, 32)
+    b = random.uniform(0.65, 0.99)
+
     list1.append(a)
     list2.append(b)
-    list3.append(c*c)
+    list3.append(a*a)
 
 list4 = []
 list4.append(list1)
@@ -27,4 +27,4 @@ list4.append(list2)
 list4.append(list3)
 
 df = pd.DataFrame(list4)
-df.to_excel('gtwr.xlsx')
+df.to_excel('test.xlsx')

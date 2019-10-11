@@ -78,7 +78,7 @@ data_out = pd.concat([data_dummies, data_std], join='outer', axis=1)
 data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标准化前的真实值
 
 # 打乱
-data_all = shuffle(data_all, random_state=1027)
+# data_all = shuffle(data_all, random_state=1027)
 
 MAE_list = []
 RE_list = []

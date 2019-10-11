@@ -61,7 +61,7 @@ data_to_std = data_all.drop(
 # 不标准化
 data_out = pd.concat([data_dummies, data_to_std], join='outer', axis=1)
 # 打乱
-data_all = shuffle(data_all, random_state=1027)
+# data_all = shuffle(data_all, random_state=1027)
 
 MAE_list = []
 RE_list = []
