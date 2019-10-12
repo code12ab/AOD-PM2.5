@@ -62,32 +62,40 @@ data_to_std = data_all.drop(
 
 
 # 标准化
+"""
 data_std = copy.deepcopy(data_to_std)
-mean_pm = data_std['PM25'].mean()
-std_pm = data_std['PM25'].std()
-
-print(mean_pm)
-print(std_pm)
-
-# 49.65522239999188
-# 39.39446197985595
+#mean_pm = data_std['PM25'].mean()# 49.65522239999188
+#std_pm = data_std['PM25'].std()# 39.39446197985595
+#print(mean_pm)
+#print(std_pm)
+max_pm = data_std['PM25'].max()#388
+min_pm = data_std['PM25'].min()#1
+print(max_pm)
+print(min_pm)
 
 for col in data_std:
-    mean = data_std[col].mean()
-    std = data_std[col].std()
-    data_std[col] = data_std[col].map(lambda x:(x-mean)/std)
+    #mean = data_std[col].mean()
+    max = data_std[col].max()
+    #std = data_std[col].std()
+    min = data_std[col].min()
+    data_std[col] = data_std[col].map(lambda x:(x-min)/(max-min))
 
-# 标准化后的数据矩阵
-data_out = pd.concat([data_dummies, data_std], join='outer', axis=1)
+"""
 # 标准化前的数据矩阵
 data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标准化前的真实值
+
+# 标准化后的数据矩阵
+#data_out = pd.concat([data_dummies, data_std], join='outer', axis=1)
 # 更改格式
+"""
 data_out['tm_mon'] = data_out['tm_mon'].map(lambda x: float(x))
 data_out['经度'] = data_out['经度'].map(lambda x: float(x))
 data_out['纬度'] = data_out['纬度'].map(lambda x: float(x))
+"""
 data_out2['tm_mon'] = data_out2['tm_mon'].map(lambda x: float(x))
 data_out2['经度'] = data_out2['经度'].map(lambda x: float(x))
 data_out2['纬度'] = data_out2['纬度'].map(lambda x: float(x))
+
 # 划分
 idlist = list(range(1, 153))
 slice1 = random.sample(idlist, 38)  # 从list中随机获取5个元素，作为一个片断返回
@@ -97,15 +105,17 @@ for idx in idlist:
         idx = str(idx)
         slice2.append(idx)
 slice1 = [str(j) for j in slice1]
-
+"""
 data_test2 = data_out2[data_out2['id'].isin(slice1)]
+"""
 # print(data_test2.PM25)  # 这才是真实值
 
 # 划分标准化后的训练集测试集, 用于训练
-data_test = data_out[data_out['id'].isin(slice1)]
-data_train = data_out[data_out['id'].isin(slice2)]
-
-data_test.to_excel('D:\\data_test\\data_true.xlsx')
+data_test = data_out2[data_out2['id'].isin(slice1)]
+data_train = data_out2[data_out2['id'].isin(slice2)]
+"""
+data_test2.to_excel('D:\\data_test\\data_true.xlsx')
+"""
 # print(data_test2.PM25)  # 这才是真实值
 
 # 划分标准化后的训练集测试集, 用于训练
