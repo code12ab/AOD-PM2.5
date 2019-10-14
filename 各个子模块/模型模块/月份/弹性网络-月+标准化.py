@@ -172,14 +172,14 @@ for t_numb in range(0, 100):
     y_train = data_train[dependent].values.ravel()
     y_test = data_test[dependent].values.ravel()
     # 计算耗时
-    starttime = datetime.datetime.now().second
+    starttime = datetime.datetime.now()
     # 程序
     enet = ElasticNet(alpha=alpha, l1_ratio=0.7)
     res = enet.fit(x_train, y_train).predict(x_test)
-    endtime = datetime.datetime.now().second
+    endtime = datetime.datetime.now()
     t_gap = endtime - starttime
     print(t_gap)
-    time_list.append(t_gap)
+    time_list.append(t_gap.seconds)
     # 比较
     datares = res - y_test
     datares = pd.DataFrame(datares,index=data_test.index, columns = ['PM25'])

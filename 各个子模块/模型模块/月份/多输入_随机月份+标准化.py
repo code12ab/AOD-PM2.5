@@ -371,7 +371,7 @@ for t_numb in range(0, 10):
         # epsilon=None, decay=0.0, amsgrad=False),
         metrics=["accuracy"])
     # 计算耗时
-    starttime = datetime.datetime.now().second
+    starttime = datetime.datetime.now()
     # 运行
     model.fit([
         data_aod_train,
@@ -386,9 +386,9 @@ for t_numb in range(0, 10):
         epochs=20,
         batch_size=5120)
     # 耗时
-    endtime = datetime.datetime.now().second
+    endtime = datetime.datetime.now()
     t_gap = endtime - starttime
-    time_list.append(t_gap)
+    time_list.append(t_gap.seconds)
 
     res = model.predict([data_aod_test,
                          data_sky_test,

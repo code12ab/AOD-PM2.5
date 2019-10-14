@@ -678,7 +678,7 @@ for t_numb in range(0, 10):
     data_aods_test = np.array(data_aods_test)
     data_aod_test = np.array(data_aod_test)
     # 计算耗时
-    starttime = datetime.datetime.now().second
+    starttime = datetime.datetime.now()
     # 运行
     # 输入顺序： 气象 时滞 NDVI 时间 空间 AODs AOD
     model_last.fit([
@@ -696,9 +696,9 @@ for t_numb in range(0, 10):
         verbose=2)  # validation_split=0.2,shuffle=True  verbose=2 输出一行
 
     # 耗时
-    endtime = datetime.datetime.now().second
+    endtime = datetime.datetime.now()
     t_gap = endtime - starttime
-    time_list.append(t_gap)
+    time_list.append(t_gap.seconds)
     # 预测
     res = model_last.predict([data_sky_test,
                               data_t1_test,

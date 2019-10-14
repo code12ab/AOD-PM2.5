@@ -97,16 +97,16 @@ for t_numb in range(0, 10):
                   optimizer=keras.optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999),
                   metrics=['accuracy'])
     # 计算耗时
-    starttime = datetime.datetime.now().second
+    starttime = datetime.datetime.now()
     # 程序
 
     model.fit(x_train, y_train,
               batch_size=int(len(data_train.index) / 152), epochs=20, verbose=2)  # 114 114个实验站
 
     # 耗时
-    endtime = datetime.datetime.now().second
+    endtime = datetime.datetime.now()
     t_gap = endtime - starttime
-    time_list.append(t_gap)
+    time_list.append(t_gap.seconds)
     res = model.predict(x_test)
 
     print(t_gap)

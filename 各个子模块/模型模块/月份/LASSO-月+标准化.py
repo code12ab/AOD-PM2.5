@@ -174,13 +174,13 @@ for t_numb in range(0, 50):
     y_train = data_train[dependent].values.ravel()
     y_test = data_test[dependent].values.ravel()
     # 计算耗时
-    starttime = datetime.datetime.now().second
+    starttime = datetime.datetime.now()
     # 程序
     res = lasso.fit(x_train, y_train).predict(x_test)
     # 耗时
-    endtime = datetime.datetime.now().second
+    endtime = datetime.datetime.now()
     t_gap = endtime - starttime
-    time_list.append(t_gap)
+    time_list.append(t_gap.seconds)
 
 
     datares = res - y_test

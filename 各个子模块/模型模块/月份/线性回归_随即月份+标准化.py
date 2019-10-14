@@ -166,14 +166,14 @@ for t_numb in range(0, 50):
     y_test = data_test[dependent].values.ravel()
 
     # 计算耗时
-    starttime = datetime.datetime.now().second
+    starttime = datetime.datetime.now()
     # 程序
     ensemble = AdaBoostRegressor(base_estimator=mlp, learning_rate=0.01,
                                  loss='linear').fit(x_train, y_train)
     # 耗时
-    endtime = datetime.datetime.now().second
+    endtime = datetime.datetime.now()
     t_gap = endtime - starttime
-    time_list.append(t_gap)
+    time_list.append(t_gap.seconds)
     # 预测
     res = ensemble.predict(x_test)
 
