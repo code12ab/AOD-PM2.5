@@ -43,13 +43,14 @@ for col in data_std:
 data_out = pd.concat([data_dummies, data_std], join='outer', axis=1)
 # 标准化前的数据矩阵
 data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标准化前的真实值
-
+# 格式
+data_out['tm_mon'] = data_out['tm_mon'].map(lambda x: int(x))
 # 耗时
 time_list = []
 
 
 # 整体选择一个最优带宽
-    # AOD
+# AOD
 aod0 = np.array(data_out.AOD_0).reshape((-1, 1))
 # AODs
 aod1 = np.array(data_out.AOD_1).reshape((-1, 1))
@@ -104,11 +105,24 @@ ndvi = np.array(data_out.NDVI_0).reshape((-1, 1))
 mon = np.array(data_out.tm_mon).reshape((-1, 1))
 # 设置
 coords = list(zip(data_out['经度'], data_out['纬度']))
-x = np.hstack([aod0, ndvi, aod0_T1])
+# x = np.hstack([aod0, ndvi, aod0_T1])
+x = np.hstack(
+    [aod0, aod1, aod2, aod3, aod4, aod5, aod6, aod7, aod8,
+     aod9,
+     aod10, aod11, aod12, aod13, aod14, aod15, aod16,
+     cloudCover, dewPoint, humidity, sunTime, tempMM, tempHL, atempMM,
+     atempHL, visibility,
+     windGust, windSpeed, windBearing, apparentTemperature, temperature, pressure,
+     precipIntensity, precipAccumulation,
+     aod0_T1, cloudCover_T1, dewPoint_T1, humidity_T1, sunTime_T1, visibility_T1,
+     windSpeed_T1,
+     temperature_T1, pressure_T1, precipIntensity_T1, precipAccumulation_T1,
+     ndvi, mon])
 y = np.array(data_out.PM25).reshape((-1, 1))
 
 # bw
 bw = Sel_BW(coords, y, x).search(criterion='AICc')
+# bw = 1096
 # ==================================================================================
 
 for method in ['tm_mon', 'id']:
@@ -116,7 +130,7 @@ for method in ['tm_mon', 'id']:
     MAE_list = []
     RE_list = []
     MSE_list = []
-    for t_numb in range(0, 5):
+    for t_numb in range(0, 35):
         # 划分
         if method == "tm_mon":
             idlist = list(range(1, 13))
@@ -137,8 +151,7 @@ for method in ['tm_mon', 'id']:
                     slice2.append(idx)
             slice1 = [str(j) for j in slice1]
 
-        # 格式
-        data_out['tm_mon'] = data_out['tm_mon'].map(lambda x: int(x))
+
         # 划分不标准化下的训练集测试集, 用于检验
         data_test2 = data_out2[data_out2["%s" % method].isin(slice1)]
         # print(data_test2.PM25)  # 这才是真实值
@@ -265,16 +278,17 @@ for method in ['tm_mon', 'id']:
     
     
         # 训练
+        """
+    
         x_train = np.hstack([aod0_train,
                              ndvi_train,  aod0_T1_train])
-        """
         x_train = np.hstack([aod0_train, cloudCover_train, humidity_train,
                              windSpeed_train, windBearing_train,
                              temperature_train, pressure_train,
                              ndvi_train,  aod0_T1_train])
+
         """
-        """
-    
+
         x_train = np.hstack([aod0_train,aod1_train,aod2_train,aod3_train,aod4_train, aod5_train, aod6_train, aod7_train, aod8_train, aod9_train,
                              aod10_train, aod11_train, aod12_train, aod13_train, aod14_train, aod15_train, aod16_train,
                              cloudCover_train, dewPoint_train, humidity_train, sunTime_train, tempMM_train, tempHL_train, atempMM_train, atempHL_train, visibility_train,
@@ -282,17 +296,15 @@ for method in ['tm_mon', 'id']:
                              aod0_T1_train, cloudCover_T1_train, dewPoint_T1_train, humidity_T1_train, sunTime_T1_train, visibility_T1_train, windSpeed_T1_train,
                              temperature_T1_train, pressure_T1_train, precipIntensity_T1_train, precipAccumulation_T1_train,
                              ndvi_train, mon_train])
-        """
         # 验证
+        """
         x_test = np.hstack([aod0_test,
                             ndvi_test,  aod0_T1_test])
-        """
+
         x_test = np.hstack([aod0_test, cloudCover_test, humidity_test,
                             windSpeed_test, windBearing_test,
                             temperature_test, pressure_test,
                             ndvi_test,  aod0_T1_test])
-        
-        """
         """
         x_test = np.hstack([aod0_test,aod1_test,aod2_test,aod3_test,aod4_test, aod5_test, aod6_test, aod7_test, aod8_test, aod9_test,
                             aod10_test, aod11_test, aod12_test, aod13_test, aod14_test, aod15_test, aod16_test,
@@ -301,9 +313,7 @@ for method in ['tm_mon', 'id']:
                             aod0_T1_test, cloudCover_T1_test, dewPoint_T1_test, humidity_T1_test, sunTime_T1_test, visibility_T1_test, windSpeed_T1_test,
                             temperature_T1_test, pressure_T1_test, precipIntensity_T1_test, precipAccumulation_T1_test,
                             ndvi_test, mon_test])
-        """
-    
-    
+
         # 训练
         y_train = np.array(data_train.PM25).reshape((-1, 1))
         # 验证
@@ -363,11 +373,6 @@ for method in ['tm_mon', 'id']:
 print('平均耗时', np.average(time_list))
 print('总耗时', np.sum(time_list))
 
+print(bw)
+# os.system('shutdown -s -f -t 60')
 
-os.system('shutdown -s -f -t 60')
-
-bw_e = pd.DataFrame(bw)
-bw.to_excel('bw.xlsx')
-tt_e = np.average(time_list)
-tt_ee = pd.DataFrame(tt_e)
-tt_ee.to_excel('tt_ee.xlsx')
