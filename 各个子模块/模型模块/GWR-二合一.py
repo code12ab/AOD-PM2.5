@@ -121,8 +121,8 @@ x = np.hstack(
 y = np.array(data_out.PM25).reshape((-1, 1))
 
 # bw
-bw = Sel_BW(coords, y, x).search(criterion='AICc')
-# bw = 1096
+# bw = Sel_BW(coords, y, x).search(criterion='AICc')
+bw = 1096
 # ==================================================================================
 
 for method in ['tm_mon', 'id']:
@@ -130,7 +130,7 @@ for method in ['tm_mon', 'id']:
     MAE_list = []
     RE_list = []
     MSE_list = []
-    for t_numb in range(0, 35):
+    for t_numb in range(0, 1):  # 实验次数
         # 划分
         if method == "tm_mon":
             idlist = list(range(1, 13))
@@ -150,7 +150,6 @@ for method in ['tm_mon', 'id']:
                     idx = str(idx)
                     slice2.append(idx)
             slice1 = [str(j) for j in slice1]
-
 
         # 划分不标准化下的训练集测试集, 用于检验
         data_test2 = data_out2[data_out2["%s" % method].isin(slice1)]

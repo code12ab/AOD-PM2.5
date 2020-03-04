@@ -17,11 +17,12 @@ from fancyimpute import IterativeImputer  # 方法创建新的数据框,不覆�
 import os
 
 # 路径
-input_file_path_darksky_weather = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018_不补全\\"
-merge_output_file_path = "D:\\毕业论文程序\\气象数据\\插值模块\\Merge\\2018_不补全\\"
+input_file_path_darksky_weather = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2008\\"
+merge_output_file_path = "D:\\毕业论文程序\\气象数据\\插值模块\\Merge\\2008\\"
+# 原先为2018_不补全
 JCZ_info = pd.read_excel(
     "D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx",
-    sheet_name="汇总")  # 152个
+    sheet_name="北京")  # 152个
 JCZ_info["监测站"] = JCZ_info["城市"] + "-" + JCZ_info["监测点名称"]
 # 已经输出
 saved_list = os.listdir(merge_output_file_path)
@@ -242,13 +243,13 @@ def get4method(xx152):
 if __name__ == '__main__':
     print('=====主进程=====')
 
-    p1 = Process(target=get4method, args=("样例1",))
+    p1 = Process(target=get4method, args=("北京1",))
 
-    p2 = Process(target=get4method, args=('样例2',))
-    p3 = Process(target=get4method, args=('样例3',))    # 样例3ok
-    p4 = Process(target=get4method, args=('样例4',))
-    p5 = Process(target=get4method, args=('样例5',))  # 样例5ok
-    p6 = Process(target=get4method, args=('样例6',))  # yangli6ok
+    p2 = Process(target=get4method, args=('北京2',))
+    p3 = Process(target=get4method, args=('北京3',))    # 样例3ok
+    p4 = Process(target=get4method, args=('北京4',))
+    p5 = Process(target=get4method, args=('北京5',))  # 样例5ok
+    p6 = Process(target=get4method, args=('北京6',))  # yangli6ok
 
     p1.start()
     p2.start()

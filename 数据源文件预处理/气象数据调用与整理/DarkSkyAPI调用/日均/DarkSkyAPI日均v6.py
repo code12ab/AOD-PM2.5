@@ -72,7 +72,7 @@ print("监测站个数:", len(JCZ_file), "\n",
       "天数:", len(time_list), "\n",
       "即" + str(time_list[0]) + "至" + str(time_list[-1]))
 
-time.sleep(10)
+time.sleep(18)
 # 主程序
 global t
 

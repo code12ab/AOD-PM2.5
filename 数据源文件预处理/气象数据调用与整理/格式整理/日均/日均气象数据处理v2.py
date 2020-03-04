@@ -10,7 +10,7 @@ import os
 
 # 批量读取
 
-for year_tag in [2018]:
+for year_tag in [2008,2009,2010,2011,2012,2013,2014,2015,2016,2017]:
     print(year_tag)
     input_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % year_tag
     output_path = "D:\\毕业论文程序\\气象数据\\整理\\日均\\%s\\" % year_tag

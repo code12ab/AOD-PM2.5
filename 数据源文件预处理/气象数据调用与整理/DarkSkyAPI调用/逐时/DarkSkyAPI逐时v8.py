@@ -16,7 +16,7 @@ pd.set_option('display.max_rows', None)  # 设置显示最大行
 pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显示所有列
 
 # 参数设置
-save_year = 2017
+save_year = 2008
 date_start = int(str(save_year) + "000")
 
 if save_year % 4 == 0:
@@ -24,7 +24,8 @@ if save_year % 4 == 0:
 else:
     year_days = 365
 
-start_count = -1  # 刘家园超出次数，没完成
+
+start_count = -1
 
 API_KEY_LIST = [
     "2ab378a4b9a0daee27f74037217b2632",
@@ -172,4 +173,4 @@ for jcz in JCZ:
 
 # 自动关机
 print("程序已完成," + str(60) + '秒后将会关机')
-# os.system('shutdown -s -f -t 60')
+os.system('shutdown -s -f -t 60')
