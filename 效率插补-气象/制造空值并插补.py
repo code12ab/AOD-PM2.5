@@ -17,9 +17,11 @@ from fancyimpute import KNN, IterativeImputer  # 方法创建新的数据框,不
 import os
 
 # 路径
-year = 2017
+year = 2018
 input_file_path_darksky_weather = "D:\\毕业论文程序\\气象数据\\筛除字符串\\%s\\" % year
-merge_output_file_path = "D:\\毕业论文程序\\气象数据\\插值模块\\Merge\\%s\\" % year
+merge_output_file_path = "D:\\毕业论文程序\\气象数据\\插值模块\\Merge\\%s插补效率\\" % year
+null_output_path = "D:\\毕业论文程序\\气象数据\\插值模块\\制造的缺失值\\"  # 2018
+
 """
 # 原先
 input_file_path_darksky_weather = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018_不补全\\"
@@ -127,6 +129,7 @@ def get4method(xx152):
         sheet_name=xx152)
     jcz_152["监测站名称_152"] = jcz_152["城市"] + "-" + jcz_152["监测点名称"]
     error_list = []
+    import random
     for input_file_name in jcz_152["监测站名称_152"]:
         input_file_name = input_file_name + ".xlsx"
         # if input_file_name in saved_list:
@@ -138,6 +141,36 @@ def get4method(xx152):
             data_darksky_weather = pd.read_excel(
                 input_file_path_darksky_weather + input_file_name)
             data_darksky_weather = data_darksky_weather.set_index('日期')
+
+            # 处理AQUA，制造 缺失值
+            saveA = list()
+            for columname in data_darksky_weather.columns:
+                if columname != "日期":
+                    if columname != "监测站":
+                        # loc 是某列为空的行坐标
+                        loc = data_darksky_weather[columname][data_darksky_weather[columname].isnull().values == False].index.tolist()
+                        # 筛选个数
+                        c1 = int(len(loc) * 0.25)
+                        # 筛选出样本
+                        slice1 = random.sample(loc, c1)
+                        # print(data_darksky_weather[columname][0])
+                        # print(slice1)
+                        # 保存 变空之前 的 变量位置和数值
+                        exec('save_a_%s = list()' % columname)
+                        for nub in slice1:
+                            # print(data_darksky_weather[columname][nub])
+                            # print((columname, nub, data_darksky_weather[columname][nub]))
+                            exec('save_a_%s.append((columname, nub, data_darksky_weather[columname][nub]))' % columname)
+                            # exec("JCZ.append(JCZ%s)" % i)
+                            # 下一行，修改成缺失值
+                            data_darksky_weather[columname][nub] = np.nan
+                            # print(data_darksky_weather[columname][nub])
+                        exec('saveA.append(save_a_%s)' % columname)
+
+            # 保存编号
+            sA = pd.DataFrame(saveA)
+            sA.to_excel(null_output_path + "%s" % input_file_name)
+
             # 时间局部：最近邻KNN,是使用K行都具有全部特征的样本,使用其他特征的均方差进行加权,判断最接近的时间点.
             data_darksky_weather_KNN = KNN(
                 k=7).fit_transform(data_darksky_weather)
@@ -326,4 +359,5 @@ if __name__ == '__main__':
     # 自动关机
     print("程序已完成," + str(60) + '秒后将会关机')
     print('关机')
-    os.system('shutdown -s -f -t 660')
+    #os.system('shutdown -s -f -t 660')
+

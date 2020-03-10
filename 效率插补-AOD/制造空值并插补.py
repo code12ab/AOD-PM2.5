@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
-# 时间: 2019/8/7 11:10
+# 时间: 2020/3/10 11:10
 
 
 # 库
 import pandas as pd
+
 import numpy as np
 from fancyimpute import KNN, IterativeImputer
 import os
 # 路径
-input_file_path_Aqua = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\2008\\"
-input_file_path_Terra = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra\\2008\\"
-merge_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Merge\\2008\\"
-mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2008\\"
+input_file_path_Aqua = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua插补效率\\2018\\"
+input_file_path_Terra = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra插补效率\\2018\\"
+merge_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Merge\\"
+mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2018插补效率\\"
+# res_output_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Res\\2018插补效率\\"  # 2018
+null_output_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\制造的缺失值\\"
 xytodis = pd.read_excel("D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\xytodis.xlsx")  # 17个区域的投影坐标
 input_file_names = os.listdir(input_file_path_Aqua)  # 文件名列表
 saved_list = os.listdir(mean_output_file_path)
-
 
 # 空间局部公式: 不存在插值为1*nan=nan的插值结果;只存在nan*nan=nan -> 因为使用的插值数据已经筛选为'>0'的部分.
 def get_IDW(input_data):
@@ -65,10 +67,9 @@ def get_IDW(input_data):
     return data_last
 
 
+import random
+
 for input_file_name in input_file_names:
-    if input_file_name in saved_list:
-        print("已经完成%s" % input_file_name)
-        continue
     print("========正在计算%s========" % input_file_name)
     # 读取
     data_Aqua = pd.read_excel(input_file_path_Aqua + input_file_name)
@@ -78,6 +79,61 @@ for input_file_name in input_file_names:
     del data_Aqua["监测站"]
     data_Aqua = data_Aqua.set_index('日期')
     data_Terra = data_Terra.set_index('日期')
+
+    # 处理AQUA，制造 缺失值
+    saveA = list()
+    for columname in data_Aqua.columns:
+        if columname != "日期":
+            if columname != "监测站":
+                # loc 是某列为空的行坐标
+                loc = data_Aqua[columname][data_Aqua[columname].isnull().values == False].index.tolist()
+                # 筛选个数
+                c1 = int(len(loc) * 0.25)
+                # 筛选出样本
+                slice1 = random.sample(loc, c1)
+                # print(data_Aqua[columname][0])
+                # print(slice1)
+                # 保存 变空之前 的 变量位置和数值
+                exec('save_a_%s = list()' % columname)
+                for nub in slice1:
+                    # print(data_Aqua[columname][nub])
+                    # print((columname, nub, data_Aqua[columname][nub]))
+                    exec('save_a_%s.append((columname, nub, data_Aqua[columname][nub]))' % columname)
+                    # exec("JCZ.append(JCZ%s)" % i)
+                    # 下一行，修改成缺失值
+                    data_Aqua[columname][nub] = np.nan
+                    # print(data_Aqua[columname][nub])
+                exec('saveA.append(save_a_%s)' % columname)
+    # 处理TERRA，制造 缺失值
+    saveT = list()
+    for columname in data_Terra.columns:
+        if columname != "日期":
+            if columname != "监测站":
+                # loc 是某列为空的行坐标
+                loc = data_Aqua[columname][data_Aqua[columname].isnull().values == False].index.tolist()
+                # 筛选个数
+                c1 = int(len(loc) * 0.25)
+                # 筛选出样本
+                slice1 = random.sample(loc, c1)
+                # print(data_Aqua[columname][0])
+                # print(slice1)
+                # 保存 变空之前 的 变量位置和数值
+                exec('save_t_%s = list()' % columname)
+                for nub in slice1:
+                    # print(data_Aqua[columname][nub])
+                    # print((columname, nub, data_Aqua[columname][nub]))
+                    exec('save_t_%s.append((columname, nub, data_Aqua[columname][nub]))' % columname)
+                    # exec("JCZ.append(JCZ%s)" % i)
+                    # 下一行，修改成缺失值
+                    data_Aqua[columname][nub] = np.nan
+                    # print(data_Aqua[columname][nub])
+                exec('saveT.append(save_t_%s)' % columname)
+    # 保存编号
+    sA = pd.DataFrame(saveA)
+    sT = pd.DataFrame(saveT)
+    sA.to_excel(null_output_path+"Aqua\\" + "%s" % input_file_name)
+    sT.to_excel(null_output_path+"Terra\\" + "%s" % input_file_name)
+
     # 时间局部：KNN
     # 最近邻估算，使用两行都具有观测数据的特征的均方差来对样本进行加权。然后用加权的结果进行特征值填充
     # 相当于A0D17个点为特征进行近邻,则参数K为时间,即时间上最近的16行按特征的均方差进行加权，即哪个时间点的权重大一些
@@ -147,43 +203,22 @@ for input_file_name in input_file_names:
     data_Terra_Iterative.columns = data_Terra.columns
     data_Terra_Iterative["日期合并用"] = data_Terra_Iterative.index
 
-    # 合并不同方法下的A/T为一个文件
+    #
+    # 合并不同方法为一个文件
     sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
-    sheet_name_count = 0  # 为什么显示without usage ?  因为下面如果if为false则..
-    writer = pd.ExcelWriter(merge_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")))
-    for methods_output in [[data_Aqua_KNN, data_Terra_KNN], [data_Aqua_ewm, data_Terra_ewm], [
-            data_Aqua_IDW, data_Terra_IDW], [data_Aqua_Iterative, data_Terra_Iterative]]:
-        if len(methods_output[0].index) >= len(methods_output[1].index):
-            data_merge_AT = pd.merge(
-                methods_output[0],
-                methods_output[1],
-                how='left',
-                on=["日期"])
-            data_merge_AT.to_excel(
-                writer, sheet_name=sheet_name[sheet_name_count])
-        else:
-            data_merge_AT = pd.merge(
-                methods_output[0],
-                methods_output[1],
-                how='right',
-                on=["日期"])
-            data_merge_AT.to_excel(
-                writer, sheet_name=sheet_name[sheet_name_count])
+    sheet_name_count = 0
+    writer = pd.ExcelWriter(merge_output_file_path + 'Terra\\2018插补效率\\%s.xlsx' % (input_file_name.replace(".xlsx", "")))
+    for methods_output in [data_Terra_KNN, data_Terra_ewm, data_Terra_IDW, data_Terra_Iterative]:
+        methods_output.to_excel(writer, sheet_name=sheet_name[sheet_name_count])
         sheet_name_count = 1 + sheet_name_count
     writer.save()
 
-    # AQ.mean(1) 对两颗卫星去均值, 列的横向均值
-    writer = pd.ExcelWriter(mean_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")))
-    for methods_output in sheet_name:
-        data_to_mean = pd.read_excel(merge_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")), sheet_name=methods_output)
-        data_to_mean = data_to_mean.set_index("日期")
-        for area_numb in range(0, 17):
-            d1 = data_to_mean[['AOD_%s_x' % area_numb, "AOD_%s_y" % area_numb]]
-            d2 = d1.mean(1)
-            data_to_mean["AOD_%s" % area_numb] = d2
-            data_to_mean.drop(['AOD_%s_x' %
-                               area_numb, "AOD_%s_y" %
-                               area_numb], inplace=True, axis=1)
-        data_to_mean.drop(['日期合并用_y', "日期合并用_x"], inplace=True, axis=1)
-        data_to_mean.to_excel(writer, sheet_name=methods_output)
+    sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
+    sheet_name_count2 = 0
+    writer = pd.ExcelWriter(merge_output_file_path + 'Aqua\\2018插补效率\\%s.xlsx' % (input_file_name.replace(".xlsx", "")))
+    for methods_output in [data_Aqua_KNN, data_Aqua_ewm, data_Aqua_IDW, data_Aqua_Iterative]:
+        methods_output.to_excel(writer, sheet_name=sheet_name[sheet_name_count2])
+        sheet_name_count2 = 1 + sheet_name_count2
     writer.save()
+
+

@@ -52,8 +52,8 @@ def cal_weight(x):
     return w
 
 
-mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2008\\"
-res_output_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Res\\2008\\"
+mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2018插补效率\\"
+res_output_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Res\\2018插补效率\\"
 
 input_file_names = os.listdir(mean_output_file_path)  # 文件名列表
 for input_file_name in input_file_names:
