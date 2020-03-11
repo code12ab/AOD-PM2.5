@@ -9,10 +9,12 @@ import math
 from numpy import array
 import os
 
+# 问题: 去掉空值后计算...权重大部分均为1/4; 如何改善?
+# 2020.3.10目前使用 含空值数据。 请无视上述问题。
 
 # 定义熵值法函数
 def cal_weight(x):
-    # 标准化 每列各自标准化 目前错误
+    # 标准化
     x = x.apply(lambda x: ((x - np.min(x)) / (np.max(x) - np.min(x))))
 
     # 求k
@@ -52,40 +54,44 @@ def cal_weight(x):
     return w
 
 
-mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2018插补效率\\"
-res_output_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Res\\2018插补效率\\"
+Merge_output_file_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Merge\\2018插补效率\\"
+res_output_path = "D:\\毕业论文程序\\污染物浓度\\插值模块\\Res\\2018插补效率\\"
 
-input_file_names = os.listdir(mean_output_file_path)  # 文件名列表
+saved_list = os.listdir(res_output_path)
+
+input_file_names = os.listdir(Merge_output_file_path)  # 文件名列表
 for input_file_name in input_file_names:
     # 读取
     data_KNN = pd.read_excel(
-        mean_output_file_path +
+        Merge_output_file_path +
         input_file_name,
         sheet_name="KNN")
     data_ewm = pd.read_excel(
-        mean_output_file_path +
+        Merge_output_file_path +
         input_file_name,
         sheet_name="ewm")
     data_IDW = pd.read_excel(
-        mean_output_file_path +
+        Merge_output_file_path +
         input_file_name,
         sheet_name="IDW")
     data_Iterative = pd.read_excel(
-        mean_output_file_path +
+        Merge_output_file_path +
         input_file_name,
         sheet_name="Iterative")
     # 结果列表
     res = []
-    for area_numb in range(0, 17):
-        d1 = data_KNN[["日期", 'AOD_%s' % area_numb]]
-        d2 = data_ewm[["日期", 'AOD_%s' % area_numb]]
+
+    # for area_numb in range(0, 17):  # 这里需要修改
+    for column_name in ["PM25"]:
+        d1 = data_KNN[["日期", column_name]]
+        d2 = data_ewm[["日期", column_name]]
         data_Time = pd.merge(d1,
                              d2,
                              how='left',
                              on=["日期"])
 
-        d3 = data_IDW[["日期", 'AOD_%s' % area_numb]]
-        d4 = data_Iterative[["日期", 'AOD_%s' % area_numb]]
+        d3 = data_IDW[["日期", column_name]]
+        d4 = data_Iterative[["日期", column_name]]
         data_Station = pd.merge(
             d3,
             d4,
@@ -100,11 +106,12 @@ for input_file_name in input_file_names:
         data_aod.columns = ["日期", "KNN", "ewm", "IDW", "Iterative"]
         # data_aod.columns : 日期 AOD_0_x_x AOD_0_y_x AOD_0_x_y AOD_0_y_y
         data_aod = data_aod.set_index("日期")
-        data_aod_to_weight = data_aod.dropna()  # 用非空值计算更合理
+        data_aod_to_weight = data_aod # 用非空值计算更合理
+        # data_aod_to_weight = data_aod.dropna()  # 用非空值计算更合理
         w = cal_weight(data_aod_to_weight)  # 调用cal_weight
         w.index = data_aod.columns
         w.columns = ['weight']
-        # print(w)
+        print(w)
         '''
         value_weight= data_aod["KNN"] * w.weight[0] + data_aod["ewm"] * \
             w.weight[1] + data_aod["IDW"] * w.weight[2] + data_aod["Iterative"] * w.weight[3]
@@ -191,7 +198,7 @@ for input_file_name in input_file_names:
             # print(value_weight)
         value_weight_list = pd.DataFrame(value_weight_list)
         value_weight_list = value_weight_list.set_index(data_aod.index)
-        value_weight_list.columns = ["AOD_%s" % area_numb]
+        value_weight_list.columns = [column_name]
         connect_data = pd.merge(
             data_aod,
             value_weight_list,
@@ -200,7 +207,6 @@ for input_file_name in input_file_names:
         connect_data = connect_data.drop(
             columns=["KNN", "ewm", "IDW", "Iterative"])
         res.append(connect_data)
-
     res_data = pd.concat(res, sort=False, axis=1)
     res_data.to_excel(res_output_path + input_file_name)
     print("已输出:" + "%s" % input_file_name)

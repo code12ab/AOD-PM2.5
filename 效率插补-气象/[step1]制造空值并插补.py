@@ -17,16 +17,11 @@ from fancyimpute import KNN, IterativeImputer  # 方法创建新的数据框,不
 import os
 
 # 路径
-year = 2018
-input_file_path_darksky_weather = "D:\\毕业论文程序\\气象数据\\筛除字符串\\%s\\" % year
-merge_output_file_path = "D:\\毕业论文程序\\气象数据\\插值模块\\Merge\\%s插补效率\\" % year
+
+input_file_path_darksky_weather = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018插补效率\\"
+merge_output_file_path = "D:\\毕业论文程序\\气象数据\\插值模块\\Merge\\2018插补效率\\"
 null_output_path = "D:\\毕业论文程序\\气象数据\\插值模块\\制造的缺失值\\"  # 2018
 
-"""
-# 原先
-input_file_path_darksky_weather = "D:\\毕业论文程序\\气象数据\\筛除字符串\\2018_不补全\\"
-merge_output_file_path = "D:\\毕业论文程序\\气象数据\\插值模块\\Merge\\2018_不补全\\"
-"""
 JCZ_info = pd.read_excel(
     "D:\\毕业论文程序\\MODIS\\坐标\\监测站坐标.xlsx",
     sheet_name="北京")  # 152个
@@ -170,28 +165,117 @@ def get4method(xx152):
             # 保存编号
             sA = pd.DataFrame(saveA)
             sA.to_excel(null_output_path + "%s" % input_file_name)
+            name2 = str(input_file_name).replace(".xlsx", "")  # 定义相关变量
+            lng1 = JCZ_info[JCZ_info["监测站"] == name2]["经度"]
+            lat1 = JCZ_info[JCZ_info["监测站"] == name2]["纬度"]
+            merge_list_KNN = []  # 同一监测站,不同污染物
+            for darksky_weather_KNN in [
+            'apparentTemperatureHigh',
+            'apparentTemperatureLow',
+            'apparentTemperatureMax',
+            'apparentTemperatureMin',
+            'cloudCover',
+            'dewPoint',
+            'humidity',
+            'moonPhase',
+            'ozone',
+            'precipAccumulation',
+            'precipIntensity',
+            'precipIntensityMax',
+            'pressure',
+            'sunriseTime',
+            'sunsetTime',
+            'temperatureHigh',
+            'temperatureLow',
+            'temperatureMax',
+            'temperatureMin',
+            'uvIndex',
+            'visibility',
+            'windBearing',
+            'windGust',
+            'windSpeed',
+            'apparentTemperature',
+                'temperature']:
+                # 合并部分
+                numb2 = 0
+                data_darksky_weather_to_KNN = copy.deepcopy(data_darksky_weather[[darksky_weather_KNN]])
+                data_darksky_weather_to_KNN = data_darksky_weather_to_KNN.reset_index()
+                for item in JCZ_info["监测站"]:  # 不同于气溶胶插值方法
+                    if item != name2:
+                        lng2 = JCZ_info[JCZ_info["监测站"] == item]["经度"]
+                        lat2 = JCZ_info[JCZ_info["监测站"] == item]["纬度"]
+                        dis_1 = geo_distance(lng1, lat1, lng2, lat2)  # 两站地理距离
+                        if dis_1 > 0: # <=
+                            # 添加的文件
+                            data_to_add_in_to_KNN = pd.read_excel(
+                                input_file_path_darksky_weather + item + ".xlsx")
+                            # 添加的列名
+                            data_to_KNN_concat = data_to_add_in_to_KNN[[darksky_weather_KNN, '日期']]
+                            data_to_KNN_concat.columns = [darksky_weather_KNN + "_add%s" % numb2,
+                                                                '日期']  # 如果有五个临近, 则NDVI1-NDVI5
 
-            # 时间局部：最近邻KNN,是使用K行都具有全部特征的样本,使用其他特征的均方差进行加权,判断最接近的时间点.
-            data_darksky_weather_KNN = KNN(
-                k=7).fit_transform(data_darksky_weather)
-            data_darksky_weather_KNN = pd.DataFrame(data_darksky_weather_KNN)
+                            data_darksky_weather_to_KNN = pd.merge(data_darksky_weather_to_KNN,
+                                                                         data_to_KNN_concat,
+                                                                         how='left',
+                                                                         on='日期')
+                            data_darksky_weather_to_KNN = data_darksky_weather_to_KNN.set_index('日期')
+                    numb2 += 1
+                # 迭代部分
+                count_2 = 0
+                for value_1 in data_darksky_weather_to_KNN.sum():
+                    if value_1 != 0:
+                        count_2 += 1
+                if count_2 > 1:  # 至少两个非空列才可以计算
+                    data_darksky_weather_KNN_to_merge = KNN(k=7).fit_transform(data_darksky_weather_to_KNN)
+                    # data_darksky_weather_KNN_to_merge = IterativeImputer(max_iter=100).fit_transform(data_darksky_weather_to_KNN)
+                else:
+                    data_darksky_weather_KNN_to_merge = copy.deepcopy(
+                        data_darksky_weather_to_KNN)
+                data_darksky_weather_KNN_to_merge = pd.DataFrame(
+                    data_darksky_weather_KNN_to_merge)  # 格式转换
+                data_darksky_weather_KNN_to_merge = data_darksky_weather_KNN_to_merge.set_index(
+                    data_darksky_weather_to_KNN.index)  # ok
+                if len(data_darksky_weather_KNN_to_merge.columns) < len(
+                        data_darksky_weather_to_KNN.columns):
+                    reset_col_name_list_KNN = []  # 对非nan列先命名
+                    for col_name in data_darksky_weather_to_KNN.columns:
+                        if np.max(data_darksky_weather_to_KNN[col_name]) > 0:
+                            reset_col_name_list_KNN.append(col_name)
+                    data_darksky_weather_KNN_to_merge.columns = reset_col_name_list_KNN
+
+                    for col_name in data_darksky_weather_to_KNN.columns:  # 对缺失的nan列补充
+                        if col_name not in data_darksky_weather_KNN_to_merge.columns:
+                            # 补全缺失nan列
+                            data_darksky_weather_KNN_to_merge[col_name] = np.nan
+                else:
+                    data_darksky_weather_KNN_to_merge.columns = data_darksky_weather_to_KNN.columns  # 重设列名
+                for numb_del in data_darksky_weather_KNN_to_merge.columns:
+                    if 'add' in numb_del:
+                        del data_darksky_weather_KNN_to_merge[numb_del]
+
+                # 插补后的该监测点的气象特征列, 仅一列, 循环添加其他特征
+                merge_list_KNN.append(data_darksky_weather_KNN_to_merge)
+            data_darksky_weather_KNN_1 = pd.concat(
+                merge_list_KNN, axis=1, sort=False)
+            # 对结果的0值取np.nan
+            # data_darksky_weather_KNN = KNN(k=7).fit_transform(data_darksky_weather)
+            # data_darksky_weather_KNN = pd.DataFrame(data_darksky_weather_KNN)
+
             # 时间全局: 平滑,常用于股市;创建新的数据框,不会覆盖原始数据
             data_darksky_weather_ewm_mid = pd.DataFrame.ewm(
                 self=data_darksky_weather,
-                com=0.5,
+                com=0.8,
                 ignore_na=True,
                 adjust=True).mean()
-            data_darksky_weather_ewm = copy.deepcopy(
-                data_darksky_weather)  # 避免覆盖原始数据
+            # data_darksky_weather_ewm_mid = data_darksky_weather.interpolate()  # 23%[时间视图33→19]
+            # 替换空白处
+            data_darksky_weather_ewm = copy.deepcopy(data_darksky_weather)  # 避免覆盖原始数据
             for columname in data_darksky_weather_ewm.columns:
-                if data_darksky_weather[columname].count() != len(
-                        data_darksky_weather):
-                    loc = data_darksky_weather[columname][data_darksky_weather[columname].isnull(
-                    ).values].index.tolist()
+                if data_darksky_weather[columname].count() != len(data_darksky_weather):
+                    loc = data_darksky_weather[columname][data_darksky_weather[columname].isnull().values == True].index.tolist()
                     for nub in loc:
-                        data_darksky_weather_ewm.loc[nub,
-                                                     columname] = data_darksky_weather_ewm_mid.loc[nub,
-                                                                                                   columname]
+                        data_darksky_weather_ewm[columname][nub] = data_darksky_weather_ewm_mid[columname][nub]
+
 
             # 空间
             data_darksky_weather_to_IDW = copy.deepcopy(data_darksky_weather)
@@ -291,15 +375,14 @@ def get4method(xx152):
                 merge_list, axis=1, sort=False)
 
             # 对结果的0值取np.nan
-            data_darksky_weather_KNN.replace(0, np.nan, inplace=True)
+            data_darksky_weather_KNN_1.replace(0, np.nan, inplace=True)  # 新
             data_darksky_weather_ewm.replace(0, np.nan, inplace=True)
             data_darksky_weather_IDW.replace(0, np.nan, inplace=True)
             data_darksky_weather_Iterative_1.replace(0, np.nan, inplace=True)
 
             # 合并相同方法的结果
-            data_darksky_weather_KNN = data_darksky_weather_KNN.set_index(
-                data_darksky_weather.index)
-            data_darksky_weather_KNN.columns = data_darksky_weather.columns
+            data_darksky_weather_KNN = data_darksky_weather_KNN_1.set_index(data_darksky_weather.index)  # 新
+            data_darksky_weather_KNN.columns = data_darksky_weather.columns  # 新
             data_darksky_weather_ewm = data_darksky_weather_ewm.set_index(
                 data_darksky_weather.index)
             data_darksky_weather_ewm.columns = data_darksky_weather.columns
@@ -359,5 +442,5 @@ if __name__ == '__main__':
     # 自动关机
     print("程序已完成," + str(60) + '秒后将会关机')
     print('关机')
-    #os.system('shutdown -s -f -t 660')
+    os.system('shutdown -s -f -t 660')
 

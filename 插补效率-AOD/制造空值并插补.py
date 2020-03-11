@@ -203,8 +203,8 @@ for input_file_name in input_file_names:
     data_Terra_Iterative.columns = data_Terra.columns
     data_Terra_Iterative["日期合并用"] = data_Terra_Iterative.index
 
-    #
-    # 合并不同方法为一个文件
+    """
+    # 合并不同方法为一个文件===================================================== 分开存A\T
     sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
     sheet_name_count = 0
     writer = pd.ExcelWriter(merge_output_file_path + 'Terra\\2018插补效率\\%s.xlsx' % (input_file_name.replace(".xlsx", "")))
@@ -219,6 +219,48 @@ for input_file_name in input_file_names:
     for methods_output in [data_Aqua_KNN, data_Aqua_ewm, data_Aqua_IDW, data_Aqua_Iterative]:
         methods_output.to_excel(writer, sheet_name=sheet_name[sheet_name_count2])
         sheet_name_count2 = 1 + sheet_name_count2
+    writer.save()
+    """
+
+    # 合并不同方法下的A/T为一个文件
+    sheet_name = ["KNN", "ewm", "IDW", "Iterative"]
+    sheet_name_count = 0  # 为什么显示without usage ?  因为下面如果if为false则..
+    writer = pd.ExcelWriter(merge_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")))
+    for methods_output in [[data_Aqua_KNN, data_Terra_KNN], [data_Aqua_ewm, data_Terra_ewm], [
+            data_Aqua_IDW, data_Terra_IDW], [data_Aqua_Iterative, data_Terra_Iterative]]:
+        if len(methods_output[0].index) >= len(methods_output[1].index):
+            data_merge_AT = pd.merge(
+                methods_output[0],
+                methods_output[1],
+                how='left',
+                on=["日期"])
+            data_merge_AT.to_excel(
+                writer, sheet_name=sheet_name[sheet_name_count])
+        else:
+            data_merge_AT = pd.merge(
+                methods_output[0],
+                methods_output[1],
+                how='right',
+                on=["日期"])
+            data_merge_AT.to_excel(
+                writer, sheet_name=sheet_name[sheet_name_count])
+        sheet_name_count = 1 + sheet_name_count
+    writer.save()
+
+    # AQ.mean(1) 对两颗卫星去均值, 列的横向均值
+    writer = pd.ExcelWriter(mean_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")))
+    for methods_output in sheet_name:
+        data_to_mean = pd.read_excel(merge_output_file_path+'%s.xlsx' % (input_file_name.replace(".xlsx", "")), sheet_name=methods_output)
+        data_to_mean = data_to_mean.set_index("日期")
+        for area_numb in range(0, 17):
+            d1 = data_to_mean[['AOD_%s_x' % area_numb, "AOD_%s_y" % area_numb]]
+            d2 = d1.mean(1)
+            data_to_mean["AOD_%s" % area_numb] = d2
+            data_to_mean.drop(['AOD_%s_x' %
+                               area_numb, "AOD_%s_y" %
+                               area_numb], inplace=True, axis=1)
+        data_to_mean.drop(['日期合并用_y', "日期合并用_x"], inplace=True, axis=1)
+        data_to_mean.to_excel(writer, sheet_name=methods_output)
     writer.save()
 
 

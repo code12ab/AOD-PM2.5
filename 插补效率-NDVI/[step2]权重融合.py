@@ -52,40 +52,40 @@ def cal_weight(x):
     return w
 
 
-mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2018插补效率\\"
-res_output_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Res\\2018插补效率\\"
+merge_output_file_path = "D:\\毕业论文程序\\NDVI\\插值模块\\Merge\\2018插补效率\\"
+res_output_path = "D:\\毕业论文程序\\NDVI\\插值模块\\Res\\2018插补效率\\"
 
-input_file_names = os.listdir(mean_output_file_path)  # 文件名列表
+input_file_names = os.listdir(merge_output_file_path)  # 文件名列表
 for input_file_name in input_file_names:
     # 读取
     data_KNN = pd.read_excel(
-        mean_output_file_path +
+        merge_output_file_path +
         input_file_name,
         sheet_name="KNN")
     data_ewm = pd.read_excel(
-        mean_output_file_path +
+        merge_output_file_path +
         input_file_name,
         sheet_name="ewm")
     data_IDW = pd.read_excel(
-        mean_output_file_path +
+        merge_output_file_path +
         input_file_name,
         sheet_name="IDW")
     data_Iterative = pd.read_excel(
-        mean_output_file_path +
+        merge_output_file_path +
         input_file_name,
         sheet_name="Iterative")
     # 结果列表
     res = []
     for area_numb in range(0, 17):
-        d1 = data_KNN[["日期", 'AOD_%s' % area_numb]]
-        d2 = data_ewm[["日期", 'AOD_%s' % area_numb]]
+        d1 = data_KNN[["日期", 'NDVI_%s' % area_numb]]
+        d2 = data_ewm[["日期", 'NDVI_%s' % area_numb]]
         data_Time = pd.merge(d1,
                              d2,
                              how='left',
                              on=["日期"])
 
-        d3 = data_IDW[["日期", 'AOD_%s' % area_numb]]
-        d4 = data_Iterative[["日期", 'AOD_%s' % area_numb]]
+        d3 = data_IDW[["日期", 'NDVI_%s' % area_numb]]
+        d4 = data_Iterative[["日期", 'NDVI_%s' % area_numb]]
         data_Station = pd.merge(
             d3,
             d4,
@@ -100,11 +100,11 @@ for input_file_name in input_file_names:
         data_aod.columns = ["日期", "KNN", "ewm", "IDW", "Iterative"]
         # data_aod.columns : 日期 AOD_0_x_x AOD_0_y_x AOD_0_x_y AOD_0_y_y
         data_aod = data_aod.set_index("日期")
-        data_aod_to_weight = data_aod.dropna()  # 用非空值计算更合理
+        data_aod_to_weight = data_aod  # 用非空值计算更合理 .dropna() # 2020.3.10 用含空的,这样权重是变化的，不然 恒等于0.25每个。
         w = cal_weight(data_aod_to_weight)  # 调用cal_weight
         w.index = data_aod.columns
         w.columns = ['weight']
-        # print(w)
+        print(w)
         '''
         value_weight= data_aod["KNN"] * w.weight[0] + data_aod["ewm"] * \
             w.weight[1] + data_aod["IDW"] * w.weight[2] + data_aod["Iterative"] * w.weight[3]
@@ -191,7 +191,7 @@ for input_file_name in input_file_names:
             # print(value_weight)
         value_weight_list = pd.DataFrame(value_weight_list)
         value_weight_list = value_weight_list.set_index(data_aod.index)
-        value_weight_list.columns = ["AOD_%s" % area_numb]
+        value_weight_list.columns = ["NDVI_%s" % area_numb]
         connect_data = pd.merge(
             data_aod,
             value_weight_list,
