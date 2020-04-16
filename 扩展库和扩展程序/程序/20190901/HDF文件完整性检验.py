@@ -17,7 +17,7 @@ from pyhdf.SD import SD, SDC  # 批量导入HDF
 import os
 
 # HDF文件位置
-file_path =  "D:\\MOD04_3K_2009\\"
+file_path = "D:\\HDF-DATA\\MYD04_3K_2013\\"
 
 # 批量读取
 dir_str = file_path  # 文件位置
@@ -40,7 +40,6 @@ for hdf in file_name:
         error_information = hdf + "第" + str(i) + "个文件错误"
         # error_file.append(error_information)
         error_file.append(hdf)
-
 
 print("错误文件个数:" + str(len(error_file)) + "个")
 

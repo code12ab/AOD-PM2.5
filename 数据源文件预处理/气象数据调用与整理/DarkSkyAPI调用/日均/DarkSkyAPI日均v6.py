@@ -16,7 +16,7 @@ pd.set_option('display.max_rows', None)  # 设置显示最大行
 pd.set_option('display.max_columns', None)  # 设置显示最大列，None为显示所有列
 
 # 参数设置
-save_year = 2017
+save_year = 2018
 dayinyear_start = "000"
 date_start = int(str(save_year) + dayinyear_start)
 if save_year % 4 == 0:
@@ -24,7 +24,7 @@ if save_year % 4 == 0:
     year_days = 366 - int(dayinyear_start)
 else:
     year_days = 365 - int(dayinyear_start)
-start_count = -1
+start_count = 2222
 
 # API KEY
 API_KEY_LIST = [
@@ -41,7 +41,7 @@ API_KEY_LIST = [
     "ea6ba6d12b5619189b54f10275557872"]
 # 路径
 coordinate_file_path = "D:\\毕业论文程序\\MODIS\\坐标\\"
-output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\%s\\" % save_year  # 气象数据存储路径
+output_file_path = "D:\\毕业论文程序\\气象数据\\数据\\日均\\t0318%s\\" % save_year  # 气象数据存储路径
 error_information_path = "D:\\毕业论文程序\\气象数据\\报错\\"  # 报错信息输出路径
 time_out = 30  # 超时设置,10秒太短
 saved_list = os.listdir(output_file_path)

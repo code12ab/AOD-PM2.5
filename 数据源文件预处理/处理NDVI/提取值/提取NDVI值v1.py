@@ -135,10 +135,13 @@ dis2 = 20000
 dis3 = 50000
 
 # 文件路径
-x_input = 'D:\\NDVI\\X\\MYD2018\\'
-y_input = 'D:\\NDVI\\Y\\MYD2018\\'
-ndvi_output = 'D:\\NDVI\\DATA\\MYD2018\\'
-data_input = 'D:\\NDVI\\NDVI_RAW\\MYD2018\\'
+AorT = 'Aqua'
+# AorT = "Terra"
+year = 2016  # ing
+x_input = 'D:\\NDVI\\X\\%s\\%s\\' % (AorT, year)
+y_input = 'D:\\NDVI\\Y\\%s\\%s\\' % (AorT, year)
+ndvi_output = 'D:\\NDVI\\outcome\\%s\\%s\\' % (AorT, year)
+data_input = 'D:\\NDVI\\NDVI_RAW\\%s\\%s\\' % (AorT, year)
 location_xy_input_file = "D:\\毕业论文程序\\MODIS\\坐标\\站点列表-2018.11.08起_152.xlsx"
 exist_file_list = os.listdir(ndvi_output)
 
@@ -240,12 +243,12 @@ def get_ndvi_multiprocessing(sheetname):
 if __name__ == '__main__':
     print('=====主进程=====')
 
-    p1 = Process(target=get_ndvi_multiprocessing, args=('样例1',))
-    p2 = Process(target=get_ndvi_multiprocessing, args=('样例2',))
-    p3 = Process(target=get_ndvi_multiprocessing, args=('样例3',))
-    p4 = Process(target=get_ndvi_multiprocessing, args=('样例4',))
-    p5 = Process(target=get_ndvi_multiprocessing, args=('样例5',))
-    p6 = Process(target=get_ndvi_multiprocessing, args=('样例6',))
+    p1 = Process(target=get_ndvi_multiprocessing, args=('北京1',))
+    p2 = Process(target=get_ndvi_multiprocessing, args=('北京2',))
+    p3 = Process(target=get_ndvi_multiprocessing, args=('北京3',))
+    p4 = Process(target=get_ndvi_multiprocessing, args=('北京4',))
+    p5 = Process(target=get_ndvi_multiprocessing, args=('北京5',))
+    p6 = Process(target=get_ndvi_multiprocessing, args=('北京6',))
 
     p1.start()
     p2.start()

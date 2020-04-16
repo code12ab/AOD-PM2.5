@@ -9,13 +9,18 @@ import numpy as np
 from osgeo import gdal
 import os
 # 路径
-hdf_input = "e:\\NDVI\\MOD2018\\"
+# hdf_input = "e:\\NDVI\\MOD2018\\"
+# 卫星
+AorT = 'Aqua'
+# AorT = "Terra"
+year = 2014
+hdf_input = "D:\\NDVI\\DATA\\%s\\%s\\" % (AorT, year)
 file_name = os.listdir(hdf_input)
 # 输出
-tif_output_path = "E:\\NDVI\\TIF\\MOD2018\\"
-ndvi_raw_output_path = "E:\\NDVI\\NDVI_RAW\\MOD2018\\"
-x_output_path = "E:\\NDVI\\X\\MOD2018\\"
-y_output_path = "E:\\NDVI\\Y\\MOD2018\\"
+tif_output_path = "D:\\NDVI\\TIF\\%s\\%s\\" % (AorT, year)
+ndvi_raw_output_path = "D:\\NDVI\\NDVI_RAW\\%s\\%s\\" % (AorT, year)
+x_output_path = "D:\\NDVI\\X\\%s\\%s\\" % (AorT, year)
+y_output_path = "D:\\NDVI\\Y\\%s\\%s\\" % (AorT, year)
 # 检查重复
 saved_file_list = os.listdir(ndvi_raw_output_path)
 saved_file_list = map(lambda x: str(x).replace(".csv", ".hdf"), [x for x in saved_file_list])  # map, lambda

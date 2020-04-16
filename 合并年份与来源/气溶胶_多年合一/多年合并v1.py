@@ -16,7 +16,7 @@ import os
 # input_path ='D:\\毕业论文程序\\污染物浓度\\整理\\PM\\2018_日期补全\\'
 # output_path ='D:\\毕业论文程序\\污染物浓度\\整理\\PM\\2018_all\\'
 
-input_path = 'D:\\毕业论文程序\\污染物浓度\\整理\\PM\\2018_日期补全\\'
+input_path = 'D:\\毕业论文程序\\污染物浓度\\整理\\PM\\2018_new\\'
 output_path = 'D:\\'
 
 file_name = os.listdir(input_path)  # 获取文件名
@@ -29,7 +29,7 @@ for name in file_name:
     data_list.append(data)
     print(name, "完成")
     nub += 1
-data_all = pd.concat(data_list,axis =0)
+data_all = pd.concat(data_list,axis =1)
 print(data_all.isnull().sum())
-data_all.PM25 =data_all.PM25.interpolate()
-# data_all.to_excel(output_path+"PM2018_all.xlsx")
+data_all.PM25 = data_all.PM25.interpolate()
+data_all.to_excel(output_path+"PM2018_all.xlsx")

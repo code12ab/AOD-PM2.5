@@ -8,7 +8,9 @@
       <w>arrayw</w>
       <w>atemp</w>
       <w>auqa</w>
+      <w>backfill</w>
       <w>brng</w>
+      <w>brokenaxes</w>
       <w>cccol</w>
       <w>cccola</w>
       <w>chabu</w>
@@ -20,9 +22,11 @@
       <w>datares</w>
       <w>dataset</w>
       <w>dayinyear</w>
+      <w>despine</w>
       <w>edvi</w>
       <w>endtime</w>
       <w>ging</w>
+      <w>hspace</w>
       <w>hstack</w>
       <w>idlist</w>
       <w>imputer</w>
@@ -31,14 +35,17 @@
       <w>keras</w>
       <w>knnadd</w>
       <w>lnfij</w>
+      <w>lstm</w>
       <w>mday</w>
       <w>modall</w>
       <w>morethan</w>
       <w>ndvi</w>
       <w>nesterov</w>
       <w>noin</w>
+      <w>olsr</w>
       <w>otherpollution</w>
       <w>predt</w>
+      <w>queshi</w>
       <w>regressor</w>
       <w>reprojection</w>
       <w>rmsprop</w>
@@ -53,6 +60,7 @@
       <w>stdmon</w>
       <w>timestation</w>
       <w>wday</w>
+      <w>xlims</w>
       <w>xytodis</w>
       <w>yday</w>
     </words>

@@ -53,7 +53,7 @@ for number in JCZ_number:
             data = pd.read_csv(input_file_path+file, encoding='utf8')
             data = data[data["type"].isin(['PM10_24h', 'SO2_24h', "NO2_24h", "O3_24h", "CO_24h", "PM2.5_24h"])]
             data = data[data["hour"] == 0]
-            # 为合并做准备
+            # 为2做准备
 
             # 筛选行: 返回 同类型污染物的多个监测站数据
             data_PM25 = data[data["type"] == "PM2.5_24h"]
@@ -66,8 +66,8 @@ for number in JCZ_number:
             # 今日0时的24小时平均滑动值是前一天的24小时PM2.5均值
             # print(file)
             '''
-            先对同一个type合并在一起。
-            再合并不同的污染物
+            先对同一个type2在一起。
+            再2不同的污染物
             '''
             # 筛选列: 返回 同污染物 同监测站
             data_PM25 = data_PM25[["%s" % number]]  # 原版代码: [["hour", "%s" % number]]

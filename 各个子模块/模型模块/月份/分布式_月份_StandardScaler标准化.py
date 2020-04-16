@@ -19,7 +19,8 @@ import copy
 import numpy as np
 from sklearn.utils import shuffle
 
-input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate.xlsx'
+# input_path = 'D:\\雨雪+2018_new_pm_aod_interpolate.xlsx'
+input_path = 'D:\\毕业论文D盘数据\\D盘根目录数据\\雨雪+2018_new_pm_aod_interpolate.xlsx'
 data_all = pd.read_excel(input_path, index_col='日期')
 
 """

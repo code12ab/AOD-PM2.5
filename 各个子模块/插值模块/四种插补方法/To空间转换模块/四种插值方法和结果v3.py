@@ -9,12 +9,13 @@ import numpy as np
 from fancyimpute import KNN, IterativeImputer
 import os
 # 路径
-input_file_path_Aqua = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\2008\\"
-input_file_path_Terra = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra\\2008\\"
-merge_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Merge\\2008\\"
-mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\2008\\"
+year = 2017
+input_file_path_Aqua = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\%s\\" % year
+input_file_path_Terra = "D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Terra\\%s\\" % year
+merge_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Merge\\%s\\" % year
+mean_output_file_path = "D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\Mean\\%s\\" % year
 xytodis = pd.read_excel("D:\\毕业论文程序\\气溶胶光学厚度\\插值模块\\xytodis.xlsx")  # 17个区域的投影坐标
-input_file_names = os.listdir(input_file_path_Aqua)  # 文件名列表
+input_file_names = os.listdir("D:\\毕业论文程序\\气溶胶光学厚度\\空间转换模块\\Aqua\\2008\\")  # 文件名列表  # 为了只用北京所以2008
 saved_list = os.listdir(mean_output_file_path)
 
 
@@ -187,3 +188,5 @@ for input_file_name in input_file_names:
         data_to_mean.drop(['日期合并用_y', "日期合并用_x"], inplace=True, axis=1)
         data_to_mean.to_excel(writer, sheet_name=methods_output)
     writer.save()
+
+print('Finish %s' % year)
