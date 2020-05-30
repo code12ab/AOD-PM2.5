@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # 作者: xcl
-# 时间: 2019/9/21 23:54
+# 时间: 2020 0528
 
 
 # 库
@@ -41,20 +41,14 @@ data_ts_df = data_all[['tm_mon', 'tm_mday',
 for ccc in data_ts_df.columns:
     data_ts_df[ccc] = data_ts_df[ccc].map(lambda x: str(x))
 data_get_dummies1 = pd.get_dummies(data_ts_df[['tm_mon']], drop_first=True)
-print(data_get_dummies1.columns)
+# print(data_get_dummies1.columns)
 # data_get_dummies2 = pd.get_dummies(data_ts_df[['tm_mday']], drop_first=True)
 data_get_dummies3 = pd.get_dummies(data_ts_df[['id']], drop_first=True)
 data_dummies = pd.concat([data_get_dummies1,
                           data_get_dummies3,
                           data_ts_df[['tm_mon']],
                           data_ts_df[['id']]], axis=1)
-"""
-list1 = []
-for ccc in data_dummies.columns:
-    # print(ccc)
-    if ccc != 'tm_mon':
-        list1.append(ccc)
-"""
+
 
 # 去掉无用列
 data_to_std = data_all.drop(['tm_mon', 'tm_mday', 'tm_wday', 'tm_yday', 'tm_week', 'id'], axis=1)
@@ -81,48 +75,12 @@ data_out2 = pd.concat([data_dummies, data_to_std], join='outer', axis=1)  # 标�
 MAE_list = []
 RE_list = []
 MSE_list = []
-for t_numb in range(0, 20):
-
-    # 划分
-    idlist = list(range(1, 153))
-    slice1 = random.sample(idlist, 38)  # 从list中随机获取5个元素，作为一个片断返回
-    slice2 = []
-    for idx in idlist:
-        if idx not in slice1:
-            idx = str(idx)
-            slice2.append(idx)
-    slice1 = [str(j) for j in slice1]
-
-    data_test2 = data_out2[data_out2['id'].isin(slice1)]
-    # print(data_test2.PM25)  # 这才是真实值
-
+for t_numb in range(0,1):
     # 划分标准化后的训练集测试集, 用于训练
-    data_test = data_out[data_out['id'].isin(slice1)]
-    data_train = data_out[data_out['id'].isin(slice2)]
+    data_train = data_out
     # AOD
-    data_aod_test = data_test[['AOD_0']]
     data_aod_train = data_train[['AOD_0']]
-
     # 气象
-    data_sky_test = data_test[[
-        'cloudCover',
-        'dewPoint',
-        'humidity',
-
-        'sunTime',
-        'tempMM', 'tempHL', 'atempMM', 'atempHL',
-
-        'visibility',
-        'windGust',
-        'windSpeed',
-        'windBearing',
-        'apparentTemperature',
-        'temperature',
-
-        'pressure',
-        'precipIntensity',
-        'precipAccumulation']]
-
     data_sky_train = data_train[[
         'cloudCover',
         'dewPoint',
@@ -144,19 +102,6 @@ for t_numb in range(0, 20):
     ]]
 
     # 时间特征
-    data_time_test = data_test[['tm_mon_10',
-                                'tm_mon_11',
-                                'tm_mon_12',
-                                'tm_mon_2',
-                                'tm_mon_3',
-                                'tm_mon_4',
-                                'tm_mon_5',
-                                'tm_mon_6',
-                                'tm_mon_7',
-                                'tm_mon_8',
-                                'tm_mon_9',
-                                ]]
-
     data_time_train = data_train[['tm_mon_10',
                                   'tm_mon_11',
                                   'tm_mon_12',
@@ -170,48 +115,8 @@ for t_numb in range(0, 20):
                                   'tm_mon_9',
                                   ]]
     # 空间特征
-    data_station_test = data_test[data_get_dummies3.columns]
-
     data_station_train = data_train[data_get_dummies3.columns]
     # 时滞
-    data_t1_test = data_test[['AOD_0_T1',
-                              'cloudCover_T1',
-                              'dewPoint_T1',
-                              'humidity_T1',
-                              'sunTime_T1',
-                              'visibility_T1',
-                              'windSpeed_T1',
-                              'temperature_T1',
-                              'pressure_T1',
-                              'precipIntensity_T1',
-                              'precipAccumulation_T1',
-                              ]]
-    """
-    data_t1_train = data_train[['AOD_0_T1',
-                                'apparentTemperatureHigh_T1',
-                                'apparentTemperatureLow_T1',
-                                'apparentTemperatureMax_T1',
-                                'apparentTemperatureMin_T1',
-                                'cloudCover_T1',
-                                'dewPoint_T1',
-                                'humidity_T1',
-
-                                'sunTime_T1',
-                                'temperatureHigh_T1',
-                                'temperatureLow_T1',
-                                'temperatureMax_T1',
-                                'temperatureMin_T1',
-
-                                'visibility_T1',
-                                'windBearing_T1',
-                                'windGust_T1',
-                                'windSpeed_T1',
-                                'apparentTemperature_T1',
-                                'temperature_T1',                          'pressure_T1',
-                              'precipIntensity_T1',
-                              'precipIntensityMax_T1',
-                              'precipAccumulation_T1',]]
-                              """
     data_t1_train = data_train[['AOD_0_T1',
                                 'cloudCover_T1',
                                 'dewPoint_T1',
@@ -225,57 +130,8 @@ for t_numb in range(0, 20):
                                 'precipAccumulation_T1',
                                 ]]
     # NDVI
-    data_ndvi_test = data_test[['NDVI_0']]
     data_ndvi_train = data_train[['NDVI_0']]
-    """
-    data_ndvi_train = data_train[['tm_mday_10',
-                                  'tm_mday_11',
-                                  'tm_mday_12',
-                                  'tm_mday_13',
-                                  'tm_mday_14',
-                                  'tm_mday_15',
-                                  'tm_mday_16',
-                                  'tm_mday_17',
-                                  'tm_mday_18',
-                                  'tm_mday_19',
-                                  'tm_mday_2',
-                                  'tm_mday_20',
-                                  'tm_mday_21',
-                                  'tm_mday_22',
-                                  'tm_mday_23',
-                                  'tm_mday_24',
-                                  'tm_mday_25',
-                                  'tm_mday_26',
-                                  'tm_mday_27',
-                                  'tm_mday_28',
-                                  'tm_mday_29',
-                                  'tm_mday_3',
-                                  'tm_mday_30',
-                                  'tm_mday_31',
-                                  'tm_mday_4',
-                                  'tm_mday_5',
-                                  'tm_mday_6',
-                                  'tm_mday_7',
-                                  'tm_mday_8',
-                                  'tm_mday_9']]
-    """
     # AODS
-    data_aods_test = data_test[['AOD_1',
-                                'AOD_2',
-                                'AOD_3',
-                                'AOD_4',
-                                'AOD_5',
-                                'AOD_6',
-                                'AOD_7',
-                                'AOD_8',
-                                'AOD_9',
-                                'AOD_10',
-                                'AOD_11',
-                                'AOD_12',
-                                'AOD_13',
-                                'AOD_14',
-                                'AOD_15',
-                                'AOD_16']]
     data_aods_train = data_train[['AOD_1',
                                   'AOD_2',
                                   'AOD_3',
@@ -293,28 +149,26 @@ for t_numb in range(0, 20):
                                   'AOD_15',
                                   'AOD_16']]
     # 污染物
-    data_pm_test = data_test[['PM25']]
     data_pm_train = data_train[['PM25']]
     # 输入层 全部
-
-    AOD_input = Input(shape=(len(data_aod_test.columns),), name="AOD_input")  # AOD
-    AODs_input = Input(shape=(len(data_aods_test.columns),),
+    AOD_input = Input(shape=(len(data_aod_train.columns),), name="AOD_input")  # AOD
+    AODs_input = Input(shape=(len(data_aods_train.columns),),
                        name="AODs_input")  # AODs
 
     Meteorology_input = Input(
-        shape=(len(data_sky_test.columns),), name="Meteorology_input")  # 气象
+        shape=(len(data_sky_train.columns),), name="Meteorology_input")  # 气象
 
-    Weather_input = Input(shape=(len(data_t1_test.columns),),
+    Weather_input = Input(shape=(len(data_t1_train.columns),),
                           name="Weather_input")  # 时滞
 
-    Ndvi_input = Input(shape=(len(data_ndvi_test.columns),),
+    Ndvi_input = Input(shape=(len(data_ndvi_train.columns),),
                        name="NDVI_input")  # NDVI
 
-    Time_input = Input(shape=(len(data_time_test.columns),),
+    Time_input = Input(shape=(len(data_time_train.columns),),
                        name="Time_input")  # 时间
 
     Station_input = Input(
-        shape=(len(data_station_test.columns),), name="Station_input")  # 空间
+        shape=(len(data_station_train.columns),), name="Station_input")  # 空间
     # 融合层
     aods_concat = concatenate([AOD_input, AODs_input])  # AOD + AODs
 
@@ -682,13 +536,6 @@ for t_numb in range(0, 20):
     data_aods_train = np.array(data_aods_train)
     data_aod_train = np.array(data_aod_train)
 
-    data_sky_test = np.array(data_sky_test)
-    data_t1_test = np.array(data_t1_test)
-    data_ndvi_test = np.array(data_ndvi_test)
-    data_time_test = np.array(data_time_test)
-    data_station_test = np.array(data_station_test)
-    data_aods_test = np.array(data_aods_test)
-    data_aod_test = np.array(data_aod_test)
 
     # 运行
     # 输入顺序： 气象 时滞 NDVI 时间 空间 AODs AOD
@@ -705,22 +552,22 @@ for t_numb in range(0, 20):
         epochs=20,
         batch_size=5120)
 
-    res = model_last.predict([data_sky_test,
-                              data_t1_test,
-                              data_ndvi_test,
-                              data_time_test,
-                              data_station_test,
-                              data_aods_test,
-                              data_aod_test])
+    res = model_last.predict([data_sky_train,
+                              data_t1_train,
+                              data_ndvi_train,
+                              data_time_train,
+                              data_station_train,
+                              data_aods_train,
+                              data_aod_train])
 
     # 还原，反标准化
     res2 = [float((j * std_pm) + mean_pm) for j in res]
-    res2 = pd.DataFrame(res2, index=data_pm_test.index, columns=['PM25'])
+    res2 = pd.DataFrame(res2, index=data_pm_train.index, columns=['PM25'])
 
-    datares = res2 - data_test2[['PM25']]  # 预测-真实
+    datares = res2 - data_out2[['PM25']]  # 预测-真实
     # print(datares)
     datares.PM25 = datares.PM25.map(lambda x: abs(x))
-    data_predt = pd.concat([datares, data_test2.PM25], axis=1)  # 标准化后真值变化了 需要修改
+    data_predt = pd.concat([datares, data_out2.PM25], axis=1)  # 标准化后真值变化了 需要修改
 
     data_predt.columns = ["差值", '真']
     data_predt['差值'] = data_predt['差值'].map(lambda x: abs(x))
@@ -749,8 +596,10 @@ a.append(RE_list)
 a.append(MSE_list)
 
 a = pd.DataFrame(a)
-a.to_excel('test100_sta.xlsx')
+# a.to_excel('test100_sta.xlsx')
 # os.system('shutdown -s -f -t 60')
 # 计算所用时间
 endtime = datetime.datetime.now()
 print(endtime - starttime)
+
+res2.to_excel("d:\\res2.xlsx")
